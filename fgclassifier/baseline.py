@@ -18,10 +18,9 @@ from fgclassifier import classifiers
 logger = logging.getLogger(__name__)
 
 
-class Indie():
+class Baseline():
     """
-    Fine Grain classifier where we train and predict for
-    each aspect independently.
+    The Baseline model
     """
 
     # transform review content (string) to features (matrices)
@@ -52,6 +51,21 @@ class Indie():
         labels = df.drop(['id', 'content'], axis=1)
         return features, labels
 
+    def save(self, filepath):
+        """Save model to disk, so we can reuse it later"""
+        logger.info("Saving model...")
+        pathdir = os.path.dirname(filepath)
+        if not os.path.exists(pathdir):
+            os.makedirs(pathdir)
+        joblib.dump(self, filepath)
+        logger.info("Saving model... Done.")
+
+class Indie():
+    """
+    Fine Grain classifier where we train and predict for
+    each aspect independently.
+    """
+
     def train(self, features, labels):
         """Train the model"""
         for aspect in labels.columns:
@@ -73,15 +87,6 @@ class Indie():
         logger.info('[validate] \n' + '\n'.join('  {: <40s}\t{:.4f}'.format(aspect, self.scores[aspect])
                                                 for aspect in labels.columns))
         logger.info("[validate] Final F1 Score: %s\n", avg_score)
-
-    def save(self, filepath):
-        """Save model to disk, so we can reuse it later"""
-        logger.info("Saving model...")
-        pathdir = os.path.dirname(filepath)
-        if not os.path.exists(pathdir):
-            os.makedirs(pathdir)
-        joblib.dump(self, filepath)
-        logger.info("Saving model... Done.")
 
     def predict(self, df, save_to=None):
         """Predict classes and update the output dataframe"""
