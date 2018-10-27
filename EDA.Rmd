@@ -1,0 +1,19 @@
+---
+title: "Exploratory Data Analysis"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE)
+library(tidyverse)
+```
+
+## Basic Statistics
+
+```{r}
+df_train <- read_csv('data/train/sentiment_analysis_trainingset.csv')
+df_validate <- read_csv('data/validate/sentiment_analysis_validationset.csv')
+df_testa <- read_csv('data/test-a/sentiment_analysis_testa.csv')
+```
+
+

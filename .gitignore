@@ -2,3 +2,7 @@
 .DS_Store
 data/
 .ipynb_checkpoints/
+.Rproj.user
+.RDataTmp
+.RData
+.Rhistory
