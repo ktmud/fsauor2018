@@ -9,6 +9,7 @@ import logging
 import numpy as np
 
 from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.preprocessing import StandardScaler
 from sklearn.externals import joblib
 from sklearn.base import clone as sk_clone
 
@@ -17,6 +18,13 @@ from fgclassifier import classifiers
 
 logger = logging.getLogger(__name__)
 
+# Classifiers that does not accept sparse matrix
+# as features
+NO_SPARSE_MATRIX_CLASSIFIERS = {
+    'LinearDiscriminantAnalysis',
+    'QuadraticDiscriminantAnalysis',
+    'SVC'
+}
 
 class Baseline():
     """
@@ -38,11 +46,29 @@ class Baseline():
         # different instances of classifiers
         self.transformer = transformer or self.DEFAULT_TRANSFORMER
         self.classifier = classifier or self.DEFAULT_CLASSIFIER
+        self.standardizer = StandardScaler()
 
         if callable(self.transformer):
             self.transformer = self.transformer()
         if callable(self.classifier):
             self.classifier = self.classifier()
+    
+    @property
+    def classifier_class(self):
+        return self.classifier.__class__.__name__ 
+
+    def transform(self, content):
+        """Transform text content to features"""
+        features = self.transformer.transform(content)
+        if self.classifier_class in NO_SPARSE_MATRIX_CLASSIFIERS:
+            features = features.toarray()
+            # print(np.where(np.isnan(features)))
+            # print(np.where(np.isinf(features)))
+        if self.classifier_class == 'SVC':
+            if not hasattr(self.standardizer, 'scale_'):
+                self.standardizer.fit(features)
+            features = self.standardizer.transform(features)
+        return features
 
     def load(self, data_path, fit=False, **kwargs):
         """Extract features and associated labels"""
@@ -52,8 +78,10 @@ class Baseline():
             self.transformer.fit(df['content'])
             logger.info('Fitted training features, vocabulary: %s',
                         len(self.transformer.vocabulary_.keys()))
-        features = self.transformer.transform(df['content'])
+        features = self.transform(df['content'])
         labels = df.drop(['id', 'content'], axis=1)
+        # Mark NA values "not mentioned"
+        labels = labels.fillna(-2)
         return features, labels
 
     def save(self, filepath):
@@ -97,7 +125,7 @@ class Indie(Baseline):
     def predict(self, df, save_to=None):
         """Predict classes and update the output dataframe"""
         logger.info("compete predict test data.")
-        features = self.transformer.transform(df['content'])
+        features = self.transform(df['content'])
         for aspect, model in self.classifiers.items():
             df[aspect] = model.predict(features)
         if save_to:
