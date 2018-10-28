@@ -24,7 +24,7 @@ if __name__ == '__main__':
     args = parser.parse_args()
     Classifier = getattr(classifiers, args.classifier)
     model = Indie(classifier=Classifier())
-    X_train, Y_train = model.load(config.train_data_path, sample_n=None)
+    X_train, Y_train = model.load(config.train_data_path, sample_n=5000)
     X_validate, Y_validate = model.load(config.validate_data_path, sample_n=100)
     model.train(X_train, Y_train)
     model.validate(X_validate, Y_validate)

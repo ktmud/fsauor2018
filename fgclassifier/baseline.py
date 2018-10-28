@@ -60,7 +60,7 @@ class Baseline():
         joblib.dump(self, filepath)
         logger.info("Saving model... Done.")
 
-class Indie():
+class Indie(Baseline):
     """
     Fine Grain classifier where we train and predict for
     each aspect independently.
