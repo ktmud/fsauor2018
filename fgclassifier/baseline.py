@@ -30,14 +30,19 @@ class Baseline():
     DEFAULT_CLASSIFIER = classifiers.MultinomialNB
 
     def __init__(self, transformer=None, classifier=None):
-        # separate classfiers for each aspect
+        # separate classifiers for each aspect
         self.classifiers = {}  # trained models
         self.scores = {}  # F1 scores to measure model performance
 
         # All aspects use the same feature transformer, but need
-        # different instances of classfiers
+        # different instances of classifiers
         self.transformer = transformer or self.DEFAULT_TRANSFORMER
-        self.classfier = classifier or self.DEFAULT_CLASSIFIER
+        self.classifier = classifier or self.DEFAULT_CLASSIFIER
+
+        if callable(self.transformer):
+            self.transformer = self.transformer()
+        if callable(self.classifier):
+            self.classifier = self.classifier()
 
     def load(self, data_path, fit=False, **kwargs):
         """Extract features and associated labels"""
@@ -72,7 +77,7 @@ class Indie(Baseline):
             logger.debug("[train] %s ", aspect)
             # Each aspect must use different estimators,
             # so we make a clone here
-            model = sk_clone(self.classfier)
+            model = sk_clone(self.classifier)
             model.fit(features, labels[aspect])
             self.classifiers[aspect] = model
 
@@ -87,6 +92,7 @@ class Indie(Baseline):
         logger.info('[validate] \n' + '\n'.join('  {: <40s}\t{:.4f}'.format(aspect, self.scores[aspect])
                                                 for aspect in labels.columns))
         logger.info("[validate] Final F1 Score: %s\n", avg_score)
+        return avg_score, self.scores
 
     def predict(self, df, save_to=None):
         """Predict classes and update the output dataframe"""

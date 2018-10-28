@@ -23,9 +23,12 @@ if __name__ == '__main__':
                         help='Classifier used for each aspect')
     args = parser.parse_args()
     Classifier = getattr(classifiers, args.classifier)
-    model = Indie(classifier=Classifier())
-    X_train, Y_train = model.load(config.train_data_path, sample_n=5000)
+
+    model = Indie(classifier=Classifier)
+    X_train, Y_train = model.load(config.train_data_path, sample_n=2000)
     X_validate, Y_validate = model.load(config.validate_data_path, sample_n=100)
+
     model.train(X_train, Y_train)
     model.validate(X_validate, Y_validate)
+
     model.save(os.path.join(config.model_save_path, args.classifier + '.pkl'))
