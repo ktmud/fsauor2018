@@ -3,3 +3,4 @@ numpy==1.15.3
 pandas==0.23.4
 jieba==0.39
 scikit-learn==0.20.0
+tqdm==4.28.1

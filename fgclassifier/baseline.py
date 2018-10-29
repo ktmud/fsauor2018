@@ -17,6 +17,7 @@ from fgclassifier import read_csv, f1_score
 from fgclassifier import classifiers
 
 logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
 
 # Classifiers that does not accept sparse matrix
 # as features
