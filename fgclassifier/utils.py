@@ -13,6 +13,11 @@ from sklearn.metrics import f1_score as f1_score_
 
 logger = logging.getLogger(__name__)
 
+# Blank space in Chinese can be meaningful,
+# so we create a unique word to replace blankspaces
+BLANKSPACE = 'BBLANKK'
+jieba.add_word(BLANKSPACE)
+
 def read_csv(filename, *args, seg_words=True, sample_n=100, **kwargs):
     """Load data from CSV"""
     logger.info('Reading %s..', filename)
@@ -34,8 +39,9 @@ def read_csv(filename, *args, seg_words=True, sample_n=100, **kwargs):
         # re-join with space,
         # remove extraneous quotes
         logger.info('Segmenting %s..', filename)
-        df['content'] = [' '.join(jieba.lcut(s.strip('"')))
-                         for s in tqdm(df['content'])]
+        df['content'] = [
+            ' '.join(jieba.lcut(s.strip('"').replace(' ', BLANKSPACE)))
+             for s in tqdm(df['content'])]
         df.to_csv(segged_file, index=False, sep='\t', encoding='utf-8')
     return df
 
