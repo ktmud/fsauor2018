@@ -19,7 +19,13 @@
             "label": "Train - LDA",
             "type": "shell",
             "group": "test",
-            "command": "python fgclassifier/train.py -c LDA"
+            "command": "python fgclassifier/train.py -c LinearDiscriminantAnalysis"
+        },
+        {
+            "label": "Test - LDA",
+            "type": "shell",
+            "group": "test",
+            "command": "python fgclassifier/test.py -c LinearDiscriminantAnalysis"
         }
     ]
 }

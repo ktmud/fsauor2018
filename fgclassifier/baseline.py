@@ -26,6 +26,11 @@ NO_SPARSE_MATRIX_CLASSIFIERS = {
     'QuadraticDiscriminantAnalysis',
     'SVC'
 }
+NEED_STANDARDIZATION_CLASSIFIERS = {
+    'LinearDiscriminantAnalysis',
+    'QuadraticDiscriminantAnalysis',
+    'SVC'
+}
 
 class Baseline():
     """
@@ -33,24 +38,25 @@ class Baseline():
     """
 
     # transform review content (string) to features (matrices)
-    DEFAULT_TRANSFORMER = TfidfVectorizer(
-        analyzer='word', ngram_range=(1, 5), min_df=5, norm='l2')
+    DEFAULT_VECTORIZER = TfidfVectorizer(
+        analyzer='word', ngram_range=(1, 5), min_df=0.012, max_df=0.9,
+        norm='l2')
     # the model to run
     DEFAULT_CLASSIFIER = classifiers.MultinomialNB
 
-    def __init__(self, transformer=None, classifier=None):
+    def __init__(self, vectorizer=None, classifier=None):
         # separate classifiers for each aspect
         self.classifiers = {}  # trained models
         self.scores = {}  # F1 scores to measure model performance
 
-        # All aspects use the same feature transformer, but need
+        # All aspects use the same feature vectorizer, but need
         # different instances of classifiers
-        self.transformer = transformer or self.DEFAULT_TRANSFORMER
+        self.vectorizer = vectorizer or self.DEFAULT_VECTORIZER
         self.classifier = classifier or self.DEFAULT_CLASSIFIER
         self.standardizer = StandardScaler()
 
-        if callable(self.transformer):
-            self.transformer = self.transformer()
+        if callable(self.vectorizer):
+            self.vectorizer = self.vectorizer()
         if callable(self.classifier):
             self.classifier = self.classifier()
     
@@ -60,12 +66,12 @@ class Baseline():
 
     def transform(self, content):
         """Transform text content to features"""
-        features = self.transformer.transform(content)
+        features = self.vectorizer.transform(content)
         if self.classifier_class in NO_SPARSE_MATRIX_CLASSIFIERS:
             features = features.toarray()
             # print(np.where(np.isnan(features)))
             # print(np.where(np.isinf(features)))
-        if self.classifier_class == 'SVC':
+        if self.classifier_class in NEED_STANDARDIZATION_CLASSIFIERS:
             if not hasattr(self.standardizer, 'scale_'):
                 self.standardizer.fit(features)
             features = self.standardizer.transform(features)
@@ -74,11 +80,13 @@ class Baseline():
     def load(self, data_path, fit=False, **kwargs):
         """Extract features and associated labels"""
         df = read_csv(data_path, **kwargs)
-        if fit or not hasattr(self.transformer, 'vocabulary_'):
-            logger.info('Fitting feature transformer...')
-            self.transformer.fit(df['content'])
+        if fit or not hasattr(self.vectorizer, 'vocabulary_'):
+            logger.info('Fitting feature vectorizer...')
+            self.vectorizer.fit(df['content'])
+            # print(self.vectorizer.vocabulary_)
             logger.info('Fitted training features, vocabulary: %s',
-                        len(self.transformer.vocabulary_.keys()))
+                        len(self.vectorizer.vocabulary_.keys()))
+        logger.info('Transform features...')
         features = self.transform(df['content'])
         labels = df.drop(['id', 'content'], axis=1)
         # Mark NA values "not mentioned"
@@ -103,7 +111,7 @@ class Indie(Baseline):
     def train(self, features, labels):
         """Train the model"""
         for aspect in labels.columns:
-            logger.debug("[train] %s ", aspect)
+            logger.info("[train] %s ", aspect)
             # Each aspect must use different estimators,
             # so we make a clone here
             model = sk_clone(self.classifier)
@@ -113,7 +121,7 @@ class Indie(Baseline):
     def validate(self, features, labels):
         """Validate trained models"""
         for aspect in labels.columns:
-            logger.debug("[validate] %s ", aspect)
+            logger.info("[validate] %s ", aspect)
             model = self.classifiers[aspect]
             X, y = features, labels[aspect]
             self.scores[aspect] = f1_score(model, X, y)
@@ -123,11 +131,13 @@ class Indie(Baseline):
         logger.info("[validate] Final F1 Score: %s\n", avg_score)
         return avg_score, self.scores
 
-    def predict(self, df, save_to=None):
+    def predict(self, features, labels=None, save_to=None):
         """Predict classes and update the output dataframe"""
-        logger.info("compete predict test data.")
-        features = self.transform(df['content'])
+        if labels is None:
+            labels = pd.DataFame()
         for aspect, model in self.classifiers.items():
-            df[aspect] = model.predict(features)
+            labels[aspect] = model.predict(features)
+        logger.info("Complete predict for test data.")
         if save_to:
-            df.to_csv(save_to, encoding="utf_8_sig", index=False)
+            labels.to_csv(save_to, encoding="utf_8_sig", index=False)
+        return labels

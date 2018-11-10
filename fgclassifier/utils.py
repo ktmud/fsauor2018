@@ -16,20 +16,22 @@ logger = logging.getLogger(__name__)
 # Blank space in Chinese can be meaningful,
 # so we create a unique word to replace blankspaces
 BLANKSPACE = 'BBLANKK'
+NEWLINE = 'NNEWLINEE'
 jieba.add_word(BLANKSPACE)
+jieba.add_word(NEWLINE)
 
-def read_csv(filename, *args, seg_words=True, sample_n=100, **kwargs):
+def read_csv(filename, *args, seg_words=True, sample_n=None, **kwargs):
     """Load data from CSV"""
-    logger.info('Reading %s..', filename)
     if seg_words:
         segged_file = '{}.segged_sample_{}.tsv'.format(filename, sample_n)
         if os.path.exists(segged_file):
-            logger.info('Found cache, use cached.')
+            logger.info('Read cache %s..' % segged_file)
             df = pd.read_csv(segged_file, engine='python', sep='\t',
                              encoding='utf-8', keep_default_na=False)
             df['content'] = df['content'].fillna('N/A')
             return df
 
+    logger.info('Reading %s..', filename)
     df = pd.read_csv(filename, *args, encoding='utf-8', **kwargs)
     if sample_n:
         logger.info('Pick a sample of %d', sample_n)
@@ -40,9 +42,12 @@ def read_csv(filename, *args, seg_words=True, sample_n=100, **kwargs):
         # remove extraneous quotes
         logger.info('Segmenting %s..', filename)
         df['content'] = [
-            ' '.join(jieba.lcut(s.strip('"').replace(' ', BLANKSPACE)))
-             for s in tqdm(df['content'])]
+            ' '.join(jieba.lcut(
+                s.strip('"').replace(' ', BLANKSPACE).replace('\n', NEWLINE)
+            ))
+            for s in tqdm(df['content'])]
         df.to_csv(segged_file, index=False, sep='\t', encoding='utf-8')
+        logger.info('Saved cached %s.', segged_file)
     return df
 
 def f1_score(model, X, y):

@@ -17,5 +17,5 @@ logging.basicConfig(
 model_save_path = "data/models/"
 train_data_path = "data/train/sentiment_analysis_trainingset.csv"
 validate_data_path = "data/validate/sentiment_analysis_validationset.csv"
-test_data_path = "data/test-a/sentiment_analysis_testa.csv"
-test_data_predict_out_path = "data/test_prediction.csv"
+testa_data_path = "data/test-a/sentiment_analysis_testa.csv"
+testa_predict_out_path = "data/testa_prediction.csv"
