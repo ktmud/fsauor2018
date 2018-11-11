@@ -8,6 +8,8 @@ import os
 import logging
 import numpy as np
 
+import _pickle as cPickle
+
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.preprocessing import StandardScaler
 from sklearn.externals import joblib
@@ -116,11 +118,11 @@ class Baseline():
 
     def save(self, filepath):
         """Save model to disk, so we can reuse it later"""
-        logger.info("Saving model...")
+        logger.info("Saving model to %s..." % filepath)
         pathdir = os.path.dirname(filepath)
         if not os.path.exists(pathdir):
             os.makedirs(pathdir)
-        joblib.dump(self, filepath)
+        cPickle.dump(self, filepath)
         logger.info("Saving model... Done.")
 
 class Indie(Baseline):

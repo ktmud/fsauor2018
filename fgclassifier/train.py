@@ -24,7 +24,7 @@ if __name__ == '__main__':
     Model = getattr(models, args.model)
     Classifier = getattr(classifiers, args.classifier)
     model = Model(classifier=Classifier)
-    X_train, Y_train = model.load(config.train_data_path, sample_n=10000)
+    X_train, Y_train = model.load(config.train_data_path, sample_n=None)
     X_validate, Y_validate = model.load(config.validate_data_path, sample_n=1000)
 
     model.train(X_train, Y_train)

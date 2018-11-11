@@ -5,6 +5,7 @@ Load the model and run on test data
 """
 import os
 import argparse
+import _pickle as cPickle
 
 from sklearn.externals import joblib
 from fgclassifier import classifiers
@@ -25,7 +26,8 @@ if __name__ == '__main__':
                         help='Classifier used for each aspect')
     args = parser.parse_args()
 
-    model_fpath = os.path.join(config.model_save_path, args.classifier + '.pkl')
-    model = joblib.load(model_fpath)
+    model_fpath = os.path.join(config.model_save_path,
+                               args.model + '_' + args.classifier + '.pkl')
+    model = cPickle.load(model_fpath)
     df_test = model.read(config.testa_data_path, sample_n=None)
     model.predict(df_test, save_to=config.testa_predict_out_path)
