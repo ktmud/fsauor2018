@@ -10,6 +10,18 @@
             "command": "python fgclassifier/train.py -c MultinomialNB"
         },
         {
+            "label": "Train - ComplementNB",
+            "type": "shell",
+            "group": "test",
+            "command": "python fgclassifier/train.py -c ComplementNB"
+        },
+        {
+            "label": "Train - Dummy",
+            "type": "shell",
+            "group": "test",
+            "command": "python fgclassifier/train.py -m Dummy -c DummyStratified"
+        },
+        {
             "label": "Train - SVC",
             "type": "shell",
             "group": "test",

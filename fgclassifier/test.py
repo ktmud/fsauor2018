@@ -21,11 +21,11 @@ if __name__ == '__main__':
     parser.add_argument('-c', '--classifier', default='LinearDiscriminantAnalysis',
                         choices=classifier_choices,
                         help='Classifier used for each aspect')
-    parser.add_argument('-m', '--model', default='no_interference',
+    parser.add_argument('-m', '--model', default='Indie',
                         help='Classifier used for each aspect')
     args = parser.parse_args()
 
     model_fpath = os.path.join(config.model_save_path, args.classifier + '.pkl')
     model = joblib.load(model_fpath)
-    X_test, y_test = model.load(config.testa_data_path, sample_n=None)
-    model.predict(X_test, y_test, save_to=config.testa_predict_out_path)
+    df_test = model.read(config.testa_data_path, sample_n=None)
+    model.predict(df_test, save_to=config.testa_predict_out_path)

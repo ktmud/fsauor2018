@@ -7,6 +7,8 @@ import os
 import logging
 import pandas as pd
 import jieba
+import csv
+
 from tqdm import tqdm
 
 from sklearn.metrics import f1_score as f1_score_
@@ -20,15 +22,14 @@ NEWLINE = 'NNEWLINEE'
 jieba.add_word(BLANKSPACE)
 jieba.add_word(NEWLINE)
 
-def read_csv(filename, *args, seg_words=True, sample_n=None, **kwargs):
+
+def read_csv(filename, *args, seg_words=True, sample_n=None, use_cache=True, **kwargs):
     """Load data from CSV"""
     if seg_words:
         segged_file = '{}.segged_sample_{}.tsv'.format(filename, sample_n)
-        if os.path.exists(segged_file):
+        if os.path.exists(segged_file) and use_cache:
             logger.info('Read cache %s..' % segged_file)
-            df = pd.read_csv(segged_file, engine='python', sep='\t',
-                             encoding='utf-8', keep_default_na=False)
-            df['content'] = df['content'].fillna('N/A')
+            df = pd.read_csv(segged_file, encoding='utf-8_sig')
             return df
 
     logger.info('Reading %s..', filename)
@@ -43,12 +44,14 @@ def read_csv(filename, *args, seg_words=True, sample_n=None, **kwargs):
         logger.info('Segmenting %s..', filename)
         df['content'] = [
             ' '.join(jieba.lcut(
-                s.strip('"').replace(' ', BLANKSPACE).replace('\n', NEWLINE)
+                s.strip('"').replace(' ', BLANKSPACE).replace('\n', '。')
             ))
             for s in tqdm(df['content'])]
-        df.to_csv(segged_file, index=False, sep='\t', encoding='utf-8')
+        df.to_csv(segged_file, index=False, quoting=csv.QUOTE_NONNUMERIC,
+                  encoding='utf-8_sig')
         logger.info('Saved cached %s.', segged_file)
     return df
+
 
 def f1_score(model, X, y):
     """Multi-class F1 score with Macro average"""

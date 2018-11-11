@@ -12,6 +12,7 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.preprocessing import StandardScaler
 from sklearn.externals import joblib
 from sklearn.base import clone as sk_clone
+from sklearn.decomposition import TruncatedSVD
 
 from fgclassifier import read_csv, f1_score
 from fgclassifier import classifiers
@@ -35,16 +36,20 @@ NEED_STANDARDIZATION_CLASSIFIERS = {
 class Baseline():
     """
     The Baseline model
+
+    Defaults to Tf-idf + TruncatedSVD, a.k.a, Latent Semantic Analysis
+    Classifier uses Complement Naive Bayes.
     """
 
     # transform review content (string) to features (matrices)
     DEFAULT_VECTORIZER = TfidfVectorizer(
-        analyzer='word', ngram_range=(1, 5), min_df=0.012, max_df=0.9,
+        analyzer='word', ngram_range=(1, 5), min_df=0.01, max_df=0.95,
         norm='l2')
     # the model to run
-    DEFAULT_CLASSIFIER = classifiers.MultinomialNB
+    DEFAULT_CLASSIFIER = classifiers.ComplementNB
+    DEFAULT_REDUCER = TruncatedSVD(n_components=1000)
 
-    def __init__(self, vectorizer=None, classifier=None):
+    def __init__(self, vectorizer=None, classifier=None, reducer=None):
         # separate classifiers for each aspect
         self.classifiers = {}  # trained models
         self.scores = {}  # F1 scores to measure model performance
@@ -52,7 +57,8 @@ class Baseline():
         # All aspects use the same feature vectorizer, but need
         # different instances of classifiers
         self.vectorizer = vectorizer or self.DEFAULT_VECTORIZER
-        self.classifier = classifier or self.DEFAULT_CLASSIFIER
+        self.classifier = self.DEFAULT_CLASSIFIER if classifier is None else classifier
+        self.reducer = self.DEFAULT_REDUCER if reducer is None else reducer
         self.standardizer = StandardScaler()
 
         if callable(self.vectorizer):
@@ -64,34 +70,49 @@ class Baseline():
     def classifier_class(self):
         return self.classifier.__class__.__name__ 
 
+    @property
+    def name(self):
+        return self.__class__.__name__ + '_' + self.classifier_class
+
     def transform(self, content):
         """Transform text content to features"""
+        logger.info('Transform features...')
+
+        if not hasattr(self.vectorizer, 'vocabulary_'):
+            logger.info('Fitting feature vectorizer...')
+            self.vectorizer.fit(content)
+            # print(self.vectorizer.vocabulary_)
+            logger.info('Fitted training features, vocabulary: %s',
+                        len(self.vectorizer.vocabulary_.keys()))
+
         features = self.vectorizer.transform(content)
+
         if self.classifier_class in NO_SPARSE_MATRIX_CLASSIFIERS:
             features = features.toarray()
             # print(np.where(np.isnan(features)))
             # print(np.where(np.isinf(features)))
+
         if self.classifier_class in NEED_STANDARDIZATION_CLASSIFIERS:
             if not hasattr(self.standardizer, 'scale_'):
                 self.standardizer.fit(features)
             features = self.standardizer.transform(features)
+        
+        if self.reducer:
+            if not hasattr(self.reducer, 'components_'):
+                if self.reducer.n_components >= features.shape[1]:
+                    self.reducer.n_components = features.shape[1] - 1
+                self.reducer.fit(features)
+            features = self.reducer.transform(features)
+
         return features
 
-    def load(self, data_path, fit=False, **kwargs):
+    def read(self, data_path, **kwargs):
+        return read_csv(data_path, **kwargs)
+
+    def load(self, data_path, **kwargs):
         """Extract features and associated labels"""
-        df = read_csv(data_path, **kwargs)
-        if fit or not hasattr(self.vectorizer, 'vocabulary_'):
-            logger.info('Fitting feature vectorizer...')
-            self.vectorizer.fit(df['content'])
-            # print(self.vectorizer.vocabulary_)
-            logger.info('Fitted training features, vocabulary: %s',
-                        len(self.vectorizer.vocabulary_.keys()))
-        logger.info('Transform features...')
-        features = self.transform(df['content'])
-        labels = df.drop(['id', 'content'], axis=1)
-        # Mark NA values "not mentioned"
-        labels = labels.fillna(-2)
-        return features, labels
+        df = self.read(data_path, **kwargs)
+        return self.transform(df['content']), df.drop(['id', 'content'], axis=1)
 
     def save(self, filepath):
         """Save model to disk, so we can reuse it later"""
@@ -131,13 +152,23 @@ class Indie(Baseline):
         logger.info("[validate] Final F1 Score: %s\n", avg_score)
         return avg_score, self.scores
 
-    def predict(self, features, labels=None, save_to=None):
+    def predict(self, df, save_to=None):
         """Predict classes and update the output dataframe"""
-        if labels is None:
-            labels = pd.DataFame()
+        features = self.transform(df['content'])
         for aspect, model in self.classifiers.items():
-            labels[aspect] = model.predict(features)
-        logger.info("Complete predict for test data.")
+            df[aspect] = model.predict(features)
+        logger.info("[test] Complete predicting.")
+        df['content'] = ''
         if save_to:
-            labels.to_csv(save_to, encoding="utf_8_sig", index=False)
-        return labels
+            df.to_csv(save_to, encoding="utf_8_sig", index=False)
+        return df
+
+class Dummy(Indie):
+    
+    def transform(self, content):
+        return content
+
+    def load(self, data_path, **kwargs):
+        df = read_csv(data_path, **kwargs)
+        return np.zeros(df.shape), df.drop(['id', 'content'], axis=1)
+    
