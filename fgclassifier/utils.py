@@ -34,9 +34,11 @@ def read_csv(filename, *args, seg_words=True, sample_n=None, use_cache=True, **k
 
     logger.info('Reading %s..', filename)
     df = pd.read_csv(filename, *args, encoding='utf-8', **kwargs)
+
     if sample_n:
         logger.info('Pick a sample of %d', sample_n)
         df = df.head(sample_n)
+
     if seg_words:
         # Separate chinese words,
         # re-join with space,

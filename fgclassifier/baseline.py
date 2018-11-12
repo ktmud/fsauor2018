@@ -44,12 +44,12 @@ class Baseline():
     """
 
     # transform review content (string) to features (matrices)
-    DEFAULT_VECTORIZER = TfidfVectorizer(
+    DEFAULT_VECTORIZER = lambda x: TfidfVectorizer(
         analyzer='word', ngram_range=(1, 5), min_df=0.01, max_df=0.95,
         norm='l2')
     # the model to run
     DEFAULT_CLASSIFIER = classifiers.ComplementNB
-    DEFAULT_REDUCER = TruncatedSVD(n_components=1000)
+    DEFAULT_REDUCER = lambda x: TruncatedSVD(n_components=1000)
 
     def __init__(self, vectorizer=None, classifier=None, reducer=None):
         # separate classifiers for each aspect
@@ -58,7 +58,7 @@ class Baseline():
 
         # All aspects use the same feature vectorizer, but need
         # different instances of classifiers
-        self.vectorizer = vectorizer or self.DEFAULT_VECTORIZER
+        self.vectorizer = self.DEFAULT_VECTORIZER if vectorizer is None else vectorizer
         self.classifier = self.DEFAULT_CLASSIFIER if classifier is None else classifier
         self.reducer = self.DEFAULT_REDUCER if reducer is None else reducer
         self.standardizer = StandardScaler()
@@ -67,6 +67,8 @@ class Baseline():
             self.vectorizer = self.vectorizer()
         if callable(self.classifier):
             self.classifier = self.classifier()
+        if callable(self.reducer):
+            self.reducer = self.reducer()
     
     @property
     def classifier_class(self):
@@ -113,7 +115,9 @@ class Baseline():
 
     def load(self, data_path, **kwargs):
         """Extract features and associated labels"""
-        df = self.read(data_path, **kwargs)
+        return self.split_xy(self.read(data_path, **kwargs))
+
+    def split_xy(self, df):
         return self.transform(df['content']), df.drop(['id', 'content'], axis=1)
 
     def save(self, filepath):
