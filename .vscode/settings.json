@@ -3,5 +3,6 @@
     "python.linting.pep8Enabled": false,
     "python.linting.enabled": true,
     "python.linting.flake8Enabled": true,
-    "python.linting.prospectorEnabled": false
+    "python.linting.prospectorEnabled": false,
+    "python.pythonPath": "/Users/jesse/anaconda3/envs/idp/bin/python"
 }
