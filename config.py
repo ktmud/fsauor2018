@@ -7,8 +7,6 @@ Note:
 """
 import logging
 
-logging.getLogger('jieba').setLevel(logging.WARN)
-
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s [%(levelname)s] %(message)s')
@@ -16,7 +14,7 @@ logging.basicConfig(
 
 model_save_path = "data/models/"
 train_data_path = "data/train/sentiment_analysis_trainingset.csv"
-validate_data_path = "data/validate/sentiment_analysis_validationset.csv"
+valid_data_path = "data/valid/sentiment_analysis_validationset.csv"
 testa_data_path = "data/test-a/sentiment_analysis_testa.csv"
 testa_predict_out_path = "data/testa_prediction.csv"
 testb_data_path = "data/test-b/sentiment_analysis_testb.csv"

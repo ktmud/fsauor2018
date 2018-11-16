@@ -3,5 +3,4 @@
 """
 All the available model ensembles
 """
-
-from fgclassifier.baseline import Indie, Dummy
+from fgclassifier.baseline import Baseline, Dummy

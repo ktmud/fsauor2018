@@ -9,10 +9,12 @@ import pandas as pd
 import jieba
 import csv
 
+import _pickle as cPickle
+from sklearn.externals import joblib
+
 from tqdm import tqdm
 
-from sklearn.metrics import f1_score as f1_score_
-
+logging.getLogger('jieba').setLevel(logging.WARN)
 logger = logging.getLogger(__name__)
 
 # Blank space in Chinese can be meaningful,
@@ -23,7 +25,8 @@ jieba.add_word(BLANKSPACE)
 jieba.add_word(NEWLINE)
 
 
-def read_csv(filename, *args, seg_words=True, sample_n=None, use_cache=True, **kwargs):
+def read_csv(filename, *args, seg_words=True, sample_n=None,
+             use_cache=True, **kwargs):
     """Load data from CSV"""
     if seg_words:
         segged_file = '{}.segged_sample_{}.tsv'.format(filename, sample_n)
@@ -55,6 +58,25 @@ def read_csv(filename, *args, seg_words=True, sample_n=None, use_cache=True, **k
     return df
 
 
-def f1_score(model, X, y):
-    """Multi-class F1 score with Macro average"""
-    return f1_score_(y, model.predict(X), average='macro')
+def read_data(data_path, return_df=False, **kwargs):
+    """Load data, return X, y"""
+    if isinstance(data_path, pd.DataFrame):
+        df = data_path
+    else:
+        df = read_csv(data_path, **kwargs)
+    # X is just 1D strings
+    # y is 20-D labels
+    X, y = df['content'], df.drop(['id', 'content'], axis=1)
+    if return_df:
+        return X, y, df.copy()
+    return X, y
+
+
+def save_model(model, filepath):
+    """Save model to disk, so we can reuse it later"""
+    logger.info("Saving model to %s..." % filepath)
+    pathdir = os.path.dirname(filepath)
+    if not os.path.exists(pathdir):
+        os.makedirs(pathdir)
+    joblib.dump(model, filepath)
+    logger.info("Saving model... Done.")

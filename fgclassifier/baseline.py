@@ -4,177 +4,148 @@ A Baseline Model.
 
 TfIdfVectorizer + Classify aspects separately
 """
-import os
 import logging
 import numpy as np
 
-import _pickle as cPickle
-
-from sklearn.feature_extraction.text import TfidfVectorizer
-from sklearn.preprocessing import StandardScaler
-from sklearn.externals import joblib
 from sklearn.base import clone as sk_clone
+from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.decomposition import TruncatedSVD
+from sklearn.metrics import f1_score
 
-from fgclassifier import read_csv, f1_score
-from fgclassifier import classifiers
+from sklearn.pipeline import Pipeline
+from sklearn.multioutput import MultiOutputClassifier
+
+from fgclassifier.utils import read_data
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 
-# Classifiers that does not accept sparse matrix
-# as features
-NO_SPARSE_MATRIX_CLASSIFIERS = {
-    'LinearDiscriminantAnalysis',
-    'QuadraticDiscriminantAnalysis',
-    'SVC'
-}
-NEED_STANDARDIZATION_CLASSIFIERS = {
-    'LinearDiscriminantAnalysis',
-    'QuadraticDiscriminantAnalysis',
-    'SVC'
-}
 
-class Baseline():
+class Tfidf(TfidfVectorizer):
+
+    def fit(self, *args, **kwargs):
+        logging.info('Fitting TF-IDF...')
+        return super().fit(*args, **kwargs)
+
+    def transform(self, *args, **kwargs):
+        logging.info('Transforming TF-IDF...')
+        return super().transform(*args, **kwargs)
+
+    def fit_transform(self, *args, **kwargs):
+        logging.info('Fit & Transform TF-IDF...')
+        return super().fit_transform(*args, **kwargs)
+
+
+class SVD(TruncatedSVD):
+
+    def fit(self, *args, **kwargs):
+        logging.info('Fitting TruncatedSVD...')
+        return super().fit(*args, **kwargs)
+
+    def transform(self, *args, **kwargs):
+        logging.info('Transforming TruncatedSVD...')
+        return super().transform(*args, **kwargs)
+
+    def fit_transform(self, *args, **kwargs):
+        logging.info('Fit & Transform TruncatedSVD...')
+        return super().fit_transform(*args, **kwargs)
+
+
+class Baseline(Pipeline):
     """
     The Baseline model
 
     Defaults to Tf-idf + TruncatedSVD, a.k.a, Latent Semantic Analysis
     Classifier uses Complement Naive Bayes.
     """
+    # Default feature pipeline
+    FEATURE_PIPELINE = [
+        # from one of our sample, words like 味道 (taste), 好 (good)
+        # are also in the most frequent words, but they are actually relevant
+        # in terms of sentiment.
+        ('tfidf', Tfidf(analyzer='word', ngram_range=(1, 5),
+                        min_df=0.01, norm='l2')),
+        ('reduce_dim', SVD(n_components=100))
+    ]
 
-    # transform review content (string) to features (matrices)
-    DEFAULT_VECTORIZER = lambda x: TfidfVectorizer(
-        analyzer='word', ngram_range=(1, 5), min_df=0.01, max_df=0.95,
-        norm='l2')
-    # the model to run
-    DEFAULT_CLASSIFIER = classifiers.ComplementNB
-    DEFAULT_REDUCER = lambda x: TruncatedSVD(n_components=1000)
+    def __init__(self, classifier=None, steps=None):
+        if steps is None:
+            steps = [(name, sk_clone(estimator))
+                     for name, estimator in self.FEATURE_PIPELINE]
+        if classifier is not None:
+            if callable(classifier):
+                classifier = classifier()
+            classifier = MultiOutputClassifier(classifier)
+            steps.append(('classify', classifier))
+        super().__init__(steps)
 
-    def __init__(self, vectorizer=None, classifier=None, reducer=None):
-        # separate classifiers for each aspect
-        self.classifiers = {}  # trained models
-        self.scores = {}  # F1 scores to measure model performance
-
-        # All aspects use the same feature vectorizer, but need
-        # different instances of classifiers
-        self.vectorizer = self.DEFAULT_VECTORIZER if vectorizer is None else vectorizer
-        self.classifier = self.DEFAULT_CLASSIFIER if classifier is None else classifier
-        self.reducer = self.DEFAULT_REDUCER if reducer is None else reducer
-        self.standardizer = StandardScaler()
-
-        if callable(self.vectorizer):
-            self.vectorizer = self.vectorizer()
-        if callable(self.classifier):
-            self.classifier = self.classifier()
-        if callable(self.reducer):
-            self.reducer = self.reducer()
-    
     @property
-    def classifier_class(self):
-        return self.classifier.__class__.__name__ 
+    def classifier_name(self):
+        return self.named_steps.classify.__class__.__name__
 
     @property
     def name(self):
-        return self.__class__.__name__ + '_' + self.classifier_class
+        return self.__class__.__name__ + '_' + self.classifier_name
 
-    def transform(self, content):
-        """Transform text content to features"""
-        logger.info('Transform features...')
+    def f1_scores(self, X, y):
+        """Return f1 score on a test dataset"""
+        y_pred = self.predict(X)
+        scores = []
+        logger.info('[Validate]: F1 Scores')
+        for i, label in enumerate(y.columns):
+            score = f1_score(y[label], y_pred[:, i], average='macro')
+            scores.append(score)
+            logger.info('  {: <40s}\t{:.4f}'.format(label, score))
+        return scores
 
-        if not hasattr(self.vectorizer, 'vocabulary_'):
-            logger.info('Fitting feature vectorizer...')
-            self.vectorizer.fit(content)
-            # print(self.vectorizer.vocabulary_)
-            logger.info('Fitted training features, vocabulary: %s',
-                        len(self.vectorizer.vocabulary_.keys()))
+    def score(self, X, y):
+        scores = self.f1_scores(X, y)
+        return np.mean(scores)
 
-        features = self.vectorizer.transform(content)
-
-        if self.classifier_class in NO_SPARSE_MATRIX_CLASSIFIERS:
-            features = features.toarray()
-            # print(np.where(np.isnan(features)))
-            # print(np.where(np.isinf(features)))
-
-        if self.classifier_class in NEED_STANDARDIZATION_CLASSIFIERS:
-            if not hasattr(self.standardizer, 'scale_'):
-                self.standardizer.fit(features)
-            features = self.standardizer.transform(features)
-        
-        if self.reducer:
-            if not hasattr(self.reducer, 'components_'):
-                if self.reducer.n_components >= features.shape[1]:
-                    self.reducer.n_components = features.shape[1] - 1
-                self.reducer.fit(features)
-            features = self.reducer.transform(features)
-
-        return features
-
-    def read(self, data_path, **kwargs):
-        return read_csv(data_path, **kwargs)
-
-    def load(self, data_path, **kwargs):
-        """Extract features and associated labels"""
-        return self.split_xy(self.read(data_path, **kwargs))
-
-    def split_xy(self, df):
-        return self.transform(df['content']), df.drop(['id', 'content'], axis=1)
-
-    def save(self, filepath):
-        """Save model to disk, so we can reuse it later"""
-        logger.info("Saving model to %s..." % filepath)
-        pathdir = os.path.dirname(filepath)
-        if not os.path.exists(pathdir):
-            os.makedirs(pathdir)
-        cPickle.dump(self, filepath)
-        logger.info("Saving model... Done.")
-
-class Indie(Baseline):
-    """
-    Fine Grain classifier where we train and predict for
-    each aspect independently.
-    """
-
-    def train(self, features, labels):
-        """Train the model"""
-        for aspect in labels.columns:
-            logger.info("[train] %s ", aspect)
-            # Each aspect must use different estimators,
-            # so we make a clone here
-            model = sk_clone(self.classifier)
-            model.fit(features, labels[aspect])
-            self.classifiers[aspect] = model
-
-    def validate(self, features, labels):
-        """Validate trained models"""
-        for aspect in labels.columns:
-            logger.info("[validate] %s ", aspect)
-            model = self.classifiers[aspect]
-            X, y = features, labels[aspect]
-            self.scores[aspect] = f1_score(model, X, y)
-        avg_score = np.mean(list(self.scores.values()))
-        logger.info('[validate] \n' + '\n'.join('  {: <40s}\t{:.4f}'.format(aspect, self.scores[aspect])
-                                                for aspect in labels.columns))
-        logger.info("[validate] Final F1 Score: %s\n", avg_score)
-        return avg_score, self.scores
-
-    def predict(self, df, save_to=None):
-        """Predict classes and update the output dataframe"""
-        features = self.transform(df['content'])
-        for aspect, model in self.classifiers.items():
-            df[aspect] = model.predict(features)
-        logger.info("[test] Complete predicting.")
+    def pred_df(self, df, save_to=None):
+        """Make prediction on a data frame and save output"""
+        # read_data returns a copy of df
+        X, y, df = read_data(df, return_df=True)
         df['content'] = ''
+        df[y.columns] = self.pred(X)
         if save_to:
             df.to_csv(save_to, encoding="utf_8_sig", index=False)
         return df
 
-class Dummy(Indie):
-    
-    def transform(self, content):
-        return content
 
-    def load(self, data_path, **kwargs):
-        df = read_csv(data_path, **kwargs)
-        return np.zeros(df.shape), df.drop(['id', 'content'], axis=1)
-    
+class SparseToSense():
+    """Return content length as features.
+    do nothing to the labels"""
+
+    def __init__(self):
+        pass
+
+    def fit(self, X, y):
+        return self
+        
+    def transform(self, X):
+        return X.toarray()
+
+
+class DummyTransform():
+    """Return content length as features.
+    do nothing to the labels"""
+
+    def __init__(self):
+        pass
+
+    def fit(self, X, y):
+        return self
+        
+    def transform(self, X):
+        return np.array(X['content'].str.len())[:, None]
+
+
+class Dummy(Baseline):
+
+    def __init__(self, classifier, **kwargs):
+        steps = [
+            ('dummy_transform', DummyTransform()),
+            ('classify', MultiOutputClassifier(classifier))
+        ]
+        super(Baseline, self).__init__(steps)

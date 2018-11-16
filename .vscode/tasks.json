@@ -4,40 +4,45 @@
     "version": "2.0.0",
     "tasks": [
         {
+            "label": "Train - ExtraTree",
+            "type": "shell",
+            "group": "test",
+            "command": "${config:python.pythonPath}",
+            "args":[
+                "-m", "fgclassifier.train",
+                "-c", "ExtraTree"
+            ],
+        },
+        {
             "label": "Train - MultinomialNB",
             "type": "shell",
             "group": "test",
-            "command": "python fgclassifier/train.py -c MultinomialNB"
+            "command": "${config:python.pythonPath}",
+            "args":[
+                "-m", "fgclassifier.train",
+                "-c", "MultinomialNB"
+            ],
         },
         {
-            "label": "Train - ComplementNB",
+            "label": "Train - LinearDiscriminantAnalysis",
             "type": "shell",
             "group": "test",
-            "command": "python fgclassifier/train.py -c ComplementNB"
+            "command": "${config:python.pythonPath}",
+            "args":[
+                "-m", "fgclassifier.train",
+                "-c", "LinearDiscriminantAnalysis"
+            ],
         },
         {
             "label": "Train - Dummy",
             "type": "shell",
             "group": "test",
-            "command": "python fgclassifier/train.py -m Dummy -c DummyStratified"
+            "command": "${config:python.pythonPath}",
+            "args":[
+                "-m", "fgclassifier.train",
+                "-m", "Dummy",
+                "-c", "DummyStratified"
+            ],
         },
-        {
-            "label": "Train - SVC",
-            "type": "shell",
-            "group": "test",
-            "command": "python fgclassifier/train.py -c SVC"
-        },
-        {
-            "label": "Train - LDA",
-            "type": "shell",
-            "group": "test",
-            "command": "python fgclassifier/train.py -c LinearDiscriminantAnalysis"
-        },
-        {
-            "label": "Test - LDA",
-            "type": "shell",
-            "group": "test",
-            "command": "python fgclassifier/test.py -c LinearDiscriminantAnalysis"
-        }
     ]
 }

@@ -7,7 +7,3 @@ ELMo: Deep contextualized word representations
 - https://github.com/HIT-SCIR/ELMoForManyLangs
 """
 from elmoformanylangs import Embedder
-
-def get_embedder():
-    Embedder()
-
