@@ -75,13 +75,14 @@ class Baseline(Pipeline):
         if classifier is not None:
             if callable(classifier):
                 classifier = classifier()
+            classifier_name = classifier.__class__.__name__
             classifier = MultiOutputClassifier(classifier)
-            steps.append(('classify', classifier))
+            steps.append((classifier_name, classifier))
         super().__init__(steps)
 
     @property
     def classifier_name(self):
-        return self.named_steps.classify.__class__.__name__
+        return self.steps[-1][0]
 
     @property
     def name(self):
