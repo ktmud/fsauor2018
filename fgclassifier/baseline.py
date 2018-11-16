@@ -64,8 +64,8 @@ class Baseline(Pipeline):
         # are also in the most frequent words, but they are actually relevant
         # in terms of sentiment.
         ('tfidf', Tfidf(analyzer='word', ngram_range=(1, 5),
-                        min_df=0.01, norm='l2')),
-        ('reduce_dim', SVD(n_components=100))
+                        min_df=0.01, max_df=0.99, norm='l2')),
+        ('reduce_dim', SVD(n_components=500))
     ]
 
     def __init__(self, classifier=None, steps=None):

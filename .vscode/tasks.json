@@ -4,6 +4,26 @@
     "version": "2.0.0",
     "tasks": [
         {
+            "label": "Train - SVC",
+            "type": "shell",
+            "group": "test",
+            "command": "${config:python.pythonPath}",
+            "args":[
+                "-m", "fgclassifier.train",
+                "-c", "SVC"
+            ],
+        },
+        {
+            "label": "Train - LinearSVC",
+            "type": "shell",
+            "group": "test",
+            "command": "${config:python.pythonPath}",
+            "args":[
+                "-m", "fgclassifier.train",
+                "-c", "LinearSVC"
+            ],
+        },
+        {
             "label": "Train - ExtraTree",
             "type": "shell",
             "group": "test",
