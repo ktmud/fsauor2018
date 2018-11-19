@@ -24,6 +24,16 @@
             ],
         },
         {
+            "label": "Train - Logistic",
+            "type": "shell",
+            "group": "test",
+            "command": "${config:python.pythonPath}",
+            "args":[
+                "-m", "fgclassifier.train",
+                "-c", "Logistic"
+            ],
+        },
+        {
             "label": "Train - ExtraTree",
             "type": "shell",
             "group": "test",
@@ -44,13 +54,13 @@
             ],
         },
         {
-            "label": "Train - LinearDiscriminantAnalysis",
+            "label": "Train - LDA",
             "type": "shell",
             "group": "test",
             "command": "${config:python.pythonPath}",
             "args":[
                 "-m", "fgclassifier.train",
-                "-c", "LinearDiscriminantAnalysis"
+                "-c", "LDA"
             ],
         },
         {

@@ -13,4 +13,16 @@ from sklearn.multioutput import MultiOutputClassifier
 
 DummyStratified = DummyClassifier(strategy='stratified')
 DummyMostFrequent = DummyClassifier(strategy='most_frequent')
-ExtraTree = ExtraTreesClassifier(n_estimators=50)
+ExtraTree = ExtraTreesClassifier(n_estimators=50, max_depth=10)
+RandomForest = RandomForestClassifier(n_estimators=50, max_depth=10)
+
+# These are default parameters, add here just to suppress warnings
+Logistic = LogisticRegression(
+    solver='lbfgs',
+    multi_class='auto',
+    n_jobs=-1,
+    max_iter=200,
+)
+Ridge = RidgeClassifierCV(alphas=(0.01, 0.1, 0.5, 1.0, 5.0, 10.0))
+LDA = LinearDiscriminantAnalysis()
+QDA = QuadraticDiscriminantAnalysis()
