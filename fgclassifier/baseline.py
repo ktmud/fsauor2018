@@ -150,7 +150,7 @@ class Baseline(Pipeline):
     def name(self):
         return self.__class__.__name__ + '_' + self.classifier_name
 
-    def f1_scores(self, X, y):
+    def scores(self, X, y):
         """Return f1 score on a test dataset"""
         y_pred = self.predict(X)
         scores = []
@@ -162,7 +162,7 @@ class Baseline(Pipeline):
         return scores
 
     def score(self, X, y):
-        scores = self.f1_scores(X, y)
+        scores = self.scores(X, y)
         return np.mean(scores)
 
     def predict_df(self, df, save_to=None):
