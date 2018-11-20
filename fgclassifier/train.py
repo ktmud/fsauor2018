@@ -32,8 +32,11 @@ def fm_cross_check(fmns, clss, fm_cache=None, y_train=None, y_test=None, results
         # Test on all major classifiers
         for cls in clss:
             logger.info(f'Train for {fmn} -> {cls}...')
-            Classifier = getattr(classifiers, cls)
-            model = Baseline(name=cls, classifier=Classifier)
+            if hasattr(classifiers, cls):
+                Classifier = getattr(classifiers, cls)
+                model = Baseline(name=cls, classifier=Classifier)
+            else:
+                model = getattr(models, cls)
             model.fit(Xtrain, y_train)
             all_scores[fmn][cls] = model.scores(Xtest, y_test)
             f1 = all_avg_scores[fmn][cls] = np.mean(all_scores[fmn][cls])

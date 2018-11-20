@@ -3,4 +3,10 @@
 """
 All the available model ensembles
 """
+from sklearn.neural_network import MLPClassifier
 from fgclassifier.baseline import Baseline, Dummy
+
+# Multi Layer Perceptron
+MLP = MLPClassifier(
+    hidden_layer_sizes=10,
+)
