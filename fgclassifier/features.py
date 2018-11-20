@@ -5,6 +5,8 @@ Pipelines for building features
 """
 import logging
 import numpy as np
+import re
+
 from sklearn.pipeline import Pipeline
 
 from sklearn.feature_extraction.text import CountVectorizer, TfidfTransformer
@@ -210,6 +212,53 @@ class FeaturePipeline(Pipeline):
         return Xt
 
 
+# -------- For Word Embeddings ---------
+RE_EXCL = re.compile('！+')
+RE_QUES = re.compile('？+')
+
+def split_by(s, regexp, char):
+    if char in s.strip(char):
+        tmp = regexp.split(s)
+        last = tmp.pop()
+        ret = [x + char for x in tmp]
+        ret.append(last)  # add last sentence back
+        return ret
+
+
+def article_to_sentences(articles, split_sentence=True):
+    sentences, aids, slens = [], [], []
+    for aid, article in enumerate(articles):
+        if not split_sentence:
+            tokens = article.split()
+            sentences.append(tokens)
+            aids.append(aid)
+            slens.append(len(tokens))
+            continue
+        ss = article.split('。')
+        while ss:
+            s = ss.pop(0).strip()
+            if not s:
+                continue
+            tmp = split_by(s, RE_EXCL, '！')
+            if tmp:
+                ss = tmp + ss
+                continue
+                
+            tmp = split_by(s, RE_QUES, '？')
+            if tmp:
+                ss = tmp + ss
+                continue
+                
+            tokens = s.split()
+            sentences.append(tokens)
+            # keep a record of article ids and sentence length
+            # so that we know which sentence/word belongs to
+            # which article
+            aids.append(aid)
+            slens.append(len(tokens))
+    return sentences, aids, slens
+
+
 # ------- Additional helpers and basic pipelines ---------
 
 def build_features(df_train, df_test, steps=None):
@@ -219,4 +268,3 @@ def build_features(df_train, df_test, steps=None):
     X_train = feature.fit_transform(X_train)
     X_test = feature.transform(X_test)
     return X_train, y_train, X_test, y_test
-
