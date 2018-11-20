@@ -4,16 +4,44 @@ Load data and train the model
 import os
 import argparse
 import logging
+import numpy as np
 
 from sklearn.externals import joblib
-
 from fgclassifier import models, classifiers
+from fgclassifier.models import Baseline
 from fgclassifier.utils import read_data, save_model
 
 try:
     import local_config as config
 except ImportError:
     import config
+
+logger = logging.getLogger(__name__)
+
+
+def fm_cross_check(fmns, clss, fm_cache=None, y_train=None, y_test=None, results={}):
+    """Feature Model Cross Check"""
+    all_avg_scores = results['avg'] = results.get('avg', {})
+    all_scores = results['all'] = results.get('all', {})
+
+    # Test for all Feature models
+    for fmn in fmns:
+        logger.info(f'======== Feature Model: {fmn} =========')
+        cache = fm_cache[fmn]
+        Xtrain, Xtest = cache['train'], cache['test']
+        # Test on all major classifiers
+        for cls in clss:
+            logger.info(f'Train for {fmn} -> {cls}...')
+            Classifier = getattr(classifiers, cls)
+            model = Baseline(name=cls, classifier=Classifier)
+            model.fit(Xtrain, y_train)
+            all_scores[fmn][cls] = model.scores(Xtest, y_test)
+            f1 = all_avg_scores[fmn][cls] = np.mean(all_scores[fmn][cls])
+            logger.info('---------------------------------------------------')
+            logger.info(f'【{fmn} -> {cls}】: {f1:.4f}')
+            logger.info('---------------------------------------------------')
+        
+    return results
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()

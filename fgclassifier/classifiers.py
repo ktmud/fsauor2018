@@ -16,7 +16,8 @@ DummyMostFrequent = DummyClassifier(strategy='most_frequent')
 ExtraTree = ExtraTreesClassifier(n_estimators=50, max_depth=10)
 RandomForest = RandomForestClassifier(n_estimators=50, max_depth=10)
 
-# These are default parameters, add here just to suppress warnings
+# These are default parameters,
+# we initialize an instance here just to suppress warnings
 Logistic = LogisticRegression(
     solver='lbfgs',
     multi_class='auto',
