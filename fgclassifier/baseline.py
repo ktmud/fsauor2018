@@ -12,8 +12,8 @@ from sklearn.metrics import f1_score
 from sklearn.pipeline import Pipeline
 from sklearn.multioutput import MultiOutputClassifier
 
-from fgclassifier.features import DummyTransform
-from fgclassifier.utils import read_data, ensure_named_steps
+from fgclassifier.features import DummyTransform, ensure_named_steps
+from fgclassifier.utils import read_data
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)

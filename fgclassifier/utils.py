@@ -81,21 +81,3 @@ def save_model(model, filepath):
     joblib.dump(model, filepath)
     logger.info("Saving model... Done.")
 
-
-def ensure_named_steps(steps):
-    """make sure steps are named tuples"""
-    if not isinstance(steps, tuple) and not isinstance(steps, list):
-        steps = [steps]
-    steps_ = []
-    for i, estimator in enumerate(steps):
-        if isinstance(estimator, tuple) or isinstance(estimator, list):
-            # when estimator has name already, expand it
-            name, estimator = estimator
-        else:
-            # otherwise get name from class name
-            name = estimator.__class__.__name__
-        # Initialize estimator if necessary
-        if callable(estimator):
-            estimator = estimator()
-        steps_.append((name, estimator))
-    return steps_
