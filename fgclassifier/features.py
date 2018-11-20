@@ -129,6 +129,35 @@ def ensure_named_steps(steps, spec=None, cache=None):
 
 
 class FeaturePipeline(Pipeline):
+    """
+    FeaturePipeline with spec and cache support.
+
+    Usage:
+
+        fm_spec = {
+            'count': CountVectorizer(ngram_range=(1, 4), min_df=0.01,
+                                     max_df=0.99),
+            'tfidf': ['count', TfidfTransformer],
+        }
+        fm = defaultdict(dict)
+        model = FeaturePipeline('tfidf', spec=fm_spec, cache=fm)
+        model.fit_transform(X_train)
+        model.transform(X_test)
+
+    Generates:
+
+        > fm['tfidf']
+            {'model': FeaturePipeline(...),
+            'train': numpy.array,
+            'test': numpy.array}
+        > fm['count']
+            {'model': FeaturePipeline(...), ...}
+
+    Parameters
+    ----------
+        spec:   a dictionary of specs matching count to id
+        cache:  a defaultdict to store estimator and train/test results
+    """
 
     # Default feature pipeline
     FEATURE_PIPELINE = [
@@ -163,7 +192,6 @@ class FeaturePipeline(Pipeline):
         if cache and 'train' in cache:
             logger.info(f'  {cache_name}: fit_transform use cache.')
             return cache['train']
-
         Xt = super().fit_transform(X, y, **fit_params)
         if cache is not None:
             cache['train'] = Xt
