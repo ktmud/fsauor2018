@@ -16,6 +16,7 @@ model_save_path = "data/models/"
 train_data_path = "data/train/sentiment_analysis_trainingset.csv"
 valid_data_path = "data/valid/sentiment_analysis_validationset.csv"
 testa_data_path = "data/test-a/sentiment_analysis_testa.csv"
-testa_predict_out_path = "data/testa_prediction.csv"
 testb_data_path = "data/test-b/sentiment_analysis_testb.csv"
+
+testa_predict_out_path = "data/testa_prediction.csv"
 testb_predict_out_path = "data/testb_prediction.csv"

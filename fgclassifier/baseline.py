@@ -12,7 +12,7 @@ from sklearn.metrics import f1_score
 from sklearn.pipeline import Pipeline
 from sklearn.multioutput import MultiOutputClassifier
 
-from fgclassifier.features import DummyTransform, ensure_named_steps
+from fgclassifier.features import DummyTransform, fm_spec, ensure_named_steps
 from fgclassifier.utils import read_data
 
 logger = logging.getLogger(__name__)
@@ -28,15 +28,16 @@ class Baseline(Pipeline):
         name:        name of this model, useful when saving the model
     """
 
-    def __init__(self, classifier=None, steps=None, name=None):
+    def __init__(self, classifier=None, steps=None,
+                 spec=fm_spec, name=None, **kwargs):
         steps = steps or []
         if classifier is not None:
             steps.append(classifier)
-        steps = ensure_named_steps(steps)
+        steps = ensure_named_steps(steps, spec=spec)
         # Make sure last step is a MultiOutputClassifier
         if not isinstance(steps[-1][1], MultiOutputClassifier):
             steps[-1] = (steps[-1][0], MultiOutputClassifier(steps[-1][1]))
-        super().__init__(steps)
+        super().__init__(steps, **kwargs)
         self._name = name
 
     @property
@@ -69,8 +70,9 @@ class Baseline(Pipeline):
         # read_data returns a copy of df
         X, y, df = read_data(df, return_df=True)
         df['content'] = ''
-        df[y.columns] = self.pred(X)
+        df[y.columns] = self.predict(X)
         if save_to:
+            logger.info(f'Saving predictions to {save_to}...')
             df.to_csv(save_to, encoding="utf_8_sig", index=False)
         return df
 

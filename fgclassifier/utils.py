@@ -61,7 +61,7 @@ def read_csv(filename, flavor=None):
     """Load data from CSV"""
     if flavor and flavor is not 'raw':
         orig_filename = filename
-        filename = f'{filename.replace}.{flavor}.csv'
+        filename = f'{filename}.{flavor}.csv'
         if not os.path.exists(filename):
             return tokenize_csv(orig_filename, flavor=flavor)
     logger.info(f'Reading {filename}..')
@@ -70,7 +70,7 @@ def read_csv(filename, flavor=None):
 
 def tokenize_csv(filename, flavor='tokenized'):
     """Tokenize all data"""
-    output = f'{filename}.{flavor}.tsv'
+    output = f'{filename}.{flavor}.csv'
     if os.path.exists(output):
         logger.warn('Tokenized csv already exists. '
                     'Please use read_data() to read it.')
@@ -95,7 +95,8 @@ def read_data(data_path, flavor='tokenized', return_df=False,
     else:
         df = read_csv(data_path, flavor=flavor, **kwargs)
     if sample_n:
-        df = df.sample(sample_n)
+        logger.info(f'Take {sample_n} samples with random state {random_state}')
+        df = df.sample(sample_n, random_state=random_state)
     # X is just 1D strings, y is 20-D labels
     X, y = df['content'], df.drop(['id', 'content'], axis=1)
     if return_df:

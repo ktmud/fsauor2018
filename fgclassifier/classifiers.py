@@ -4,6 +4,7 @@ Different Classifier models
 from sklearn.naive_bayes import MultinomialNB, GaussianNB, ComplementNB
 from sklearn.svm import SVC, LinearSVC
 from sklearn.linear_model import LogisticRegression, RidgeClassifierCV
+from sklearn.linear_model import SGDClassifier
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
 from sklearn.discriminant_analysis import QuadraticDiscriminantAnalysis
 from sklearn.tree import DecisionTreeClassifier
@@ -27,3 +28,8 @@ Logistic = LogisticRegression(
 Ridge = RidgeClassifierCV(alphas=(0.01, 0.1, 0.5, 1.0, 5.0, 10.0))
 LDA = LinearDiscriminantAnalysis()
 QDA = QuadraticDiscriminantAnalysis()
+
+
+# Stochastic Gradient Descent with SVM
+SGD_LinearSVC = SGDClassifier(
+    max_iter=5000, tol=1e-6, alpha=1e-6)

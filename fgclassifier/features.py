@@ -5,27 +5,21 @@ Pipelines for building features
 """
 import logging
 import numpy as np
-import re
 
 from sklearn.pipeline import Pipeline
 
 from sklearn.base import BaseEstimator
 from sklearn.feature_extraction.text import CountVectorizer, TfidfTransformer
 from sklearn.decomposition import TruncatedSVD
-from sklearn.decomposition import LatentDirichletAllocation
-
-from fgclassifier.utils import read_data
+from sklearn.decomposition import LatentDirichletAllocation as LatentDirichlet
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 
 
-class DummyTransform():
+class DummyTransform(BaseEstimator):
     """Return content length as features.
     do nothing to the labels"""
-
-    def __init__(self):
-        pass
 
     def fit(self, X, y):
         return self
@@ -36,14 +30,6 @@ class DummyTransform():
 
 class Tfidf(TfidfTransformer):
 
-    def fit(self, *args, **kwargs):
-        logging.info('Fitting TF-IDF...')
-        return super().fit(*args, **kwargs)
-
-    def transform(self, *args, **kwargs):
-        logging.info('Transforming TF-IDF...')
-        return super().transform(*args, **kwargs)
-
     def fit_transform(self, *args, **kwargs):
         logging.info('Fit & Transform TF-IDF...')
         return super().fit_transform(*args, **kwargs)
@@ -51,25 +37,23 @@ class Tfidf(TfidfTransformer):
 
 class SVD(TruncatedSVD):
 
-    def fit(self, *args, **kwargs):
-        logging.info('Fitting TruncatedSVD...')
-        return super().fit(*args, **kwargs)
-
-    def transform(self, *args, **kwargs):
-        logging.info('Transforming TruncatedSVD...')
-        return super().transform(*args, **kwargs)
-
     def fit_transform(self, *args, **kwargs):
         logging.info('Fit & Transform TruncatedSVD...')
         return super().fit_transform(*args, **kwargs)
 
 
-class SparseToDense():
+class Count(CountVectorizer):
+
+    def fit_transform(self, raw_documents, y=None):
+        logging.info(f'Fit & Transform CountVectorizer...')
+        ret = super().fit_transform(raw_documents, y=y)
+        logging.info(f'Vocab Size: {len(self.vocabulary_)}')
+        return ret
+
+
+class SparseToDense(BaseEstimator):
     """Return content length as features.
     do nothing to the labels"""
-
-    def __init__(self):
-        pass
 
     def fit(self, X, y):
         return self
@@ -78,12 +62,42 @@ class SparseToDense():
         return X.toarray()
 
 
+class OverSample(BaseEstimator):
+
+    def __init__(self, *args, **kwargs):
+        return super().__init__(*args, **kwargs)
+
+
 # ------- Feature Builder -----------------
 def is_list_or_tuple(obj):
     return isinstance(obj, tuple) or isinstance(obj, list)
 
 
-def ensure_named_steps(steps, spec=None, cache=None):
+# Feature model specifications
+# For Chinese
+fm_spec = {
+    'count': Count(ngram_range=(1, 5), min_df=0.001, max_df=0.99),
+    'tfidf': ['count', Tfidf()],
+    'lsa_200': ['tfidf', SVD(n_components=200)],
+    'lsa_500': ['tfidf', SVD(n_components=500)],
+    'lsa_1k': ['tfidf', SVD(n_components=1000)],
+    # smaller vocabulary (removed more stop and infrequent words)
+    'count_sv': Count(ngram_range=(1, 5), min_df=0.02, max_df=1.0),
+    'tfidf_sv': ['count_sv', Tfidf()],
+    'tfidf_sv_dense': ['tfidf_sv', SparseToDense()],
+    'lsa_200_sv': ['tfidf_sv', SVD(n_components=200)],
+    'lsa_500_sv': ['tfidf_sv', SVD(n_components=500)],
+}
+
+# For English
+fm_spec_en = fm_spec.copy()
+fm_spec_en['count'] = Count(
+    ngram_range=(1, 4), min_df=0.01, stop_words='english')
+fm_spec_en['count_sv'] = Count(
+    ngram_range=(1, 4), min_df=0.02, stop_words='english')
+
+
+def ensure_named_steps(steps, spec=fm_spec, cache=None):
     """make sure steps are named tuples.
     Also handles dependencies in steps.
     """
@@ -162,27 +176,21 @@ class FeaturePipeline(Pipeline):
         cache:  a defaultdict to store estimator and train/test results
     """
 
-    # Default feature pipeline
-    FEATURE_PIPELINE = [
-        # from one of our sample, words like 味道 (taste), 好 (good)
-        # are also in the most frequent words, but they are actually relevant
-        # in terms of sentiment, so we keep max_df as 1.0
-        ('count', CountVectorizer(analyzer='word', ngram_range=(1, 5),
-                                  min_df=0.01, max_df=1.0)),
-        ('tfidf', TfidfTransformer(norm='l2')),
-        # Must has some sort of dimension reduction, otherwise feature steps
-        # will be really slow...
-        ('reduce_dim', SVD(n_components=1000))
-    ]
+    @classmethod
+    def from_spec(cls, name, spec=fm_spec, cache=None, **kwargs):
+        if cache is not None and name in cache:
+            return cache[name]['model']
+        return cls(name, spec, cache, **kwargs)
 
-    def __init__(self, steps=None, spec=None, cache=None, **kwargs):
-        steps = steps or self.FEATURE_PIPELINE
+    def __init__(self, steps='tfidf_sv', spec=fm_spec, cache=None, **kwargs):
         steps = ensure_named_steps(steps, spec, cache)
         super().__init__(steps, **kwargs)
         # if speficied cache, save self to cache
         if cache is not None:
             self.cache = cache[self._final_estimator_name]
             self.cache['model'] = self
+        else:
+            self.cache = None
 
     @property
     def _final_estimator_name(self):
@@ -213,59 +221,13 @@ class FeaturePipeline(Pipeline):
         return Xt
 
 
-# -------- For Word Embeddings ---------
-RE_EXCL = re.compile('！+')
-RE_QUES = re.compile('？+')
-
-def split_by(s, regexp, char):
-    if char in s.strip(char):
-        tmp = regexp.split(s)
-        last = tmp.pop()
-        ret = [x + char for x in tmp]
-        ret.append(last)  # add last sentence back
-        return ret
-
-
-def article_to_sentences(articles, split_sentence=True):
-    sentences, aids, slens = [], [], []
-    for aid, article in enumerate(articles):
-        if not split_sentence:
-            tokens = article.split()
-            sentences.append(tokens)
-            aids.append(aid)
-            slens.append(len(tokens))
-            continue
-        ss = article.split('。')
-        while ss:
-            s = ss.pop(0).strip()
-            if not s:
-                continue
-            tmp = split_by(s, RE_EXCL, '！')
-            if tmp:
-                ss = tmp + ss
-                continue
-                
-            tmp = split_by(s, RE_QUES, '？')
-            if tmp:
-                ss = tmp + ss
-                continue
-                
-            tokens = s.split()
-            sentences.append(tokens)
-            # keep a record of article ids and sentence length
-            # so that we know which sentence/word belongs to
-            # which article
-            aids.append(aid)
-            slens.append(len(tokens))
-    return sentences, aids, slens
-
-
 # ------- Additional helpers and basic pipelines ---------
 
-def build_features(df_train, df_test, steps=None):
-    X_train, y_train = read_data(df_train)
-    X_test, y_test = read_data(df_test)
-    feature = FeaturePipeline(steps)
+def build_features(X_train, X_test, steps='tfidf_sv', spec=fm_spec, **kwargs):
+    # if provided both training and testing dataset
+    # otherwise, load it from cache
+    feature = FeaturePipeline(steps, spec=spec, **kwargs)
     X_train = feature.fit_transform(X_train)
     X_test = feature.transform(X_test)
-    return X_train, y_train, X_test, y_test
+    return X_train, X_test
+

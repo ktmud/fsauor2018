@@ -19,14 +19,17 @@ except ImportError:
 logger = logging.getLogger(__name__)
 
 
-def fm_cross_check(fmns, clss, fm_cache=None, y_train=None, y_test=None, results={}):
+def fm_cross_check(fmns, clss, fm_cache=None, y_train=None, y_test=None,
+                   results={}):
     """Feature Model Cross Check"""
     all_avg_scores = results['avg'] = results.get('avg', {})
     all_scores = results['all'] = results.get('all', {})
 
     # Test for all Feature models
     for fmn in fmns:
-        logger.info(f'======== Feature Model: {fmn} =========')
+        logger.info('')
+        logger.info(f'============ Feature Model: {fmn} ============')
+        logger.info('')
         cache = fm_cache[fmn]
         Xtrain, Xtest = cache['train'], cache['test']
         # Test on all major classifiers
@@ -51,8 +54,9 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     classifier_choices = [x for x in dir(classifiers) if not x.startswith('_')]
     parser.add_argument('-m', '--model', default='Baseline',
-                        help='Top-level model, including how to do '
-                             'feature engineering')
+                        help='Top-level model, the basis for classifiers.')
+    parser.add_argument('-fm', '--feature-model', default='tfidf_sv',
+                        help='Which model to use for feature engineering')
     parser.add_argument('-c', '--classifier', default='SVC',
                         choices=classifier_choices,
                         help='Classifier used by the model')
@@ -62,17 +66,21 @@ if __name__ == '__main__':
                         help='Number of validation sample to use')
     args = parser.parse_args()
 
+    logging.info(f'{args}')
+
     Model = getattr(models, args.model)
     Classifier = getattr(classifiers, args.classifier)
-    model = Model(classifier=Classifier)
     X_train, Y_train = read_data(config.train_data_path, sample_n=args.train)
     X_valid, Y_valid = read_data(config.valid_data_path, sample_n=args.valid)
+    model = Model(classifier=Classifier, steps=[args.feature_model],
+                  memory='data/feature_cache')
 
-    with joblib.parallel_backend('threading', n_jobs=5):
+    with joblib.parallel_backend('threading', n_jobs=4):
         model.fit(X_train, Y_train)
         score = model.score(X_valid, Y_valid)
         logging.info('')
         logging.info(f'Overall F1: {score:.4f}')
         logging.info('')
 
-    save_model(model, os.path.join(config.model_save_path, model.name + '.pkl'))
+    filename = f'{args.feature_model}_{model.name}.pkl'
+    save_model(model, os.path.join(config.model_save_path, filename))
