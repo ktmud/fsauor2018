@@ -9,6 +9,7 @@ import re
 
 from sklearn.pipeline import Pipeline
 
+from sklearn.base import BaseEstimator
 from sklearn.feature_extraction.text import CountVectorizer, TfidfTransformer
 from sklearn.decomposition import TruncatedSVD
 from sklearn.decomposition import LatentDirichletAllocation
@@ -63,7 +64,7 @@ class SVD(TruncatedSVD):
         return super().fit_transform(*args, **kwargs)
 
 
-class SparseToSense():
+class SparseToDense():
     """Return content length as features.
     do nothing to the labels"""
 
