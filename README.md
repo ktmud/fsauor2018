@@ -26,5 +26,8 @@ Checkout the `notebooks` or
 ### Check Visualizations
 
 ```
-python ./fgclassifier/visualizer/app.py
+export FLASK_APP=fgclassifier.visualizer.app
+python -m flask run --port 5050
 ```
+
+Change `--port` as your like.
