@@ -8,22 +8,21 @@ import numpy as np
 
 from sklearn.externals import joblib
 from fgclassifier import models, classifiers
+from fgclassifier.features import fm_spec
 from fgclassifier.models import Baseline
 from fgclassifier.utils import read_data, save_model
 
-try:
-    import local_config as config
-except ImportError:
-    import config
+import config
 
 logger = logging.getLogger(__name__)
 
 
-def fm_cross_check(fmns, clss, fm_cache=None, y_train=None, y_test=None,
-                   results={}):
+def fm_cross_check(fmns, clss, fm_cache=None, X_train=None, X_test=None,
+                   y_train=None, y_test=None, results={}):
     """Feature Model Cross Check"""
     all_avg_scores = results['avg'] = results.get('avg', {})
     all_scores = results['all'] = results.get('all', {})
+    models = results['models'] = results.get('models', {})  # save modes as well
 
     # Test for all Feature models
     for fmn in fmns:
@@ -31,21 +30,18 @@ def fm_cross_check(fmns, clss, fm_cache=None, y_train=None, y_test=None,
         logger.info(f'============ Feature Model: {fmn} ============')
         logger.info('')
         cache = fm_cache[fmn]
-        Xtrain, Xtest = cache['train'], cache['test']
         # Test on all major classifiers
         for cls in clss:
             logger.info(f'Train for {fmn} -> {cls}...')
-            if hasattr(classifiers, cls):
-                Classifier = getattr(classifiers, cls)
-                model = Baseline(name=cls, classifier=Classifier)
-            else:
-                model = getattr(models, cls)
-            model.fit(Xtrain, y_train)
-            all_scores[fmn][cls] = model.scores(Xtest, y_test)
+            Classifier = getattr(classifiers, cls)
+            model = Baseline((cls, Classifier), fm=cache['model'])
+            model.fit(X_train, y_train)
+            all_scores[fmn][cls] = model.scores(X_test, y_test)
             f1 = all_avg_scores[fmn][cls] = np.mean(all_scores[fmn][cls])
             logger.info('---------------------------------------------------')
             logger.info(f'【{fmn} -> {cls}】: {f1:.4f}')
             logger.info('---------------------------------------------------')
+            models[model.name] = model
         
     return results
 
@@ -56,6 +52,7 @@ if __name__ == '__main__':
     parser.add_argument('-m', '--model', default='Baseline',
                         help='Top-level model, the basis for classifiers.')
     parser.add_argument('-fm', '--feature-model', default='tfidf_sv',
+                        choices=fm_spec.keys(),
                         help='Which model to use for feature engineering')
     parser.add_argument('-c', '--classifier', default='SVC',
                         choices=classifier_choices,
@@ -72,7 +69,8 @@ if __name__ == '__main__':
     Classifier = getattr(classifiers, args.classifier)
     X_train, Y_train = read_data(config.train_data_path, sample_n=args.train)
     X_valid, Y_valid = read_data(config.valid_data_path, sample_n=args.valid)
-    model = Model(classifier=Classifier, steps=[args.feature_model],
+    model = Model(classifier=Classifier,
+                  steps=[args.feature_model],
                   memory='data/feature_cache')
 
     with joblib.parallel_backend('threading', n_jobs=4):
@@ -83,4 +81,4 @@ if __name__ == '__main__':
         logging.info('')
 
     filename = f'{args.feature_model}_{model.name}.pkl'
-    save_model(model, os.path.join(config.model_save_path, filename))
+    save_model(model)

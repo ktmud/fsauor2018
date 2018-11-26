@@ -1,0 +1,55 @@
+<div class="columns">
+    <div class="column is-three-quarters">
+        <p>First, pick a random review you want to exam the predictions for.</p>
+        <form action="/" class="form pick-review">
+            <div class="field">
+                <label for="sel-data-source" class="label">Data Source</label>
+                <div class="control">
+                    <div class="select">
+                        <select name="dataset" id="sel-data-source">
+                            {% for opt, opt_disp in dataset_choices.items() %}
+                            <option value="{{ opt | lower }}" {% if dataset==opt %} selected="selected" {% endif %}>{{
+                                opt_disp }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="field">
+                <label for="inp-keyword" class="label">Must contain</label>
+                <div class="control">
+                    <input class="input" type="text" name="keyword" id="inp-keyword" placeholder="Keyword">
+                </div>
+            </div>
+            <div class="field">
+                <label class="label" for="inp-seed">Random Seed</label>
+                <div class="control">
+                    <input class="input" type="number" name="seed" id="inp-seed" size="3" value="{{ seed }}">
+                </div>
+            </div>
+            <div class="field">
+                <button class="button is-primary prev-seed" type="button">
+                    <span class="icon">
+                        <i class="fas fa-lg fa-angle-left"></i>
+                    </span>
+                </button>
+                <button class="button is-primary next-seed" type="button">
+                    <span class="icon">
+                        <i class="fas fa-lg fa-angle-right"></i>
+                    </span>
+                </button>
+            </div>
+        </form>
+        <article class="single-review">
+            <h4 class="title review-id">
+                Review #{{ review.id }}
+            </h4>
+            <blockquote class="review-text">
+                {{ review.content }}
+            </blockquote>
+        </article>
+    </div>
+    <div class="column help-info">
+
+    </div>
+</div>

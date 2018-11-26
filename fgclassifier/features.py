@@ -81,20 +81,28 @@ fm_spec = {
     'lsa_200': ['tfidf', SVD(n_components=200)],
     'lsa_500': ['tfidf', SVD(n_components=500)],
     'lsa_1k': ['tfidf', SVD(n_components=1000)],
+
     # smaller vocabulary (removed more stop and infrequent words)
-    'count_sv': Count(ngram_range=(1, 5), min_df=0.02, max_df=1.0),
+    'count_sv': Count(ngram_range=(1, 5), min_df=0.02, max_df=0.99),
     'tfidf_sv': ['count_sv', Tfidf()],
     'tfidf_sv_dense': ['tfidf_sv', SparseToDense()],
     'lsa_200_sv': ['tfidf_sv', SVD(n_components=200)],
     'lsa_500_sv': ['tfidf_sv', SVD(n_components=500)],
-}
 
-# For English
-fm_spec_en = fm_spec.copy()
-fm_spec_en['count'] = Count(
-    ngram_range=(1, 4), min_df=0.01, stop_words='english')
-fm_spec_en['count_sv'] = Count(
-    ngram_range=(1, 4), min_df=0.02, stop_words='english')
+    # For English
+    'count_en': Count(ngram_range=(1, 4), min_df=0.01, stop_words='english'),
+    'tfidf_en': ['count_en', Tfidf()],
+    'tfidf_en_dense': ['tfidf_en', SparseToDense()],
+    'lsa_200_en': ['tfidf_en', SVD(n_components=200)],
+    'lsa_500_en': ['tfidf_en', SVD(n_components=500)],
+    'lsa_1k_en': ['tfidf_en', SVD(n_components=1000)],
+
+    'count_en_sv': Count(ngram_range=(1, 4), min_df=0.02, stop_words='english'),
+    'tfidf_en_sv': ['count_en_sv', Tfidf()],
+    'tfidf_en_sv_dense': ['tfidf_en_sv', SparseToDense()],
+    'lsa_200_en_sv': ['tfidf_en_sv', SVD(n_components=200)],
+    'lsa_500_en_sv': ['tfidf_en_sv', SVD(n_components=500)],
+}
 
 
 def ensure_named_steps(steps, spec=fm_spec, cache=None):
@@ -103,14 +111,23 @@ def ensure_named_steps(steps, spec=fm_spec, cache=None):
     """
     if not isinstance(steps, list):
         steps = [steps]
+
     # make a copy of the steps
     if is_list_or_tuple(steps):
         steps = list(steps)
+
     steps_ = []
+
     # while steps is not empty
     while steps:
         name, estimator = None, steps.pop(0)
-        if isinstance(estimator, str):
+
+        # If already a FeaturePipeline, return the pipeline itself
+        if isinstance(estimator, FeaturePipeline):
+            steps.append((estimator.name, estimator))
+            continue
+
+        elif isinstance(estimator, str):
             # if string, look it up from cache or spec
             if cache and estimator in cache:
                 # if in cache, return cache
@@ -183,8 +200,11 @@ class FeaturePipeline(Pipeline):
         return cls(name, spec, cache, **kwargs)
 
     def __init__(self, steps='tfidf_sv', spec=fm_spec, cache=None, **kwargs):
+        self._steps = steps  # steps name
+
         steps = ensure_named_steps(steps, spec, cache)
         super().__init__(steps, **kwargs)
+
         # if speficied cache, save self to cache
         if cache is not None:
             self.cache = cache[self._final_estimator_name]
@@ -192,9 +212,17 @@ class FeaturePipeline(Pipeline):
         else:
             self.cache = None
 
+    def __repr__(self):
+        return f'FeaturePipeline(steps={self._steps})'
+
     @property
     def _final_estimator_name(self):
         return self.steps[-1][0]
+    
+    @property
+    def name(self):
+        """Feature model name is just the final estimator name"""
+        return self._final_estimator_name
 
     def fit_transform(self, X, y=None, **fit_params):
         """Fit transform the training data and save the results in cache"""

@@ -1,0 +1,37 @@
+<div class="columns">
+    <div class="column is-three-quarters">
+        <p>Then, select a pre-trained model</p>
+        <form action="/" class="form pick-model">
+            <div class="field">
+                <label for="sel-fm" class="label">Feature Processing</label>
+                <div class="control">
+                    <div class="select">
+                        <select name="fm" id="sel-fm">
+                            {% for opt, opt_disp in fm_choices.items() %}
+                            <option value="{{ opt | lower }}" {% if fm==opt %} selected="selected" {% endif %}>{{
+                                opt_disp }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="field">
+                <label for="sel-clf" class="label">Base Classifier</label>
+                <div class="control">
+                    <div class="select">
+                        <select name="clf" id="sel-clf">
+                            {% for opt, opt_disp in clf_choices.items() %}
+                            <option value="{{ opt | lower }}" {% if clf==opt %} selected="selected" {% endif %}>{{
+                                opt_disp }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </form>
+        <div id="chart"></div>
+    </div>
+    <div class="column help-info">
+        <p>We use the Base Classifier to predict sentiment labels one by one.</p>
+    </div>
+</div>

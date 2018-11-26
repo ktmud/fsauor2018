@@ -9,15 +9,15 @@ import jieba
 import csv
 import pandas as pd
 
-from sklearn.externals import joblib
+import config
 
+from functools import lru_cache
+from sklearn.externals import joblib
 from tqdm import tqdm
 
 logging.getLogger('jieba').setLevel(logging.INFO)
 logger = logging.getLogger(__name__)
-
 CURRENT_PATH = os.path.dirname(os.path.realpath(__file__))
-
 jieba.enable_parallel(4)
 
 
@@ -94,22 +94,59 @@ def read_data(data_path, flavor='tokenized', return_df=False,
         df = data_path
     else:
         df = read_csv(data_path, flavor=flavor, **kwargs)
+
     if sample_n:
         logger.info(f'Take {sample_n} samples with random state {random_state}')
         df = df.sample(sample_n, random_state=random_state)
+
     # X is just 1D strings, y is 20-D labels
     X, y = df['content'], df.drop(['id', 'content'], axis=1)
+
+    # remove other columns, as well
+    if 'raw_content' in y.columns:
+        y = y.drop(['raw_content'], axis=1)
+
     if return_df:
         return X, y, df.copy()
     return X, y
 
 
-def save_model(model, filepath):
+@lru_cache(maxsize=32)
+def get_dataset(dataset, keyword=None):
+    """Get a dataset DataFrame, including the raw content and tokenized content
+    and filter it by keywords"""
+    data_path = getattr(config, f'{dataset}_data_path')
+    if 'english' in data_path:
+        df = read_csv(data_path)
+        # For english, the raw content is the same
+        df['content_raw'] = df['content']
+    else:
+        # if Chinese, needs to add a raw column
+        df = read_csv(data_path, 'tokenized')
+        df['content_raw'] = read_csv(data_path, 'raw')['content']
+    if keyword:
+        df = df[df['content_raw'].str.match(keyword, case=False)]
+    return df
+
+
+def save_model(model, model_save_path=config.model_save_path):
     """Save model to disk, so we can reuse it later"""
-    logger.info("Saving model to %s..." % filepath)
-    pathdir = os.path.dirname(filepath)
+    filename = f'{model.name}.pkl'
+    model_path = os.path.join(model_save_path, filename)
+    logger.info("Saving model to %s..." % model_path)
+    pathdir = os.path.dirname(model_path)
     if not os.path.exists(pathdir):
         os.makedirs(pathdir)
-    joblib.dump(model, filepath)
+    joblib.dump(model, model_path)
     logger.info("Saving model... Done.")
 
+
+@lru_cache(maxsize=16)
+def load_model(feature_model, classifier, model='Baseline',
+               model_save_path=config.model_save_path):
+    if model == 'Baseline':
+        filename = f'{feature_model}_{classifier}.pkl'
+    else:
+        filename = f'{feature_model}_{model}_{classifier}.pkl'
+    model_path = os.path.join(model_save_path, filename)
+    return joblib.load(model_path)

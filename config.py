@@ -18,5 +18,15 @@ valid_data_path = "data/valid/sentiment_analysis_validationset.csv"
 testa_data_path = "data/test-a/sentiment_analysis_testa.csv"
 testb_data_path = "data/test-b/sentiment_analysis_testb.csv"
 
+train_en_data_path = "data/english_train.csv"
+valid_en_data_path = "data/english_valid.csv"
+
 testa_predict_out_path = "data/testa_prediction.csv"
 testb_predict_out_path = "data/testb_prediction.csv"
+
+
+try:
+    # import and override from local config
+    from local_config import *
+except ImportError:
+    pass

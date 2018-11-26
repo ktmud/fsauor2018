@@ -5,19 +5,14 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Python: Current File (Integrated Terminal)",
-            "type": "python",
-            "request": "launch",
-            "program": "${file}",
-            "console": "integratedTerminal"
-        },
-        {
             "name": "Visualizer",
             "type": "python",
             "request": "launch",
-            "module": "fgclassifier.visualizer.app",
+            "module": "flask",
             "env": {
-                "FLASK_APP": "app.py"
+                "FLASK_APP": "fgclassifier.visualizer.app",
+                "FLASK_ENV": "development",
+                "FLASK_DEBUG": "1"
             },
             "args": [
                 "run",
@@ -25,6 +20,21 @@
                 // "--no-reload"
             ],
             "jinja": true
-        }
+        },
+        {
+            "type": "chrome",
+            "request": "launch",
+            "name": "Launch Chrome",
+            "url": "http://localhost:5000",
+            "webRoot": "${workspaceFolder}/fgclassifier/visualizer/static",
+            "skipFiles": ["d3.js"]
+        },
+        {
+            "name": "Python: Current File (Integrated Terminal)",
+            "type": "python",
+            "request": "launch",
+            "program": "${file}",
+            "console": "integratedTerminal"
+        },
     ]
 }
