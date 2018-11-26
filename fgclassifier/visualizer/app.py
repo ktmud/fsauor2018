@@ -3,6 +3,8 @@
 """
 The Visualizer for Fine-grained Sentiment Classification
 """
+import os
+
 from flask import Flask, send_from_directory
 from flask import request, jsonify, render_template
 from flask_cors import CORS
@@ -14,10 +16,9 @@ from fgclassifier.visualizer.config import clf_choices
 
 
 app = Flask(__name__)
-app.config['SECRECT_KEY'] = 'keyboardcat!'
-socketio = SocketIO(app)
-
+app.config['SECRECT_KEY'] = os.environ.get('FLASK_SECRECT_KEY', 'keyboardcat!')
 CORS(app)
+socketio = SocketIO(app)
 
 
 @app.route('/')
@@ -46,5 +47,9 @@ def predict():
     return jsonify(actions.predict_one(**inputs))
 
 
+# Export for gunicorn
+application = app
+
 if __name__ == '__main__':
-    socketio.run(app)
+    port = os.environ.get('DOKKU_PROXY_PORT', 5000)
+    socketio.run(app, port=port)

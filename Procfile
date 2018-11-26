@@ -1,0 +1,1 @@
+web: gunicorn fgclassifier.visualizer.app
