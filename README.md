@@ -23,10 +23,26 @@ Checkout the `notebooks` or
 ./fgclassifer/train.py -c LDA
 ```
 
-### Check Visualizations
+### Visualize the Results
 
 ```
 python app.py --port 5000
 ```
 
 Change `--port` as your like.
+
+## Deploy
+
+The visualization can be easily deployed to via Dokku.
+Just make sure to upload your pre-trained models to the appropriate
+[persistent storage](https://github.com/dokku/dokku/blob/master/docs/advanced-usage/persistent-storage.md)
+directory on the host machine.
+
+Here's a list of Dokku commands you would need to run
+
+```
+dokku apps:create review-sentiments
+dokku storage:mount review-sentiments /var/lib/dokku/data/storage/review-sentiments:/storage
+dokku proxy:ports-set review-sentiments http:80:5000
+dokku config:set review-sentiments FLASK_SECRECT_KEY=`openssl rand -base64 16`
+```

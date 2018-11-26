@@ -24,7 +24,6 @@ socketio = SocketIO(app)
 @app.route('/')
 def index():
     """The Index Page"""
-    
     inputs = actions.parse_inputs(**dict(request.args.items()))
     tmpl_data = {
         'dataset_choices': dataset_choices,

@@ -10,7 +10,7 @@
             "request": "launch",
             "module": "flask",
             "env": {
-                "FLASK_APP": "fgclassifier.visualizer.app",
+                "FLASK_APP": "fgclassifier.visualizer",
                 "FLASK_ENV": "development",
                 "FLASK_DEBUG": "1"
             },
