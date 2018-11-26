@@ -11,36 +11,52 @@ from fgclassifier.utils import get_dataset, load_model, read_data
 
 
 def parse_inputs(dataset='train_en', keyword=None,
-                 fm='tfidf', clf='lda', seed='42', **kwargs):
+                 fm='lsa_1k_en', clf='lda', seed='42', **kwargs):
     """Predict sentiments for one single review"""
     if keyword is None or isinstance(keyword, str):
         keyword = [keyword]
     # DataFrames for all keywords
     keywords = keyword
-    dfs = [get_dataset(dataset, keyword=x) for x in keywords]
+
+    # make sure values are valid
+    if dataset not in dataset_choices:
+        dataset = 'train_en'
+    if fm not in fm_choices:
+        fm = 'lsa_1k_en'
+    if clf not in clf_choices:
+        clf = 'LDA'
+
+    dfs = [get_dataset(dataset, keyword=x) for x in keywords]  # filtered reviews
+    totals = [df.shape[0] for df in dfs]  # total number of reviews
     seed = int(seed) if seed.isdigit() else 42
     return dict(locals())
 
 
-def pick_review(dfs, seed, **kwargs):
-    """Pick a random review"""
-    # A random review from the first keyword
-    random_review = dfs[0].sample(1, random_state=seed)
-    return {
-        'review': random_review.to_dict('records')[0],
-    }
-
-
-def predict_one(dfs, seed, fm, clf, **kwargs):
+def predict_one(dfs, totals, seed, fm, clf, **kwargs):
     """Predict for a random review"""
     # get the random review
+    if totals[0] == 0:
+        return {
+            'totals': totals,
+            'error': 'no_review',
+            'review': {
+                'id': 'N/A',
+                'content_html': '--  No matching reviews found. Please remove keyword. --'
+            }
+        }
+
     random_review = dfs[0].sample(1, random_state=seed)
     # split to feature and labels
     X, y = read_data(random_review)
     model = load_model(fm, clf)
-    probas = model.proba(model)
+    probas = model.predict_proba(X)
+    review = random_review.to_dict('records')[0]
+    # Add highlighted HTML's
+    review['content_html'] = review['content_raw'].replace('\n', '<br>')
     return {
-        'label_columns': y.columns, 
-        'probas': probas
+        'review': review,
+        'label_names': y.columns.tolist(), 
+        'true_labels': y.values.tolist(),
+        'probas': [x.tolist() for x in probas]
     }
 

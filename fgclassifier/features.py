@@ -113,7 +113,9 @@ def ensure_named_steps(steps, spec=fm_spec, cache=None):
         steps = [steps]
 
     # make a copy of the steps
-    if is_list_or_tuple(steps):
+    if isinstance(steps, list):
+        steps = steps.copy()
+    elif isinstance(steps, tuple):
         steps = list(steps)
 
     steps_ = []
@@ -121,13 +123,7 @@ def ensure_named_steps(steps, spec=fm_spec, cache=None):
     # while steps is not empty
     while steps:
         name, estimator = None, steps.pop(0)
-
-        # If already a FeaturePipeline, return the pipeline itself
-        if isinstance(estimator, FeaturePipeline):
-            steps.append((estimator.name, estimator))
-            continue
-
-        elif isinstance(estimator, str):
+        if isinstance(estimator, str):
             # if string, look it up from cache or spec
             if cache and estimator in cache:
                 # if in cache, return cache
@@ -138,6 +134,10 @@ def ensure_named_steps(steps, spec=fm_spec, cache=None):
         elif is_list_or_tuple(estimator):
             # when estimator has name already, expand it
             name, estimator = estimator
+
+        # If already a Pipeline, name it with the last step
+        if isinstance(estimator, Pipeline):
+            name = estimator.steps[-1][0]
 
         # if is an array in cache
         if isinstance(estimator, list):

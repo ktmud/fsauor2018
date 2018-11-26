@@ -6,7 +6,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>The Anatomy of a Restaurant Review</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.7.2/css/bulma.min.css">
-    <script defer src="https://use.fontawesome.com/releases/v5.3.1/js/all.js"></script>
     <link rel="stylesheet" href="main.css">
 </head>
 
@@ -14,13 +13,20 @@
     <section class="section header">
         <div class="container  has-text-centered">
             <h1 class="title">
-                <a href="/">The Anatomy of a Restaunt Review</a>
+                <a href="/">
+                    The Anatomy of a Restaunt Review
+                    <span class="icon"><i class="fas fa-utensils"></i></span>
+                </a>
             </h1>
             <p class="subtitle">Fine-grained sentiment analysis on online reviews</p>
             <p class="credit">DS5520, Fall 2018 // Northeastern University</p>
         </div>
     </section>
-    <section class="section">
+
+    <!-- <section class="section" id="overview">
+    </section> -->
+
+    <section class="section" id="single-review">
         <div class="container">
             <h2 class="title">Dissecting a Single Review</h2>
             {% include "single/pick_review.html" %}
@@ -29,8 +35,15 @@
         </div>
     </section>
 
+    <!-- <section class="section" id="single-review">
+        <div class="container">
+            <h2 class="title">Review Label Correlations</h2>
+        </div>
+    </section> -->
+
+    <script defer src="https://use.fontawesome.com/releases/v5.3.1/js/all.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/5.7.0/d3.js"></script>
-    <script src="scripts/main.js"></script>
+    <script type="module" src="scripts/main.js"></script>
 
 </body>
 

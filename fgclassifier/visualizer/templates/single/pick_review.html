@@ -3,10 +3,10 @@
         <p>First, pick a random review you want to exam the predictions for.</p>
         <form action="/" class="form pick-review">
             <div class="field">
-                <label for="sel-data-source" class="label">Data Source</label>
+                <label for="sel-dataset" class="label">Data Source</label>
                 <div class="control">
                     <div class="select">
-                        <select name="dataset" id="sel-data-source">
+                        <select name="dataset" id="sel-dataset">
                             {% for opt, opt_disp in dataset_choices.items() %}
                             <option value="{{ opt | lower }}" {% if dataset==opt %} selected="selected" {% endif %}>{{
                                 opt_disp }}</option>
@@ -18,7 +18,8 @@
             <div class="field">
                 <label for="inp-keyword" class="label">Must contain</label>
                 <div class="control">
-                    <input class="input" type="text" name="keyword" id="inp-keyword" placeholder="Keyword">
+                    <input class="input" type="text" name="keyword" id="inp-keyword"
+                         placeholder="Keyword" autocomplete="off">
                 </div>
             </div>
             <div class="field">
@@ -33,23 +34,31 @@
                         <i class="fas fa-lg fa-angle-left"></i>
                     </span>
                 </button>
-                <button class="button is-primary next-seed" type="button">
+                <button class="button is-primary next-seed" type="submit">
                     <span class="icon">
                         <i class="fas fa-lg fa-angle-right"></i>
                     </span>
                 </button>
             </div>
+            <div class="summary">
+                {% if keywords[0] %}
+                    {{ totals[0] }} reviews after filtering.
+                {% else %}
+                    This data source has {{ totals[0] }} reviews in total.
+                {% endif %}
+            </div>
         </form>
-        <article class="single-review">
+        <article class="box single-review">
             <h4 class="title review-id">
                 Review #{{ review.id }}
             </h4>
             <blockquote class="review-text">
-                {{ review.content }}
+                {{ review.content_html | safe }}
             </blockquote>
         </article>
     </div>
     <div class="column help-info">
-
+        <p>The <a href="https://challenger.ai/competition/fsauor2018" target="_blank">raw dataset</a> is in Chinese.
+           The English dataset showing here are translated using Google Translate API.</p>
     </div>
 </div>

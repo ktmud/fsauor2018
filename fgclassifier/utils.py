@@ -103,8 +103,8 @@ def read_data(data_path, flavor='tokenized', return_df=False,
     X, y = df['content'], df.drop(['id', 'content'], axis=1)
 
     # remove other columns, as well
-    if 'raw_content' in y.columns:
-        y = y.drop(['raw_content'], axis=1)
+    if 'content_raw' in y.columns:
+        y = y.drop(['content_raw'], axis=1)
 
     if return_df:
         return X, y, df.copy()
@@ -123,7 +123,7 @@ def get_dataset(dataset, keyword=None):
     else:
         # if Chinese, needs to add a raw column
         df = read_csv(data_path, 'tokenized')
-        df['content_raw'] = read_csv(data_path, 'raw')['content']
+        df['content_raw'] = read_csv(data_path, 'raw')['content'].str.strip('"')
     if keyword:
         df = df[df['content_raw'].str.match(keyword, case=False)]
     return df

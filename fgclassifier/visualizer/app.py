@@ -29,7 +29,6 @@ def index():
         'fm_choices': fm_choices,
         'clf_choices': clf_choices,
         **inputs,
-        **actions.pick_review(**inputs),
         **actions.predict_one(**inputs)
     }
     return render_template('index.html', **tmpl_data)
@@ -45,13 +44,6 @@ def predict():
     """Predict for one single review"""
     inputs = actions.parse_inputs(**dict(request.args.items()))
     return jsonify(actions.predict_one(**inputs))
-
-
-@app.route('/pick_review')
-def pick_review():
-    """Predict for one single review"""
-    inputs = actions.parse_inputs(**dict(request.args.items()))
-    return jsonify(actions.pick_review(**inputs))
 
 
 if __name__ == '__main__':

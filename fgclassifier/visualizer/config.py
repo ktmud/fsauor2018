@@ -6,21 +6,27 @@ Configuration for Visualizer
 from collections import OrderedDict
 
 dataset_choices = OrderedDict([
-    ('train_en', 'Training (8,000 reviews)'),
-    ('valid_en', 'Validation (2,000 reviews)'),
-    ('train', 'Chinese Training (100,000)'),
-    ('valid', 'Chinese Validation (20,000)'),
+    ('train_en', 'Training'),
+    ('valid_en', 'Validation'),
+    ('train', 'Training (Chinese)'),
+    ('valid', 'Validation (Chinese)'),
 ])
 
 # Feature model choices -------
 fm_choices = OrderedDict([
-    ('tfidf', 'TF-IDF (min_df=0.001)'),
-    ('tfidf_sv', 'TF-IDF (min_df=0.02)'),
+    ('lsa_200_en', 'TF-IDF(min_df=0.01) -> SVD(200)'),
+    ('lsa_500_en', 'TF-IDF(min_df=0.01) -> SVD(500)'),
+    ('lsa_1k_en', 'TF-IDF(min_df=0.01) -> SVD(1000)'),
+    ('tfidf_en_sv_dense', 'TF-IDF(min_df=0.02)'),
+    ('lsa_200_en_sv', 'TF-IDF(min_df=0.02) -> SVD(200)'),
+    ('lsa_500_en_sv', 'TF-IDF(min_df=0.02) -> SVD(500)'),
 ])
 
 # Classifier choices ---------
 clf_choices = OrderedDict([
-    ('LinearDiscriminantAnalysis', 'Linear Discriminant Analysis'),
+    # Only LDA and Logistic supports predict a probability
+    ('LDA', 'Linear Discriminant Analysis'),
     ('Logistic', 'Logistic Regression'),
-    ('Ridge', 'Ridge Classifier'),
+    # ('LinearSVC', 'Linear SVM Classifier'),
+    # ('Ridge', 'Ridge Classifier'),
 ])

@@ -10,9 +10,7 @@ from sklearn.externals import joblib
 from fgclassifier import models, classifiers
 from fgclassifier.features import fm_spec
 from fgclassifier.models import Baseline
-from fgclassifier.utils import read_data, save_model
-
-import config
+from fgclassifier.utils import read_data, save_model, get_dataset
 
 logger = logging.getLogger(__name__)
 
@@ -67,8 +65,8 @@ if __name__ == '__main__':
 
     Model = getattr(models, args.model)
     Classifier = getattr(classifiers, args.classifier)
-    X_train, Y_train = read_data(config.train_data_path, sample_n=args.train)
-    X_valid, Y_valid = read_data(config.valid_data_path, sample_n=args.valid)
+    X_train, Y_train = read_data(get_dataset('train'), sample_n=args.train)
+    X_valid, Y_valid = read_data(get_dataset('valid'), sample_n=args.valid)
     model = Model(classifier=Classifier,
                   steps=[args.feature_model],
                   memory='data/feature_cache')
@@ -80,5 +78,4 @@ if __name__ == '__main__':
         logging.info(f'Overall F1: {score:.4f}')
         logging.info('')
 
-    filename = f'{args.feature_model}_{model.name}.pkl'
     save_model(model)
