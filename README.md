@@ -44,12 +44,8 @@ Here's a list of Dokku commands you can probably use:
 dokku apps:create review-sentiments
 dokku proxy:ports-set review-sentiments http:80:5000
 dokku config:set review-sentiments FLASK_SECRECT_KEY=`openssl rand -base64 16`
-dokku config:set review-sentiments DATA_ROOT=/storage
+dokku config:set review-sentiments DATA_ROOT=/opt/storage
 
-dokku storage:mount review-sentiments /var/lib/dokku/data/storage/review-sentiments:/storage
-
-# For cache pip packages
-dokku storage:mount review-sentiments /var/lib/dokku/data/storage/review-sentiments/pip_cache:/app/.cache/pip
-# For downloading NLTK resources
-dokku storage:mount review-sentiments /var/lib/dokku/data/storage/review-sentiments/nltk_data:/app/nltk_data/
+# For storing pre-trained models
+dokku storage:mount review-sentiments /var/lib/dokku/data/storage/review-sentiments:/opt/storage
 ```
