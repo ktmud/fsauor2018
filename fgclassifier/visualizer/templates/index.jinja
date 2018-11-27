@@ -5,9 +5,11 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>The Anatomy of a Restaurant Review</title>
-    <link rel="stylesheet" href="bulma-flatly.css">
-    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.5.0/css/all.css" integrity="sha384-B4dIYHKNBt8Bc12p+WXckhzcICo0wtJAoU8YZTY5qE0Id1GSseTk6S+L3BlXeVIU" crossorigin="anonymous">
-    <link rel="stylesheet" href="main.css">
+    <link rel="stylesheet" href="css/bulma-flatly.css">
+    <link rel="stylesheet" href="css/fontawesome.css">
+    {% assets filters="libsass", output="gen/style.css", "css/main.scss", depends="**/*.scss" %}
+        <link rel="stylesheet" href="{{ ASSET_URL }}">
+    {% endassets %}
 </head>
 
 <body>
@@ -19,7 +21,7 @@
                     <span class="icon"><i class="fas fa-utensils"></i></span>
                 </a>
             </h1>
-            <p class="subtitle">Supervized Machine Learning in Fine-grained Sentiment Analysis on Online Reviews</p>
+            <p class="subtitle">Supervized Machine Learning in Fine-grained Sentiment Analysis of Online Reviews</p>
             <p class="credit">DS5520, Fall 2018 // Northeastern University</p>
         </div>
     </section>
@@ -40,8 +42,8 @@
             <h2 class="title">Review Label Correlations</h2>
         </div>
     </section> -->
-    <script src="scripts/d3.js"></script>
-    <script type="module" src="scripts/main.js"></script>
+    <script src="js/d3.js"></script>
+    <script type="module" src="js/main.js"></script>
 </body>
 
 </html>

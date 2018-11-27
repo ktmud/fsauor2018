@@ -8,3 +8,4 @@ Flask-Cors==3.0.3
 Flask-SocketIO==3.0.2
 eventlet==0.24.1
 gunicorn==19.9.0
+Flask-Assets==0.12

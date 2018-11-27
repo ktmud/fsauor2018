@@ -1,0 +1,80 @@
+.hidden {
+    display: none;
+}
+
+.title strong {
+    font-weight: 600;
+}
+
+.loader-parent {
+    position: relative;
+}
+
+.section-loader {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    background: rgba(255,255,255,0.5);
+    text-align: center;
+    padding-top: 6%;
+    z-index: 1;
+    display: none;
+}
+
+.is-loading .section-loader {
+    display: block;
+}
+
+.section-loader .loader {
+    display: inline-block;
+    width: 40px;
+    height: 40px;
+    border-left-color: #09caff;
+    border-bottom-color: #09caff;
+}
+
+.section.header {
+    border-top: 2px solid #09caff;
+    /* border-bottom: 1px dashed #09caff; */
+    box-shadow: 0 3px 1px #eee;
+}
+
+h1.title a {
+    display: block;
+    color: #333;
+    padding: 20px;
+    margin-top: -20px;
+}
+
+.form .field {
+    display: inline-block;
+    margin: 10px;
+}
+
+.form {
+    margin: 0 -10px;
+}
+
+#inp-seed {
+    width: 8em;
+}
+
+h2.title {
+    font-size: 1.6em;
+    border-left: 4px solid #09caff;
+    padding-left: 0.5em;
+}
+h2.title:not(.is-spaced) + .subtitle {
+    margin-top: -0.5rem;
+}
+h4.title {
+    font-size: 1.12em;
+}
+
+.form .filter-results {
+    font-size: 0.9em;
+    margin: 0 10px;
+    color: darkgray;
+}

@@ -82,8 +82,8 @@ class AsyncUpdater {
       d3.event.preventDefault()
     })
     let self = this
-    this.root.selectAll('.foldable').on('click', function() {
-      self.toggleClass('folded', this)
+    this.root.selectAll('.foldable .toggle').on('click', function() {
+      self.toggleClass('folded', this.closest('.foldable'))
     })
   }
 

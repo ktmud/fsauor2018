@@ -9,6 +9,7 @@ from flask import Flask, send_from_directory
 from flask import request, jsonify, render_template
 from flask_cors import CORS
 from flask_socketio import SocketIO
+from flask_assets import Environment
 
 from fgclassifier.visualizer import actions
 from fgclassifier.visualizer.config import dataset_choices, fm_choices
@@ -16,6 +17,7 @@ from fgclassifier.visualizer.config import clf_choices
 
 
 app = Flask(__name__)
+assets = Environment(app)
 app.config['SECRECT_KEY'] = os.environ.get('FLASK_SECRECT_KEY', 'keyboardcat!')
 CORS(app)
 socketio = SocketIO(app)
