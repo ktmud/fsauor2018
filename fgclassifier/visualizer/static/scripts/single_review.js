@@ -22,7 +22,7 @@ class SingleReviewChart extends AsyncUpdater {
       elem.value = Math.min(parseInt(elem.value, 0) + 1, 99999999)
       this.fetchAndUpdate()
     })
-    this.root.select('select,input').on('change', () => {
+    this.root.selectAll('select, input').on('change', () => {
       this.fetchAndUpdate()
     })
   }
@@ -177,18 +177,25 @@ class SingleReviewChart extends AsyncUpdater {
     //     aspect2,
     //     ...
     //  ]
-    let probas = this.data['probas'].map((rows) => rows[0])
+    let probas, true_probas;
+    if (this.data['probas']) {
+      probas = this.data['probas'].map((rows) => rows[0]);
+    } else {
+      probas = d3.range(20).map((i) => [1, 0, 0, 0]);
+    }
     let label2idx = {'-2': 0, '-1': 1, '0': 2, '1': 3};
     this.buildBricks(probas, 'predicted')
 
     if (this.data['true_labels']) {
-      let true_probas = this.data['true_labels'][0].map((val) => {
+      true_probas = this.data['true_labels'][0].map((val) => {
         let x = [0, 0, 0, 0];
         x[label2idx[val]] = 1;
         return x
       })
-      this.buildBricks(true_probas, 'actual')
+    } else {
+      true_probas = d3.range(20).map((i) => [1, 0, 0, 0]);
     }
+    this.buildBricks(true_probas, 'actual')
   }
 
   updateBars() {
@@ -197,7 +204,7 @@ class SingleReviewChart extends AsyncUpdater {
 
   updateReviewText() {
     let data = this.data
-    this.html('.review-id', `Review #${data.review.id}`);
+    this.html('.review-id', data.review.id);
     this.html('.review-text', data.review.content_html);
     let elem = this.$('.review-text');
     // review text height only increases, this is for avoiding

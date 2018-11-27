@@ -42,7 +42,9 @@ class AsyncUpdater {
   }
 
   html(selector, content) {
-    this.root.select(selector).node().innerHTML = content;
+    this.root.selectAll(selector).each(function() {
+      this.innerHTML = content;
+    })
   }
 
   fetchData(qs, updateHistory) {

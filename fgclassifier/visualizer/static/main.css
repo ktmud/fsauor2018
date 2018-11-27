@@ -1,3 +1,7 @@
+.hidden {
+    display: none;
+}
+
 .section.header {
     border-top: 2px solid #09caff;
     /* border-bottom: 1px dashed #09caff; */
@@ -65,14 +69,28 @@ article.single-review blockquote:before {
     overflow: hidden;
 }
 
+p + p {
+    margin-top: 0.8em;
+}
+
+.instruction {
+    font-size: 18px;
+}
+
 .chart {
     margin-top: 20px;
     min-height: 400px;
     background: #fafafa;
+    text-align: center;
+    padding: 20px;
+    border-radius: 3px;
+}
+.chart h3 {
+    margin: 0 0 20px;
 }
 
 svg {
-    display: block;
+    display: inline-block;
 }
 
 .bricks {

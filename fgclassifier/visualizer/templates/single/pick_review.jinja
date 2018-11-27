@@ -1,6 +1,5 @@
 <div class="columns">
     <div class="column is-three-quarters">
-        <p>First, pick a random review you want to exam the predictions for.</p>
         <form action="/" class="form pick-review">
             <div class="field">
                 <label for="sel-dataset" class="label">Data Source</label>
@@ -29,28 +28,25 @@
                 </div>
             </div>
             <div class="field">
+                <button type="submit" class="hidden"></button>
                 <button class="button is-primary prev-seed" type="button">
                     <span class="icon">
                         <i class="fas fa-lg fa-angle-left"></i>
                     </span>
                 </button>
-                <button class="button is-primary next-seed" type="submit">
+                <button class="button is-primary next-seed" type="button">
                     <span class="icon">
                         <i class="fas fa-lg fa-angle-right"></i>
                     </span>
                 </button>
             </div>
             <div class="summary">
-                {% if keywords[0] %}
-                    {{ totals[0] }} reviews after filtering.
-                {% else %}
-                    This data source has {{ totals[0] }} reviews in total.
-                {% endif %}
+                {% include "single/filter_results.jinja" %}
             </div>
         </form>
         <article class="box single-review">
-            <h4 class="title review-id">
-                Review #{{ review.id }}
+            <h4 class="title review-title">
+                Review # <span class="review-id">{{ review.id }}</span>
             </h4>
             <blockquote class="review-text">
                 {{ review.content_html | safe }}
@@ -58,7 +54,10 @@
         </article>
     </div>
     <div class="column help-info">
+        <p class="instruction">First, pick a random review you want to exam the predictions for.</p>
         <p>The <a href="https://challenger.ai/competition/fsauor2018" target="_blank">raw dataset</a> is in Chinese.
-           The English dataset showing here are translated using Google Translate API.</p>
+           The English reviews showing here are translated using Google Translate API.</p>
+        <p>Models are trained separately on English and Chinese datasets. The English dataset is only
+        1/10 of the Chinese training set.</p>
     </div>
 </div>

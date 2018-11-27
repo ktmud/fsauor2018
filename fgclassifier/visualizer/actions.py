@@ -3,7 +3,7 @@
 """
 Actions users can take
 """
-from flask import request
+from flask import request, render_template
 
 from fgclassifier.visualizer.config import dataset_choices, fm_choices
 from fgclassifier.visualizer.config import clf_choices
@@ -36,27 +36,31 @@ def predict_one(dfs, totals, seed, fm, clf, **kwargs):
     """Predict for a random review"""
     # get the random review
     if totals[0] == 0:
-        return {
-            'totals': totals,
-            'error': 'no_review',
-            'review': {
-                'id': 'N/A',
-                'content_html': '--  No matching reviews found. Please remove keyword. --'
-            }
+        X, y = read_data(dfs[0])
+        review = {
+            'id': 'N/A',
+            'content_html': '--  No matching reviews found. Please remove keyword. --'
         }
+        true_labels, probas = None, None
+    else:
+        random_review = dfs[0].sample(1, random_state=seed)
+        # split to feature and labels
+        X, y = read_data(random_review)
+        model = load_model(fm, clf)
+        probas = model.predict_proba(X)
+        review = random_review.to_dict('records')[0]
+        # Add highlighted HTML's
+        review['content_html'] = review['content_raw'].replace('\n', '<br>')
+        true_labels = y.values.tolist()
+        probas = [x.tolist() for x in probas]
 
-    random_review = dfs[0].sample(1, random_state=seed)
-    # split to feature and labels
-    X, y = read_data(random_review)
-    model = load_model(fm, clf)
-    probas = model.predict_proba(X)
-    review = random_review.to_dict('records')[0]
-    # Add highlighted HTML's
-    review['content_html'] = review['content_raw'].replace('\n', '<br>')
+    label_names = y.columns.tolist()
     return {
         'review': review,
-        'label_names': y.columns.tolist(), 
-        'true_labels': y.values.tolist(),
-        'probas': [x.tolist() for x in probas]
+        'label_names': label_names,
+        'true_labels': true_labels,
+        'probas': probas,
+        'filter_results': render_template(
+            'single/filter_results.jinja', **{**kwargs, **locals()})
     }
 

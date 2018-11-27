@@ -32,7 +32,7 @@ def index():
         **inputs,
         **actions.predict_one(**inputs)
     }
-    return render_template('index.html', **tmpl_data)
+    return render_template('index.jinja', **tmpl_data)
 
 
 @app.route('/<path:path>')
