@@ -7,6 +7,7 @@ from flask import request, render_template
 
 from fgclassifier.visualizer.config import dataset_choices, fm_choices
 from fgclassifier.visualizer.config import clf_choices
+from fgclassifier.visualizer.highlight import highlight_noun_chunks
 from fgclassifier.utils import get_dataset, load_model, read_data
 
 
@@ -32,9 +33,9 @@ def parse_inputs(dataset='train_en', keyword=None,
     return dict(locals())
 
 
-def predict_one(dfs, totals, seed, fm, clf, **kwargs):
+def predict_one(dataset, dfs, totals, seed, fm, clf, **kwargs):
     """Predict for a random review"""
-    # get the random review
+    lang = 'en' if '_en' in dataset else 'zh'
     if totals[0] == 0:
         X, y = read_data(dfs[0])
         review = {
@@ -43,6 +44,7 @@ def predict_one(dfs, totals, seed, fm, clf, **kwargs):
         }
         true_labels, probas = None, None
     else:
+        # get a random review
         random_review = dfs[0].sample(1, random_state=seed)
         # split to feature and labels
         X, y = read_data(random_review)
@@ -50,7 +52,9 @@ def predict_one(dfs, totals, seed, fm, clf, **kwargs):
         probas = model.predict_proba(X)
         review = random_review.to_dict('records')[0]
         # Add highlighted HTML's
-        review['content_html'] = review['content_raw'].replace('\n', '<br>')
+        review['content_html'] = highlight_noun_chunks(
+            review['content_raw'], lang
+        ).replace('\n', '<br>')
         true_labels = y.values.tolist()
         probas = [x.tolist() for x in probas]
 

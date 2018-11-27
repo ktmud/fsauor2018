@@ -1,7 +1,9 @@
 /**
  * Single Review predictions
  */
-import { $ } from "./helpers.js"
+import {
+  $
+} from "./helpers.js"
 import AsyncUpdater from './async_updater.js'
 
 let labelWidth = 260;
@@ -49,7 +51,7 @@ class SingleReviewChart extends AsyncUpdater {
 
     let labels = this.data['label_names']
     let level1 = {}
-    labels.forEach(function(item) {
+    labels.forEach(function (item) {
       let tmp = item.split('_')
       let name = tmp.shift()
       let name2 = tmp.join(' ')
@@ -65,15 +67,15 @@ class SingleReviewChart extends AsyncUpdater {
     let level1_y = [0]
     level1_keys.forEach((d, i) => {
       let height = level1[d].length * 30
-      level1_y[i+1] = level1_y[i] + height
+      level1_y[i + 1] = level1_y[i] + height
     })
-  
+
     // Add text labels
     let level1_g = this.bricks.selectAll()
       .data(level1_keys).enter()
-        .append('g')
-        .attr('class', 'level1')
-        .attr('transform', (d, i) => `translate(0, ${level1_y[i] + 20})`)
+      .append('g')
+      .attr('class', 'level1')
+      .attr('transform', (d, i) => `translate(0, ${level1_y[i] + 20})`)
 
     level1_g.append('line')
       .attr('x1', 0)
@@ -97,19 +99,19 @@ class SingleReviewChart extends AsyncUpdater {
       .attr('text-anchor', 'end')
       .attr('alignment-baseline', 'hanging')
       .text((d) => d)
-    
-    level1_g.each(function(d) {
+
+    level1_g.each(function (d) {
       d3.select(this).selectAll()
         .data(level1[d]).enter()
-          .append('g')
-          .attr('class', 'level2')
-          .attr('transform', (d, i) => `translate(0, ${i * 30})`)
-          .append('text')
-          .attr('x', labelWidth)
-          .attr('y', 8)
-          .attr('text-anchor', 'end')
-          .attr('alignment-baseline', 'hanging')
-          .text((d) => d)
+        .append('g')
+        .attr('class', 'level2')
+        .attr('transform', (d, i) => `translate(0, ${i * 30})`)
+        .append('text')
+        .attr('x', labelWidth)
+        .attr('y', 8)
+        .attr('text-anchor', 'end')
+        .attr('alignment-baseline', 'hanging')
+        .text((d) => d)
     })
 
   }
@@ -122,8 +124,9 @@ class SingleReviewChart extends AsyncUpdater {
     let xoffset = labelWidth + 8
     xoffset = variant == 'predicted' ? xoffset : xoffset + fullwidth + 2;
     let n_dim = probas[0].length
-    let cmap = ['Gainsboro', 'IndianRed', 'LightBlue', 'MediumSeaGreen']
-    let xScale = d3.scaleLinear().domain([0, 1]).range([0, fullwidth])
+    // let cmap = ['Gainsboro', 'IndianRed', 'LightBlue', 'MediumSeaGreen'];
+    let cmap = ['Gainsboro', '#d7191c', '#abd9e9', '#1a9641'];
+    let xScale = d3.scaleLinear().domain([0, 1]).range([0, fullwidth]);
     let layers = d3.stack().keys(d3.range(n_dim)).order(d3.stackOrderNone)
       .offset(d3.stackOffsetNone)(probas)
 
@@ -138,28 +141,28 @@ class SingleReviewChart extends AsyncUpdater {
       container.append('text')
         .text(variant)
         .attr('x', fullwidth / 2)
-        .attr('y',  -10)
+        .attr('y', -10)
         .attr('text-anchor', 'middle')
 
       // add the stacked bar layers
       container.selectAll('g.layer')
         .data(layers).enter().append('g')
-          .attr('class', 'layer')
-          .style('fill', (d, i) => cmap[i])
+        .attr('class', 'layer')
+        .style('fill', (d, i) => cmap[i])
         .selectAll('rect')
         .data((d) => d).enter()
-          .append('rect')
-          .attr('x', (d) => xScale(d[0]))
-          .attr('y', (d, i) => i * 30)
-          .attr('width', (d) => xScale(d[1] - d[0]))
-          .attr('height', 29)
+        .append('rect')
+        .attr('x', (d) => xScale(d[0]))
+        .attr('y', (d, i) => i * 30)
+        .attr('width', (d) => xScale(d[1] - d[0]))
+        .attr('height', 29)
     } else {
       container
         .transition().duration(400)
         .attr('transform', `translate(${xoffset},20)`)
-      container.selectAll('g.layer').each(function(d, i) {
+      container.selectAll('g.layer').each(function (d, i) {
         d3.select(this).selectAll(`rect`)
-        .data(layers[i])
+          .data(layers[i])
           .transition()
           .duration(400)
           .attr('x', (d) => xScale(d[0]))
@@ -190,7 +193,12 @@ class SingleReviewChart extends AsyncUpdater {
     } else {
       probas = d3.range(20).map((i) => [1, 0, 0, 0]);
     }
-    let label2idx = {'-2': 0, '-1': 1, '0': 2, '1': 3};
+    let label2idx = {
+      '-2': 0,
+      '-1': 1,
+      '0': 2,
+      '1': 3
+    };
     this.buildBricks(probas, 'predicted')
 
     if (this.data['true_labels']) {
@@ -222,7 +230,7 @@ class SingleReviewChart extends AsyncUpdater {
       elem.style.height = '';
       let newHeight = Math.max(elem.clientHeight, origHeight)
       elem.style.height = origHeight + 'px';
-      setTimeout(function() {
+      setTimeout(function () {
         elem.style.height = newHeight + 'px';
       }, 60)
     }
