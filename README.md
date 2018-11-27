@@ -47,6 +47,8 @@ dokku proxy:ports-set review-sentiments http:80:5000
 dokku config:set review-sentiments FLASK_SECRECT_KEY=`openssl rand -base64 16`
 dokku config:set review-sentiments DATA_ROOT=/storage
 
-# For pre-trained NLP models
-dokku storage:mount review-sentiments /var/lib/dokku/data/storage/review-sentiments/nltk_data:/usr/share/nltk_data
+# For cache pip packages
+dokku storage:mount review-sentiments /var/lib/dokku/data/storage/review-sentiments/pip_cache:/app/.cache/pip
+# For downloading NLTK resources
+dokku storage:mount review-sentiments /var/lib/dokku/data/storage/review-sentiments/nltk_data:/app/nltk_data/
 ```
