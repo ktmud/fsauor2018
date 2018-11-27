@@ -42,10 +42,11 @@ Here's a list of Dokku commands you can probably use:
 
 ```bash
 dokku apps:create review-sentiments
-dokku storage:mount review-sentiments /var/lib/dokku/data/storage/review-sentiments:/storage
 dokku proxy:ports-set review-sentiments http:80:5000
 dokku config:set review-sentiments FLASK_SECRECT_KEY=`openssl rand -base64 16`
 dokku config:set review-sentiments DATA_ROOT=/storage
+
+dokku storage:mount review-sentiments /var/lib/dokku/data/storage/review-sentiments:/storage
 
 # For cache pip packages
 dokku storage:mount review-sentiments /var/lib/dokku/data/storage/review-sentiments/pip_cache:/app/.cache/pip

@@ -11,5 +11,5 @@ gunicorn==19.9.0
 Flask-Assets==0.12
 TextBlob==0.15.2
 spacy==2.0.16
-https://github.com/howl-anderson/Chinese_models_for_SpaCy/releases/download/v2.0.5/zh_core_web_sm-2.0.5.tar.gz#egg=zh_core_web_sm==2.0.5
-https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-2.0.0/en_core_web_sm-2.0.0.tar.gz#egg=en_core_web_sm==2.0.0
+/storage/zh_core_web_sm-2.0.5.tar.gz#egg=zh_core_web_sm==2.0.5
+/storage/en_core_web_sm-2.0.0.tar.gz#egg=en_core_web_sm==2.0.0
