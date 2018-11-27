@@ -1,7 +1,0 @@
-{
-    "scripts": {
-      "dokku": {
-        "predeploy": "/app/.heroku/python/bin/python -m fgclassifier.prepare"
-      }
-    }
-  }
