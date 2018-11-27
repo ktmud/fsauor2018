@@ -33,7 +33,7 @@ Change `--port` as your like.
 
 ## Deploy
 
-The visualization can be easily deployed to via Dokku.
+The visualization can be easily deployed to via [Dokku](https://github.com/dokku/dokku).
 Just make sure to upload your pre-trained models to the appropriate
 [persistent storage](https://github.com/dokku/dokku/blob/master/docs/advanced-usage/persistent-storage.md)
 directory on the host machine.
