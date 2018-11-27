@@ -2,6 +2,37 @@
     display: none;
 }
 
+.title strong {
+    font-weight: 600;
+}
+
+.loader-parent {
+    position: relative;
+}
+
+.section-loader {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    background: rgba(255,255,255,0.5);
+    text-align: center;
+    padding-top: 6%;
+    z-index: 1;
+    display: none;
+}
+.is-loading .section-loader {
+    display: block;
+}
+.section-loader .loader {
+    display: inline-block;
+    width: 40px;
+    height: 40px;
+    border-left-color: #09caff;
+    border-bottom-color: #09caff;
+}
+
 .section.header {
     border-top: 2px solid #09caff;
     /* border-bottom: 1px dashed #09caff; */
@@ -39,7 +70,7 @@ h4.title {
     font-size: 1.12em;
 }
 
-.form .summary {
+.form .filter-results {
     font-size: 0.9em;
     margin: 0 10px;
     color: darkgray;
@@ -52,8 +83,10 @@ article.single-review {
 article.single-review blockquote {
     padding-left: 2em;
     position: relative;
-    min-height: 20px;
+    min-height: 3em;
     word-break: break-word;
+    transition: all 0.3s;
+    overflow: hidden;
 }
 article.single-review blockquote:before {
     content: '\201C';
@@ -64,6 +97,29 @@ article.single-review blockquote:before {
     top: -20pt;
     color: #aaa;
 }
+.folded article.single-review blockquote {
+    height: 1.8em;
+    min-height: 0;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.foldable {
+    position: relative;
+}
+.foldable .toggle {
+    cursor: pointer;
+}
+.foldable .toggle .icon {
+    position: absolute;
+    right: 30px;
+    top: 15px;
+    transition: all 0.3s;
+}
+.foldable.folded .toggle .icon {
+    transform: rotate(180deg);
+}
+
 .review-text {
     transition: 0.5s all;
     overflow: hidden;
@@ -78,7 +134,6 @@ p + p {
 }
 
 .chart {
-    margin-top: 20px;
     min-height: 400px;
     background: #fafafa;
     text-align: center;

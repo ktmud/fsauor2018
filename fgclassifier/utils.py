@@ -125,7 +125,7 @@ def get_dataset(dataset, keyword=None):
         df = read_csv(data_path, 'tokenized')
         df['content_raw'] = read_csv(data_path, 'raw')['content'].str.strip('"')
     if keyword:
-        df = df[df['content_raw'].str.match(keyword, case=False)]
+        df = df[df['content_raw'].str.contains(keyword, case=False)]
     return df
 
 

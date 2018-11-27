@@ -1,5 +1,5 @@
 
-import { $ } from "./helpers.js"
+import { $, debounce } from "./helpers.js"
 
 /**
  * Base class to update the DOM asynchroneous
@@ -16,7 +16,54 @@ class AsyncUpdater {
   }
 
   fetchAndUpdate(qs) {
-    this.fetchData(qs).then(this.render.bind(this));
+
+    // cancel existing request
+    if (this.t_loading != null) {
+      clearTimeout(this.t_loading);
+    }
+    if (this.req && this.req.abort) {
+      this.req.abort();
+    }
+
+    this.enterLoading()
+    this.req = this.fetchData(qs).then((res) => {
+      this.render(res);
+      this.exitLoading()
+    })
+  }
+
+  enterLoading() {
+    this.t_loading = setTimeout(() => {
+      this.addClass('is-loading')
+    }, 200);
+  }
+
+  exitLoading() {
+    if (this.t_loading != null) {
+      clearTimeout(this.t_loading);
+    }
+    this.removeClass('is-loading')
+    this.t_loading = null;
+  }
+
+  addClass(cls, root) {
+    root = root || this.root.node()
+    root.classList.add(cls)
+  }
+
+  removeClass(cls, root) {
+    root = root || this.root.node()
+    root.classList.remove(cls)
+  }
+
+  hasClass(cls, root) {
+    root = root || this.root.node()
+    root.classList.contains(cls)
+  }
+
+  toggleClass(cls, root) {
+    root = root || this.root.node()
+    root.classList.toggle(cls)
   }
 
   /**
@@ -24,14 +71,19 @@ class AsyncUpdater {
    */
   prepare(elem) {
     d3.select(window)
-      .on('resize', this.render.bind(this))
+      .on('resize', debounce(this.render.bind(this), 100))
       .on('popstate', () => {
         this.fetchAndUpdate(location.search, false)
       })
+
     this.root = d3.select(elem)
-    this.root.select('form').on('submit', () => {
+    this.root.selectAll('form').on('submit', () => {
       this.fetchAndUpdate()
       d3.event.preventDefault()
+    })
+    let self = this
+    this.root.selectAll('.foldable').on('click', function() {
+      self.toggleClass('folded', this)
     })
   }
 

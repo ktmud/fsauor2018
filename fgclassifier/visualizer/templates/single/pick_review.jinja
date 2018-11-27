@@ -40,18 +40,26 @@
                     </span>
                 </button>
             </div>
-            <div class="summary">
+            <div class="filter-results">
                 {% include "single/filter_results.jinja" %}
             </div>
         </form>
-        <article class="box single-review">
-            <h4 class="title review-title">
-                Review # <span class="review-id">{{ review.id }}</span>
+        <div class="review-preview loader-parent foldable">
+            <div class="section-loader">
+                <i class="loader"></i>
+            </div>
+            <article class="box single-review">
+            <h4 class="title review-title toggle">
+                Review <strong>#<span class="review-id">{{ review.id }}</span></strong>
+                <span class="icon">
+                    <i class="fas fa-chevron-up"></i>
+                </span>
             </h4>
             <blockquote class="review-text">
                 {{ review.content_html | safe }}
             </blockquote>
         </article>
+        </div>
     </div>
     <div class="column help-info">
         <p class="instruction">First, pick a random review you want to exam the predictions for.</p>

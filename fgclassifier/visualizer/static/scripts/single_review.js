@@ -206,16 +206,19 @@ class SingleReviewChart extends AsyncUpdater {
     let data = this.data
     this.html('.review-id', data.review.id);
     this.html('.review-text', data.review.content_html);
+    this.html('.filter-results', data.filter_results);
     let elem = this.$('.review-text');
-    // review text height only increases, this is for avoiding
-    // jumpy behavior.
-    let origHeight = Math.min(elem.clientHeight, 20); // but don't grow too tall
-    elem.style.height = '';
-    let newHeight = Math.max(elem.clientHeight, origHeight)
-    elem.style.height = origHeight + 'px';
-    setTimeout(function() {
-      elem.style.height = newHeight + 'px';
-    }, 60)
+    if (this.hasClass('is-folded')) {
+      // review text height only increases, this is for avoiding
+      // jumpy behavior.
+      let origHeight = Math.min(elem.clientHeight, 200); // but don't grow too tall
+      elem.style.height = '';
+      let newHeight = Math.max(elem.clientHeight, origHeight)
+      elem.style.height = origHeight + 'px';
+      setTimeout(function() {
+        elem.style.height = newHeight + 'px';
+      }, 60)
+    }
   }
 
 }

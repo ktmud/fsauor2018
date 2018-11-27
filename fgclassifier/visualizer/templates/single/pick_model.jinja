@@ -34,8 +34,11 @@
         <p>We use the Base Classifier to predict sentiment labels one by one.</p>
     </div>
 </div>
-<div class="columns" style="margin-top: -40px;">
-    <div class="column is-three-quarters">
+<div class="columns">
+    <div class="column loader-parent is-three-quarters">
+        <div class="section-loader">
+            <i class="loader"></i>
+        </div>
         <div class="chart">
             <h3>The Predicted and Actual Sentiments of Review #<span class="review-id">{{ review_id }}</span></h3>
             <svg class="bricks"></svg>
