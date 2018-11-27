@@ -8,3 +8,5 @@ misc/google-cloud
 .RDataTmp
 .RData
 .Rhistory
+
+.webassets-cache/

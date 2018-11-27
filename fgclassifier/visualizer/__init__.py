@@ -18,7 +18,9 @@ from fgclassifier.visualizer.config import clf_choices
 
 app = Flask(__name__)
 assets = Environment(app)
-app.config['SECRECT_KEY'] = os.environ.get('FLASK_SECRECT_KEY', 'keyboardcat!')
+app.config['SECRECT_KEY'] = os.getenv('FLASK_SECRECT_KEY', 'keyboardcat!')
+app.config['ASSETS_DEBUG'] = os.getenv('FLASK_ENV') == 'development'
+
 CORS(app)
 socketio = SocketIO(app)
 

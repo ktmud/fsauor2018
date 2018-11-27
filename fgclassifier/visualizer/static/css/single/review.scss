@@ -1,0 +1,52 @@
+article.single-review {
+    margin-top: 20px;
+}
+article.single-review blockquote {
+    padding-left: 2em;
+    position: relative;
+    min-height: 3em;
+    word-break: break-word;
+    transition: all 0.3s;
+    overflow: hidden;
+}
+article.single-review blockquote:before {
+    content: '\201C';
+    font-family: arial;
+    font-size: 50pt;
+    position: absolute;
+    left: 0;
+    top: -20pt;
+    color: #aaa;
+}
+.folded article.single-review blockquote {
+    height: 1.8em;
+    min-height: 0;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.foldable {
+    position: relative;
+}
+.foldable .toggle {
+    cursor: pointer;
+}
+.foldable .toggle .icon {
+    position: absolute;
+    right: 30px;
+    top: 15px;
+    transition: all 0.3s;
+}
+.foldable.folded .toggle .icon {
+    transform: rotate(180deg);
+}
+
+.review-text {
+    transition: 0.5s all;
+    overflow: hidden;
+}
+
+.box .review-title {
+    margin-top: -20px;
+    padding-top: 20px;
+}

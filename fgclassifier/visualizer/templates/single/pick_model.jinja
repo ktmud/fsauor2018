@@ -7,7 +7,7 @@
                     <div class="select">
                         <select name="fm" id="sel-fm">
                             {% for opt, opt_disp in fm_choices.items() %}
-                            <option value="{{ opt | lower }}" {% if fm==opt %} selected="selected" {% endif %}>{{
+                            <option value="{{ opt }}" {% if fm==opt %} selected="selected" {% endif %}>{{
                                 opt_disp }}</option>
                             {% endfor %}
                         </select>
@@ -20,7 +20,7 @@
                     <div class="select">
                         <select name="clf" id="sel-clf">
                             {% for opt, opt_disp in clf_choices.items() %}
-                            <option value="{{ opt | lower }}" {% if clf==opt %} selected="selected" {% endif %}>{{
+                            <option value="{{ opt }}" {% if clf==opt %} selected="selected" {% endif %}>{{
                                 opt_disp }}</option>
                             {% endfor %}
                         </select>

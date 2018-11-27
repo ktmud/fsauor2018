@@ -7,7 +7,7 @@
                     <div class="select">
                         <select name="dataset" id="sel-dataset">
                             {% for opt, opt_disp in dataset_choices.items() %}
-                            <option value="{{ opt | lower }}" {% if dataset==opt %} selected="selected" {% endif %}>{{
+                            <option value="{{ opt }}" {% if dataset==opt %} selected="selected" {% endif %}>{{
                                 opt_disp }}</option>
                             {% endfor %}
                         </select>

@@ -66,7 +66,15 @@ h4.title {
   margin: 0 10px;
   color: darkgray; }
 
-/* ------- Single Review Chart --------- */
+p + p {
+  margin-top: 0.8em; }
+
+.instruction {
+  font-size: 18px; }
+
+/**
+ * Single Review Chart
+ */
 article.single-review {
   margin-top: 20px; }
 
@@ -112,17 +120,15 @@ article.single-review blockquote:before {
   transition: 0.5s all;
   overflow: hidden; }
 
-p + p {
-  margin-top: 0.8em; }
-
-.instruction {
-  font-size: 18px; }
+.box .review-title {
+  margin-top: -20px;
+  padding-top: 20px; }
 
 .chart {
   min-height: 400px;
   background: #fafafa;
   text-align: center;
-  padding: 20px;
+  padding: 20px 10px;
   border-radius: 3px; }
 
 .chart h3 {

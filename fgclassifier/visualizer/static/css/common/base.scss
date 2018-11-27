@@ -78,3 +78,11 @@ h4.title {
     margin: 0 10px;
     color: darkgray;
 }
+
+p + p {
+    margin-top: 0.8em;
+}
+
+.instruction {
+    font-size: 18px;
+}

@@ -4,6 +4,8 @@
 import { $ } from "./helpers.js"
 import AsyncUpdater from './async_updater.js'
 
+let labelWidth = 260;
+
 class SingleReviewChart extends AsyncUpdater {
 
   constructor(elem) {
@@ -45,7 +47,6 @@ class SingleReviewChart extends AsyncUpdater {
 
   initBricks() {
 
-    let labelWidth = 260
     let labels = this.data['label_names']
     let level1 = {}
     labels.forEach(function(item) {
@@ -115,8 +116,11 @@ class SingleReviewChart extends AsyncUpdater {
 
   buildBricks(probas, variant) {
 
-    let xoffset = variant == 'predicted' ? 270 : 542;
-    let fullwidth = 270;
+    let fullwidth = (this.$('.chart').clientWidth - labelWidth - 30) / 2;
+    fullwidth = Math.max(100, fullwidth)
+
+    let xoffset = labelWidth + 8
+    xoffset = variant == 'predicted' ? xoffset : xoffset + fullwidth + 2;
     let n_dim = probas[0].length
     let cmap = ['Gainsboro', 'IndianRed', 'LightBlue', 'MediumSeaGreen']
     let xScale = d3.scaleLinear().domain([0, 1]).range([0, fullwidth])
@@ -150,6 +154,9 @@ class SingleReviewChart extends AsyncUpdater {
           .attr('width', (d) => xScale(d[1] - d[0]))
           .attr('height', 29)
     } else {
+      container
+        .transition().duration(400)
+        .attr('transform', `translate(${xoffset},20)`)
       container.selectAll('g.layer').each(function(d, i) {
         d3.select(this).selectAll(`rect`)
         .data(layers[i])

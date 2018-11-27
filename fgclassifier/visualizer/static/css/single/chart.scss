@@ -1,0 +1,45 @@
+
+.chart {
+    min-height: 400px;
+    background: #fafafa;
+    text-align: center;
+    padding: 20px 10px;
+    border-radius: 3px;
+}
+
+.chart h3 {
+    margin: 0 0 20px;
+}
+
+svg {
+    display: inline-block;
+}
+
+.bricks {
+    height: 621px;
+    width: 800px
+}
+
+.bricks text {
+    text-align: right;
+}
+
+text {
+    font-size: 14px;
+}
+
+text.level1-label {
+    font-weight: bold;
+}
+
+text.title {
+    font-size: 16px;
+    font-weight: 600;
+}
+
+path.line {
+    fill: none;
+    stroke-width: 1.5;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
