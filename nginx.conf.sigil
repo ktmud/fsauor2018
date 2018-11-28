@@ -17,20 +17,14 @@ server {
     proxy_set_header X-Forwarded-For $remote_addr;
     proxy_set_header X-Forwarded-Port $server_port;
     proxy_set_header X-Request-Start $msec;
-
-    # increase buffer size to bypass net::ERR_INCOMPLETE_CHUNKED_ENCODING error
-    proxy_buffer_size 1k;
-    proxy_buffers 24 4k;
-    proxy_busy_buffers_size 8k;
-    proxy_max_temp_file_size 2048m;
-    proxy_temp_file_write_size 32k;
-    chunked_transfer_encoding on;
+    sendfile        on;
+    client_max_body_size 20M;
+    keepalive_timeout  0;
   }
 
   include {{ .DOKKU_ROOT }}/{{ .APP }}/nginx.conf.d/*.conf;
 
   upstream {{ .APP }} {
-    ip_hash;
   {{ range .DOKKU_APP_LISTENERS | split " " }}
     server {{ . }};
   {{ end }}
