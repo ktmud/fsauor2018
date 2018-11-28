@@ -41,13 +41,21 @@ directory on the host machine.
 Here's a list of Dokku commands you can probably use:
 
 ```bash
-dokku apps:create review-sentiments
-dokku proxy:ports-set review-sentiments http:80:5000 https:443:5000
+alias dokku="ssh dokku@your-host"
+
+git remote add dokku dokku@your-host/review-sentiments
+git push dokku  # first push automatically creates the app
+
 dokku config:set review-sentiments FLASK_SECRECT_KEY=`openssl rand -base64 16`
-dokku config:set review-sentiments DATA_ROOT=/opt/storage
 
 # For storing pre-trained models
 dokku storage:mount review-sentiments /var/lib/dokku/data/storage/review-sentiments:/opt/storage
+```
+
+Then upload the dataset and pre-trained models to your host:
+
+```
+scp -r data/* /var/lib/dokku/data/storage/review-sentiments
 ```
 
 ## Local Development
