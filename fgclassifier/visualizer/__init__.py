@@ -8,7 +8,7 @@ import os
 from flask import Flask, send_from_directory
 from flask import request, jsonify, render_template
 from flask_cors import CORS
-from flask_socketio import SocketIO
+# from flask_socketio import SocketIO
 from flask_assets import Environment
 
 from fgclassifier.visualizer import actions
@@ -22,7 +22,7 @@ app.config['SECRECT_KEY'] = os.getenv('FLASK_SECRECT_KEY', 'keyboardcat!')
 app.config['ASSETS_DEBUG'] = os.getenv('FLASK_ENV') == 'development'
 
 CORS(app)
-socketio = SocketIO(app)
+# socketio = SocketIO(app)
 
 
 @app.route('/')
@@ -52,5 +52,6 @@ def predict():
 
 
 if __name__ == '__main__':
-    port = os.environ.get('DOKKU_PROXY_PORT', 5000)
-    socketio.run(app, port=port)
+    port = os.environ.get('PORT', 5000)
+    app.run(port=port)
+    # socketio.run(app, port=port)
