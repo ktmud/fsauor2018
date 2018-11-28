@@ -19,6 +19,5 @@ RUN python /tmp/prepare.py
 ADD ./fgclassifier /app/fgclassifier
 ADD ./config.py /app/config.py
 
-
 # Start the app
 CMD gunicorn --bind 0.0.0.0:$PORT --worker-class eventlet -w 1 fgclassifier.visualizer:app

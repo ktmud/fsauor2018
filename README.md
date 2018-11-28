@@ -42,10 +42,19 @@ Here's a list of Dokku commands you can probably use:
 
 ```bash
 dokku apps:create review-sentiments
-dokku proxy:ports-set review-sentiments http:80:5000
+dokku proxy:ports-set review-sentiments http:80:5000 https:443:5000
 dokku config:set review-sentiments FLASK_SECRECT_KEY=`openssl rand -base64 16`
 dokku config:set review-sentiments DATA_ROOT=/opt/storage
 
 # For storing pre-trained models
 dokku storage:mount review-sentiments /var/lib/dokku/data/storage/review-sentiments:/opt/storage
+```
+
+## Local Development
+
+To run the Docker image locally.
+
+```
+docker build -t ktmud/fgclassifier .
+docker-compose up
 ```
