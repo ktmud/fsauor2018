@@ -111,7 +111,7 @@ def read_data(data_path, flavor='tokenized', return_df=False,
     return X, y
 
 
-@lru_cache(maxsize=4)
+@lru_cache(maxsize=10)
 def get_dataset(dataset, keyword=None):
     """Get a dataset DataFrame, including the raw content and tokenized content
     and filter it by keywords"""
@@ -141,7 +141,7 @@ def save_model(model, model_save_path=config.model_save_path):
     logger.info("Saving model... Done.")
 
 
-@lru_cache(maxsize=10)
+@lru_cache(maxsize=5)
 def load_model(feature_model, classifier, model='Baseline',
                model_save_path=config.model_save_path):
     if model == 'Baseline':
