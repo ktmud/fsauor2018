@@ -2,6 +2,8 @@ version: '0.1'
 services:
   visualizer:
     image: ktmud/fgclassifier
+    volumes:
+        - /opt/storage:/opt/storage
     env_file:
         - .env
     ports:
