@@ -34,7 +34,9 @@
         </div>
     </section>
 
-    <script src="js/d3.js"></script>
+    {% assets output="gen/vendor.js", "js/d3.v5.js" %}
+        <script src="{{ ASSET_URL }}"></script>
+    {% endassets %}
     <script type="module" src="js/main.js"></script>
 </body>
 
