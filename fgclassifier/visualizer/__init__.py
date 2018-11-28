@@ -3,4 +3,3 @@
 """
 The Visualizer for Fine-grained Sentiment Classification
 """
-from fgclassifier.visualizer.app import app, socketio
