@@ -8,7 +8,7 @@ Start the Visualization App
 import logging
 import argparse
 
-from fgclassifier.visualizer import app, socketio
+from fgclassifier.visualizer.app import app, socketio
 
 parser = argparse.ArgumentParser(description='Development Server')
 parser.add_argument('--port', '-p', type=int, default=5000)
