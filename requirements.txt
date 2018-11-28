@@ -9,6 +9,4 @@ eventlet==0.24.1
 gunicorn==19.9.0
 TextBlob==0.15.2
 spacy==2.0.16
-zh_core_web_sm-2.0.5.tar.gz
-en_core_web_sm-2.0.0.tar.gz
 snownlp==0.12.3

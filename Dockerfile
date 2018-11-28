@@ -11,6 +11,7 @@ RUN pip install --upgrade pip
 
 ADD ./requirements.txt /tmp/requirements.txt
 RUN pip install -r /tmp/requirements.txt
+RUN pip install zh_core_web_sm-2.0.5.tar.gz en_core_web_sm-2.0.0.tar.gz
 RUN rm zh_core_web_sm-2.0.5.tar.gz en_core_web_sm-2.0.0.tar.gz
 
 # Prepare the environment more... (download nltk data, etc)
