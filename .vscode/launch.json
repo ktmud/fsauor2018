@@ -10,9 +10,10 @@
             "request": "launch",
             "module": "flask",
             "env": {
-                "FLASK_APP": "fgclassifier.visualizer",
+                "FLASK_APP": "app",
                 "FLASK_ENV": "development",
-                "FLASK_DEBUG": "1"
+                "FLASK_DEBUG": "1",
+                "DATA_ROOT": "/opt/storage"
             },
             "args": [
                 "run",

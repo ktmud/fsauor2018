@@ -68,10 +68,17 @@ docker build -t ktmud/fgclassifier .
 docker-compose up
 ```
 
-To run the app without Docker, make sure you have
-neccessary packages installed, then make sure
-the data (and pre-trained models) are in your `DATA_ROOT`
-(take a look at `config.py` for how file paths are loaded).
+Note that `docker-compose` will add storage mapping between
+your host machine and the Docker container, and set required
+variables.
+
+You need to have an `/opt/storage/` folder on your
+host machine and make user it is accessible by Docker.
+
+To run the app without Docker, install the required packages 
+via `requirements.txt`, then make sure the data (and pre-trained models)
+are in your `DATA_ROOT` (take a look at `config.py` for how file paths are
+defined).
 
 ```
 pip install -r requirement.txt

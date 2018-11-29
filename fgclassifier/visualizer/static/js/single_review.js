@@ -16,12 +16,12 @@ class SingleReviewChart extends AsyncUpdater {
     this.fields = ['dataset', 'keyword', 'seed', 'fm', 'clf']
     this.endpoint = '/predict'
 
-    this.root.select('.prev-seed').on('click', () => {
+    this.root.selectAll('.prev-seed').on('click', () => {
       let elem = $('#inp-seed')
       elem.value = Math.max(parseInt(elem.value, 0) - 1, 0)
       this.fetchAndUpdate()
     })
-    this.root.select('.next-seed').on('click', () => {
+    this.root.selectAll('.next-seed').on('click', () => {
       let elem = $('#inp-seed')
       elem.value = Math.min(parseInt(elem.value, 0) + 1, 99999999)
       this.fetchAndUpdate()
@@ -42,9 +42,11 @@ class SingleReviewChart extends AsyncUpdater {
       this.rawData = rawData
       this.data = rawData
     }
-    this.updateReviewText()
-    this.updateBricks()
-    this.updateBars()
+    if (this.data) {
+      this.updateReviewText()
+      this.updateBricks()
+      this.updateBars()
+    }
   }
 
   initBricks() {
