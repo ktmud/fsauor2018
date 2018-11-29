@@ -61,9 +61,21 @@ scp -r data/* /var/lib/dokku/data/storage/review-sentiments
 
 ## Local Development
 
-To run the Docker image locally.
+I recommend using the Docker image:
 
 ```
 docker build -t ktmud/fgclassifier .
 docker-compose up
+```
+
+To run the app without Docker, make sure you have
+neccessary packages installed, then make sure
+the data (and pre-trained models) are in your `DATA_ROOT`
+(take a look at `config.py` for how file paths are loaded).
+
+```
+pip install -r requirement.txt
+export DATA_ROOT="./data"
+python fgclassifier/prepare.py
+python app.py
 ```
