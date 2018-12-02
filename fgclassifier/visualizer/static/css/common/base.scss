@@ -37,8 +37,7 @@
 
 .section.header {
     border-top: 2px solid #09caff;
-    /* border-bottom: 1px dashed #09caff; */
-    box-shadow: 0 3px 1px #eee;
+    box-shadow: 0 1px 1px #eee;
 }
 
 h1.title a {
@@ -73,7 +72,7 @@ h4.title {
     font-size: 1.12em;
 }
 
-.form .filter-results {
+.help-text {
     font-size: 0.9em;
     margin: 0 10px;
     color: darkgray;

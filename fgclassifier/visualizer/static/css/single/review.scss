@@ -1,5 +1,7 @@
 article.single-review {
     margin-top: 20px;
+    border-radius: 6px 6px 0 0;
+    padding: 20px 0;
 }
 article.single-review blockquote {
     padding-left: 2em;
@@ -15,8 +17,8 @@ article.single-review blockquote:before {
     font-size: 50pt;
     position: absolute;
     left: 0;
-    top: -20pt;
     color: #aaa;
+    line-height: 1;
 }
 .folded article.single-review blockquote {
     height: 1.8em;
@@ -44,9 +46,22 @@ article.single-review blockquote:before {
 .review-text {
     transition: 0.5s all;
     overflow: hidden;
+    font-size: 16px;
+    line-height: 1.6em;
 }
+
 
 .box .review-title {
     margin-top: -20px;
     padding-top: 20px;
+}
+
+.positive {
+    color: #1a9641;
+}
+.negative {
+    color: #d7191c;
+}
+.neutral {
+    color: #2c7bb6;
 }

@@ -1,71 +1,94 @@
-<div class="columns">
-    <div class="column is-three-quarters">
-        <form action="/" class="form pick-review">
-            <div class="field">
-                <label for="sel-dataset" class="label">Data Source</label>
-                <div class="control">
-                    <div class="select">
-                        <select name="dataset" id="sel-dataset">
-                            {% for opt, opt_disp in dataset_choices.items() %}
-                            <option value="{{ opt }}" {% if dataset==opt %} selected="selected" {% endif %}>{{
-                                opt_disp }}</option>
-                            {% endfor %}
-                        </select>
+<form action="/" class="form pick-review">
+    <div class="field">
+        <label for="sel-dataset" class="label">Data Source</label>
+        <div class="control">
+            <div class="select">
+                <select name="dataset" id="sel-dataset">
+                    {% for opt, opt_disp in dataset_choices.items() %}
+                    <option value="{{ opt }}" {% if dataset==opt %} selected="selected" {% endif %}>{{
+                        opt_disp }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="dropdown is-right">
+                <div class="dropdown-trigger">
+                    <a class="button" aria-haspopup="true" aria-controls="dataset-help">
+                        <span class="icon is-small">
+                            <i class="fas fa-question" aria-hidden="true"></i>
+                        </span>
+                    </a>
+                </div>
+                <div class="dropdown-menu" id="dataset-help" role="menu">
+                    <div class="dropdown-content">
+                        <div class="dropdown-item">
+                            <div class="info">
+                                <p>The <a href="https://challenger.ai/competition/fsauor2018" target="_blank">raw
+                                        dataset</a> is in Chinese.
+                                    The English reviews showing here are a subset of the original Chinese reviews
+                                    and translated from Chinese using Google
+                                    Translation API.</p>
+                                <p>Models are trained separately on English and Chinese datasets.</p>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
-            <div class="field">
-                <label for="inp-keyword" class="label">Must contain</label>
-                <div class="control">
-                    <input class="input" type="text" name="keyword" id="inp-keyword"
-                         placeholder="Keyword" autocomplete="off">
-                </div>
-            </div>
-            <div class="field">
-                <label class="label" for="inp-seed">Random Seed</label>
-                <div class="control">
-                    <input class="input" type="number" name="seed" id="inp-seed" size="3" value="{{ seed }}">
-                </div>
-            </div>
-            <div class="field">
-                <button type="submit" class="hidden"></button>
-                <button class="button is-primary prev-seed" type="button">
-                    <span class="icon">
-                        <i class="fas fa-lg fa-angle-left"></i>
-                    </span>
-                </button>
-                <button class="button is-primary next-seed" type="button">
-                    <span class="icon">
-                        <i class="fas fa-lg fa-angle-right"></i>
-                    </span>
-                </button>
-            </div>
-            <div class="filter-results">
-                {% include "single/filter_results.jinja" %}
-            </div>
-        </form>
-        <div class="review-preview loader-parent foldable">
-            <div class="section-loader">
-                <i class="loader"></i>
-            </div>
-            <article class="box single-review">
-            <h4 class="title review-title toggle">
-                Review <strong>#<span class="review-id">{{ review.id }}</span></strong>
-                <span class="icon">
-                    <i class="fas fa-chevron-up"></i>
-                </span>
-            </h4>
-            <blockquote class="review-text">
-                {{ review.content_html | safe }}
-            </blockquote>
-        </article>
         </div>
     </div>
-    <div class="column help-info">
-        <p class="instruction">First, pick a random review.</p>
-        <p>The <a href="https://challenger.ai/competition/fsauor2018" target="_blank">raw dataset</a> is in Chinese.
-           The English reviews showing here are translated using Google Translate API.</p>
-        <p>Models are trained separately on English and Chinese datasets. The English dataset
-         is just a 1/10 subset of the Chinese training set.</p>
+    <div class="field">
+        <label for="inp-keyword" class="label">Must contain</label>
+        <div class="control">
+            <input class="input" type="search" name="keyword" id="inp-keyword" placeholder="Keyword" autocomplete="off">
+        </div>
+    </div>
+    <div class="field is-hidden">
+        <label class="label" for="inp-seed">Random Seed</label>
+        <div class="control">
+            <input class="input" type="number" name="seed" id="inp-seed" size="3" value="{{ seed }}">
+        </div>
+    </div>
+    <div class="help-text filter-results">
+        {% include "single/filter_results.jinja" %}
+    </div>
+</form>
+
+<div class="review-preview loader-parent">
+    <div class="section-loader">
+        <i class="loader"></i>
+    </div>
+    <article class="single-review">
+        <div class="mini-pager buttons are-small">
+            <button class="button is-small prev-seed" type="button" title="Previous random review">
+                <span class="icon">
+                    <i class="fas fa-lg fa-angle-left"></i>
+                </span>
+            </button>
+            <button class="button is-small next-seed" type="button" title="Next random review">
+                <span class="icon">
+                    <i class="fas fa-lg fa-angle-right"></i>
+                </span>
+            </button>
+        </div>
+        <h4 class="title review-title">
+            Review <strong>#<span class="review-id">{{ review.id }}</span></strong>
+            <!-- <span class="icon">
+                    <i class="fas fa-chevron-up"></i>
+                </span> -->
+        </h4>
+        <blockquote class="review-text">
+            {{ review.content_html | safe }}
+        </blockquote>
+    </article>
+    <hr>
+    <div class="help-text">
+        <p>Click on a sentence to see sentiment predictions for the sentence.</p>
+        <p>Colors highlight the key phrases in a sentence and the overall sentiment (
+            <span class="negative">Negative</span>,
+            <span class="neutral">Neutral</span>,
+            or <span class="positive">Positive</span>
+        ) of that sentence, as predicted by
+        <a href="https://textblob.readthedocs.io/en/dev/quickstart.html#sentiment-analysis" target="_blank">TextBlob</a>.
+        This sentiment prediction is only for reference and not actually used in our classification models
+        showing on the right.
     </div>
 </div>

@@ -11,8 +11,8 @@ from flask_socketio import SocketIO
 from flask_assets import Environment
 
 from fgclassifier.visualizer import actions
-from fgclassifier.visualizer.config import dataset_choices, fm_choices
-from fgclassifier.visualizer.config import clf_choices
+from fgclassifier.visualizer.options import dataset_choices, fm_choices
+from fgclassifier.visualizer.options import clf_choices
 
 
 app = Flask(__name__)
@@ -46,6 +46,13 @@ def predict():
     """Predict for one single review"""
     inputs = actions.parse_inputs(**dict(request.args.items()))
     return jsonify(actions.predict_one(**inputs))
+
+
+@app.route('/predict_text')
+def predict_text():
+    """Predict for user-inputted text"""
+    inputs = dict(request.args.items())
+    return jsonify(actions.predict_text(**inputs))
 
 
 if __name__ == '__main__':

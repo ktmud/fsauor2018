@@ -15,7 +15,7 @@ class AsyncUpdater {
     this.prepare(elem)
   }
 
-  fetchAndUpdate(qs) {
+  fetchAndUpdate(opts) {
 
     // cancel existing request
     if (this.t_loading != null) {
@@ -26,7 +26,7 @@ class AsyncUpdater {
     }
 
     this.enterLoading()
-    this.req = this.fetchData(qs).then((res) => {
+    this.req = this.fetchData(opts).then((res) => {
       this.render(res);
       this.exitLoading()
     })
@@ -73,7 +73,7 @@ class AsyncUpdater {
     d3.select(window)
       .on('resize', debounce(this.render.bind(this), 100))
       .on('popstate', () => {
-        this.fetchAndUpdate(location.search, false)
+        this.fetchAndUpdate({ qs: location.search }, false)
       })
 
     this.root = d3.select(elem)
@@ -84,6 +84,10 @@ class AsyncUpdater {
     let self = this
     this.root.selectAll('.foldable .toggle').on('click', function() {
       self.toggleClass('folded', this.closest('.foldable'))
+    })
+
+    this.root.selectAll('.dropdown-trigger').on('click', function() {
+      self.toggleClass('is-active', this.closest('.dropdown'))
     })
   }
 
@@ -99,11 +103,21 @@ class AsyncUpdater {
     })
   }
 
-  fetchData(qs, updateHistory) {
-    let p = (this.params = {});
-    if (qs) {
-      let params = new URLSearchParams(qs)
-      for (let [k, val] of params.entries()) {
+  fetchData({
+    qs,       // query string
+    params,   // parameters
+    endpoint,  // API endpoint
+    fields,   // fields to sent
+    updateHistory  // whether to update the history object
+  } = {}) {
+
+    let p = params || {};
+    this.params = p;
+
+    // Update form control values from query string
+    if (typeof qs === 'string') {
+      let qsparams = new URLSearchParams(qs)
+      for (let [k, val] of qsparams.entries()) {
         let elem = $('#sel-' + k) || $('#inp-' + k)
         if (elem) {
           elem.value = val
@@ -112,16 +126,24 @@ class AsyncUpdater {
       }
     }
 
-    let optNames = this.fields
+    // if targeting other endpoint, don't update history
+    if (typeof updateHistory == 'undefined' && endpoint != this.endpoint) {
+      updateHistory = false;
+    }
+
+    // collect values from form controls
+    let optNames = fields || this.fields
     optNames.forEach((k) => {
       let elem = $('#sel-' + k) || $('#inp-' + k)
       if (elem) {
         p[k] = elem.value;
       }
     });
+
+    // construct new query strings
     let new_qs = [];
     for (let k of Object.keys(p)) {
-      new_qs.push(`${k}=${p[k]}`)
+      new_qs.push(`${k}=${encodeURIComponent(p[k])}`)
     }
     new_qs = '?' + new_qs.join('&')
 
@@ -129,9 +151,7 @@ class AsyncUpdater {
       window.history.pushState(null, null, new_qs);
     }
 
-    // update form class, to hide certain hyperparameters
-    d3.select('form').attr('class', `form model-${p.model}`)
-    return d3.json(`${this.endpoint}${new_qs}`);
+    return d3.json(`${endpoint || this.endpoint}${new_qs}`);
   }
 }
 

@@ -1,62 +1,62 @@
-<div class="columns">
-    <div class="column is-three-quarters">
-        <form action="/" class="form pick-model">
-            <div class="field">
-                <label for="sel-fm" class="label">Feature Processing</label>
-                <div class="control">
-                    <div class="select">
-                        <select name="fm" id="sel-fm">
-                            {% for opt, opt_disp in fm_choices.items() %}
-                            <option value="{{ opt }}" {% if fm==opt %} selected="selected" {% endif %}>{{
-                                opt_disp }}</option>
-                            {% endfor %}
-                        </select>
-                    </div>
-                </div>
+<form action="/" class="form pick-model">
+    <div class="field">
+        <label for="sel-fm" class="label">Feature Processing</label>
+        <div class="control">
+            <div class="select">
+                <select name="fm" id="sel-fm">
+                    {% for opt, opt_disp in fm_choices.items() %}
+                    <option value="{{ opt }}" {% if fm==opt %} selected="selected" {% endif %}>{{
+                        opt_disp }}</option>
+                    {% endfor %}
+                </select>
             </div>
-            <div class="field">
-                <label for="sel-clf" class="label">Base Classifier</label>
-                <div class="control">
-                    <div class="select">
-                        <select name="clf" id="sel-clf">
-                            {% for opt, opt_disp in clf_choices.items() %}
-                            <option value="{{ opt }}" {% if clf==opt %} selected="selected" {% endif %}>{{
-                                opt_disp }}</option>
-                            {% endfor %}
-                        </select>
-                    </div>
-                </div>
+        </div>
+    </div>
+    <div class="field">
+        <label for="sel-clf" class="label">Base Classifier</label>
+        <div class="control">
+            <div class="select">
+                <select name="clf" id="sel-clf">
+                    {% for opt, opt_disp in clf_choices.items() %}
+                    <option value="{{ opt }}" {% if clf==opt %} selected="selected" {% endif %}>{{
+                        opt_disp }}</option>
+                    {% endfor %}
+                </select>
             </div>
-        </form>
+        </div>
     </div>
-    <div class="column help-info">
-        <p class="instruction">Then, select a pre-trained model</p>
-        <p>We use the Base Classifier to predict sentiment labels one by one.</p>
+    <div class="help-text">
+        <p>Base Classifiers are fitted for each fine-grained category one by one.</p>
     </div>
+</form>
+<div class="model-performance">
 </div>
-<div class="columns">
-    <div class="column loader-parent is-three-quarters">
-        <div class="section-loader">
-            <i class="loader"></i>
-        </div>
-        <div class="chart">
-            <h3>The Predicted and Actual Sentiments of Review #<span class="review-id">{{ review_id }}</span></h3>
-            <div class="mini-pager buttons are-small">
-                <button class="button is-small prev-seed" type="button">
-                    <span class="icon">
-                        <i class="fas fa-lg fa-angle-left"></i>
-                    </span>
-                </button>
-                <button class="button is-small next-seed" type="button">
-                    <span class="icon">
-                        <i class="fas fa-lg fa-angle-right"></i>
-                    </span>
-                </button>
-            </div>
-            <svg class="bricks"></svg>
-        </div>
+
+<div class="chart loader-parent">
+    <div class="section-loader">
+        <i class="loader"></i>
     </div>
-    <div class="column help-info">
-        <p></p>
+    <div class="mini-pager buttons are-small is-hidden">
+        <button class="button is-small prev-seed" type="button">
+            <span class="icon">
+                <i class="fas fa-lg fa-angle-left"></i>
+            </span>
+        </button>
+        <button class="button is-small next-seed" type="button">
+            <span class="icon">
+                <i class="fas fa-lg fa-angle-right"></i>
+            </span>
+        </button>
+    </div>
+    <svg class="bricks"></svg>
+    <div class="section-footer">
+        <div class="overall-sentiments">
+            <svg class="overall-bars"></svg>
+        </div>
+        <div class="correct-count-info">
+            <span class="correct-count">
+                {% include "single/correct_count.jinja" %}
+            </span>
+        </div>
     </div>
 </div>

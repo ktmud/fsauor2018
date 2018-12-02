@@ -31,8 +31,7 @@
 
 .section.header {
   border-top: 2px solid #09caff;
-  /* border-bottom: 1px dashed #09caff; */
-  box-shadow: 0 3px 1px #eee; }
+  box-shadow: 0 1px 1px #eee; }
 
 h1.title a {
   display: block;
@@ -61,7 +60,7 @@ h2.title:not(.is-spaced) + .subtitle {
 h4.title {
   font-size: 1.12em; }
 
-.form .filter-results {
+.help-text {
   font-size: 0.9em;
   margin: 0 10px;
   color: darkgray; }
@@ -76,7 +75,9 @@ p + p {
  * Single Review Chart
  */
 article.single-review {
-  margin-top: 20px; }
+  margin-top: 20px;
+  border-radius: 6px 6px 0 0;
+  padding: 20px 0; }
 
 article.single-review blockquote {
   padding-left: 2em;
@@ -92,8 +93,8 @@ article.single-review blockquote:before {
   font-size: 50pt;
   position: absolute;
   left: 0;
-  top: -20pt;
-  color: #aaa; }
+  color: #aaa;
+  line-height: 1; }
 
 .folded article.single-review blockquote {
   height: 1.8em;
@@ -118,18 +119,30 @@ article.single-review blockquote:before {
 
 .review-text {
   transition: 0.5s all;
-  overflow: hidden; }
+  overflow: hidden;
+  font-size: 16px;
+  line-height: 1.6em; }
 
 .box .review-title {
   margin-top: -20px;
   padding-top: 20px; }
 
+.positive {
+  color: #1a9641; }
+
+.negative {
+  color: #d7191c; }
+
+.neutral {
+  color: #2c7bb6; }
+
 .chart {
   min-height: 400px;
   background: #fafafa;
-  text-align: center;
   padding: 20px 10px;
-  border-radius: 3px; }
+  border-radius: 3px;
+  margin-top: 20px;
+  font-size: 12px; }
 
 .chart h3 {
   margin: 0 0 20px; }
@@ -160,16 +173,100 @@ path.line {
   stroke-linecap: round;
   stroke-linejoin: round; }
 
-.positive {
-  color: #1a9641; }
+.tooltip {
+  position: absolute;
+  top: 0;
+  left: 0;
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid lightgray;
+  padding: 5px;
+  opacity: 0;
+  transition: 0.2s all ease-in;
+  font-size: 12px;
+  line-height: 1.4;
+  z-index: -100; }
 
-.negative {
-  color: #d7191c; }
+.tooltip.active {
+  opacity: 1;
+  z-index: 100; }
 
-.neutral {
-  color: #2c7bb6; }
+.tooltip b {
+  font-weight: 600;
+  display: inline-block;
+  width: 4.5em;
+  text-align: right; }
+
+@media screen and (min-width: 1088px) {
+  .container {
+    max-width: 1200px;
+    width: auto; } }
+
+@media screen and (min-width: 1280px) {
+  .container {
+    max-width: 1280px;
+    width: auto; } }
 
 .mini-pager {
   position: absolute;
-  right: 20px;
-  top: 20px; }
+  right: 10px;
+  top: 10px; }
+  .mini-pager .button:not(:last-child):not(.is-fullwidth) {
+    margin-right: 0px; }
+
+article.single-review {
+  position: relative; }
+
+.section-header {
+  position: relative;
+  margin-bottom: 20px; }
+
+#dataset-help {
+  width: 220px; }
+
+.correct-count-info {
+  text-align: right;
+  padding: 4px 10px;
+  display: inline-block; }
+
+.chart .section-footer {
+  padding-top: 10px;
+  padding-left: 168px;
+  color: gray; }
+
+.chart .overall-sentiments {
+  display: inline-block; }
+  .chart .overall-sentiments text {
+    fill: gray; }
+
+.chart .overall-bars {
+  width: 170px;
+  height: 34px;
+  vertical-align: middle; }
+
+.footer {
+  font-size: 12px;
+  background: none;
+  padding: 1rem 2rem 4rem;
+  line-height: 1em;
+  margin-top: 3rem; }
+  .footer p {
+    margin: 0; }
+
+span.sentence {
+  display: inline-block;
+  margin-right: 1px;
+  padding: 3px 6px;
+  border: 1px solid #fff;
+  border-radius: 3px; }
+  span.sentence::selection, span.sentence ::selection {
+    background: #f9f9f9; }
+  span.sentence:hover, span.sentence.active {
+    background: #fff;
+    border: 1px solid rgba(0, 0, 0, 0.2);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2); }
+  span.sentence.active {
+    border: 1px solid #3498db;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1); }
+
+.brick-bars text {
+  font-size: 13px; }

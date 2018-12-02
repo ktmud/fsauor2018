@@ -8,8 +8,10 @@ from collections import OrderedDict
 dataset_choices = OrderedDict([
     ('train_en', 'Training'),
     ('valid_en', 'Validation'),
+    ('test_en', 'Testing'),
     ('train', 'Training (Chinese)'),
     ('valid', 'Validation (Chinese)'),
+    ('testa', 'Testing (Chinese)'),
 ])
 
 # Feature model choices -------
@@ -27,6 +29,6 @@ clf_choices = OrderedDict([
     # Only LDA and Logistic supports predict a probability
     ('LDA', 'Linear Discriminant Analysis'),
     ('Logistic', 'Logistic Regression'),
-    # ('LinearSVC', 'Linear SVM Classifier'),
-    # ('Ridge', 'Ridge Classifier'),
+    ('LinearSVC', 'Linear SVM Classifier'),
+    ('Ridge', 'Ridge Classifier'),
 ])

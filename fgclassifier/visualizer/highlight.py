@@ -42,10 +42,11 @@ def highlight_noun_chunks(text, lang='en'):
         return zh_highlight_noun_chunks(text)
 
     nlp = spacy_load(lang)
-    html = text
+    html = ''
     replacements = []
     blob = TextBlob(text)
     for sent in blob.sentences:
+        sentence = sent.string
         score = sent.sentiment.polarity
         senti = 'neutral'
         if score > 0.1:
@@ -54,13 +55,14 @@ def highlight_noun_chunks(text, lang='en'):
             senti = 'negative'
         # Find the longest noun_chunk in the text, assign the whole
         # sentence's sentiment to it.
-        chunks = sorted(nlp(sent.string).noun_chunks, key=lambda x: -len(x))
+        chunks = sorted(nlp(sentence).noun_chunks, key=lambda x: -len(x))
 
         # highlight the longest two noun chunks
         for chunk in chunks[:2]:
             # the chunk must has at least two words
             if len(chunk) > 1:
-                html = _sub_highlight(html, chunk.text, senti, replacements)
+                sentence = _sub_highlight(sentence, chunk.text, senti, replacements)
+        html += '<span class="sentence">' + sentence + '</span>'
     return _show_highlight(html, replacements)
 
 
@@ -117,7 +119,7 @@ def zh_noun_chunks_iterator(obj):
 def zh_highlight_noun_chunks(text):
     """Highlight noun chunks for Chinese"""
     nlp = spacy_load('zh')
-    html = text
+    html = ''
     replacements = []
     for sent in zh_split_sents(text):
         # Sentiment score from SnowNLP is at [0, 1] range
@@ -137,6 +139,7 @@ def zh_highlight_noun_chunks(text):
             # the chunk must has at least two words
             if len(chunk) > 1:
                 # add highlight to replacements
-                html = _sub_highlight(html, chunk.text, senti, replacements)
+                sent = _sub_highlight(sent, chunk.text, senti, replacements)
+        html += '<span class="sentence">' + sent + '</span>'
 
     return _show_highlight(html, replacements)

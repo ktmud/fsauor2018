@@ -3,10 +3,14 @@
 """
 Actions users can take
 """
-from flask import request, render_template
+import numpy as np
+import pandas as pd
 
-from fgclassifier.visualizer.config import dataset_choices, fm_choices
-from fgclassifier.visualizer.config import clf_choices
+from flask import request, render_template
+from collections import Counter
+
+from fgclassifier.visualizer.options import dataset_choices, fm_choices
+from fgclassifier.visualizer.options import clf_choices
 from fgclassifier.visualizer.highlight import highlight_noun_chunks
 from fgclassifier.utils import get_dataset, load_model, read_data
 
@@ -36,10 +40,14 @@ def parse_inputs(dataset='train_en', keyword=None,
 def predict_one(dataset, dfs, totals, seed, fm, clf, **kwargs):
     """Predict for a random review"""
     lang = 'en' if '_en' in dataset else 'zh'
+    X, y = read_data(dfs[0])
+    global_count = pd.concat(
+        [y[col].value_counts(sort=False)
+         for col in y], axis=1).sort_index().T.values.tolist()
     if totals[0] == 0:
-        X, y = read_data(dfs[0])
         review = {
             'id': 'N/A',
+            'global_count': global_count,
             'content_html': '--  No matching reviews found. Please remove keyword. --'
         }
         true_labels, probas = None, None
@@ -49,22 +57,61 @@ def predict_one(dataset, dfs, totals, seed, fm, clf, **kwargs):
         # split to feature and labels
         X, y = read_data(random_review)
         model = load_model(fm, clf)
-        probas = model.predict_proba(X)
         review = random_review.to_dict('records')[0]
         # Add highlighted HTML's
         review['content_html'] = highlight_noun_chunks(
             review['content_raw'], lang
         ).replace('\n', '<br>')
-        true_labels = y.values.tolist()
-        probas = [x.tolist() for x in probas]
+        del review['content_raw']
+        if clf in ('Logistic', 'LDA'):
+            # Only LogisticRegression and LinearDiscriminantAnalysis supports
+            # the probablisitc view.
+            probas = model.predict_proba(X)
+            probas = [x.tolist() for x in probas]
+        else:
+            probas = None
+        
+        true_labels = y.values
+        predict_labels = model.predict(X)
+        # number of correct predictions
+        n_correct_labels = np.sum(true_labels == predict_labels,
+                                  axis=1).tolist()
+        true_labels = true_labels.tolist()
+        predict_labels = predict_labels.tolist()
+        true_label_counts = [Counter(x) for x in true_labels]
+        predict_label_counts = [Counter(x) for x in predict_labels]
 
     label_names = y.columns.tolist()
+    n_total_labels = len(label_names)
     return {
+        'global_count': global_count,
         'review': review,
         'label_names': label_names,
+        'n_total_labels': n_total_labels,
+        'n_correct_labels_html': render_template(
+            'single/correct_count.jinja', **locals()
+        ),
+        'true_label_counts': true_label_counts,
+        'predict_label_counts': predict_label_counts,
         'true_labels': true_labels,
+        'predict_labels': predict_labels,
         'probas': probas,
         'filter_results': render_template(
             'single/filter_results.jinja', **{**kwargs, **locals()})
     }
 
+
+def predict_text(text, fm, clf, **kwargs):
+    """Predict for user inputed text"""
+    X = pd.Series([text], name='content')
+    model = load_model(fm, clf)
+    predict_labels = model.predict(X)
+    probas = model.predict_proba(X)
+    probas = [x.tolist() for x in probas]
+    predict_labels = predict_labels.tolist()
+    predict_label_counts = [Counter(x) for x in predict_labels]
+    return {
+        'predict_label_counts': predict_label_counts,
+        'predict_labels': predict_labels,
+        'probas': probas,
+    }

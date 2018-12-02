@@ -21,19 +21,33 @@
                     <span class="icon"><i class="fas fa-utensils"></i></span>
                 </a>
             </h1>
-            <p class="subtitle">Supervized Machine Learning in Fine-grained Sentiment Analysis of Online Reviews</p>
-            <p class="credit">DS5500, Fall 2018 // Northeastern University</p>
+            <p class="subtitle">Evaluating Supervised Classifiers for Fine-grained Sentiment Analysis</p>
         </div>
     </section>
 
     <section class="section" id="single-review">
         <div class="container">
-            <h2 class="title">Dissecting a Single Review</h2>
-            {% include "single/pick_review.jinja" %}
-            {% include "single/pick_model.jinja" %}
+        <div class="columns">
+            <div class="column is-half">
+                {% include "single/pick_review.jinja" %}
+            </div>
+            <div class="column is-half">
+                {% include "single/pick_model.jinja" %}
+            </div>
+        </div>
         </div>
     </section>
 
+    <footer class="footer">
+        <div class="content">
+            <h5>Credit</h5>
+            <p>This visualization is made for DS5500, Fall 2018 at Northeastern University, advised by Prof.
+                <a href="https://www.ccis.northeastern.edu/people/cody-dunne/" target="_blank">Cody Dunne</a>.
+                and <a href="https://www.ccis.northeastern.edu/people/ansel-maclaughlin/">Ansel MacLaughlin</a>
+            </p>
+            <p class="credit">&copy 2018 Jianchao Yang, Shivayogi Biradar, Sharyu Deshmukh</p>
+        </div>
+    </footer>
     <script src="js/d3.v5.js"></script>
     <script type="module" src="js/main.js"></script>
 </body>

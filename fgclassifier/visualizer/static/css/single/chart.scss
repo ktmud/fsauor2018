@@ -2,9 +2,10 @@
 .chart {
     min-height: 400px;
     background: #fafafa;
-    text-align: center;
     padding: 20px 10px;
     border-radius: 3px;
+    margin-top: 20px;
+    font-size: 12px;
 }
 
 .chart h3 {
@@ -42,4 +43,28 @@ path.line {
     stroke-width: 1.5;
     stroke-linecap: round;
     stroke-linejoin: round;
+}
+
+.tooltip {
+  position: absolute;
+  top: 0;
+  left: 0;
+  background: rgba(255,255,255,0.9);
+  border: 1px solid lightgray;
+  padding: 5px;
+  opacity: 0;
+  transition: 0.2s all ease-in;
+  font-size: 12px;
+  line-height: 1.4;
+  z-index: -100;
+}
+.tooltip.active {
+  opacity: 1;
+  z-index: 100;
+}
+.tooltip b {
+  font-weight: 600;
+  display: inline-block;
+  width: 4.5em;
+  text-align: right;
 }

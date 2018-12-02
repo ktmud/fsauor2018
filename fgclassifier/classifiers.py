@@ -28,6 +28,7 @@ Logistic = LogisticRegression(
 Ridge = RidgeClassifierCV(alphas=(0.01, 0.1, 0.5, 1.0, 5.0, 10.0))
 LDA = LinearDiscriminantAnalysis()
 QDA = QuadraticDiscriminantAnalysis()
+RBF = SVC(kernel='rbf')
 
 
 # Stochastic Gradient Descent with SVM
