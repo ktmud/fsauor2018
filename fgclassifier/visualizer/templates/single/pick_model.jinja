@@ -10,6 +10,29 @@
                     {% endfor %}
                 </select>
             </div>
+            <div class="dropdown is-right">
+                <div class="dropdown-trigger">
+                    <a class="button" aria-haspopup="true" aria-controls="dataset-help">
+                        <span class="icon is-small">
+                            <i class="fas fa-question" aria-hidden="true"></i>
+                        </span>
+                    </a>
+                </div>
+                <div class="dropdown-menu" id="fm-help" role="menu">
+                    <div class="dropdown-content">
+                        <div class="dropdown-item">
+                            <div class="info">
+                                <p>Select how to build the features.</p>
+                                <p>Models available are the best-performing ones for the correponding
+                                 structure.</p>
+                                <p>(SM): smaller vocabulary.<br>
+                                   (200): 200 components.</p>
+                                <p>For details, <a href="https://github.com/ktmud/fsauor2018/" target="_blank">click here</a>.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
     <div class="field">
@@ -63,8 +86,9 @@
 
 <div class="help-text">
 <p>
- Predict: the predicted probablity of the review or selected text has certain sentiment. <br>
- P: the predicted sentiment labels. <br>
- A: the actual sentiment labels. <br>
- Global distribution: the distribution of the labels in the selected/filtered dataset.</p>
+ <em>predict</em>: the predicted probablity of the review or selected text has certain sentiment. <br>
+ <em>P</em>: the predicted sentiment labels. <br>
+ <em>A</em>: the actual sentiment labels. <br>
+ <em>global</em>: the global distribution of the labels in the selected dataset.</p>
+ <em>F1</em>: F1 score on the selected dataset.</p>
 </div>

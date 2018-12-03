@@ -382,7 +382,7 @@ class SingleReviewChart extends AsyncUpdater {
     if (this.data['global_count']) {
       let margin = 12
       let width = fullwidth - barHeight * 2 - margin
-      this.buildBricks(this.data['global_count'], 'global distribution', {
+      this.buildBricks(this.data['global_count'], 'global', {
         ...configs,
         xoffset: xoffset + fullwidth + 2 * barHeight + margin,
         titlex: width / 2,
