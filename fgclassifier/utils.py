@@ -8,9 +8,11 @@ import logging
 import jieba
 import csv
 import pandas as pd
+import numpy as np
 
 import config
 
+from collections import Counter
 from functools import lru_cache
 from sklearn.externals import joblib
 from tqdm import tqdm
@@ -91,6 +93,7 @@ def read_data(data_path, flavor='tokenized', return_df=False,
               sample_n=None, random_state=1, **kwargs):
     """Load data, return X, y"""
     if isinstance(data_path, pd.DataFrame):
+        # flavor does not matter when passing in a DataFrame
         df = data_path
     else:
         df = read_csv(data_path, flavor=flavor, **kwargs)
@@ -127,6 +130,45 @@ def get_dataset(dataset, keyword=None):
     if keyword:
         df = df[df['content_raw'].str.contains(keyword, case=False)]
     return df
+
+
+def persistent(storage_path=config.model_save_path):
+    """Save function output in disk"""
+    def wrapper(func):
+        def wraped(*args, **kwargs):
+            key = hash((args, *kwargs.items()))
+            fpath = f'{storage_path}/cache/{key}.pkl'
+            if os.path.exists(fpath):
+                return joblib.load(fpath)
+            ret = func(*args, **kwargs)
+            joblib.dump(ret, fpath)
+            return ret
+        return wraped
+    return wrapper
+
+
+def label2dist(y):
+    """y (nx20x4) labels to distributions (20x4)"""
+    counts = [y[col].value_counts(sort=False) for col in y]
+    return (
+        pd.concat(counts, axis=1).sort_index().T / y.shape[0]
+    ).values.tolist()
+
+
+# @lru_cache(maxsize=4)
+# @persistent()
+def get_stats(dataset, *args, **kwargs):
+    """Get global performance stats"""
+    X, y = read_data(get_dataset(dataset))
+    model = load_model(*args, **kwargs)
+    scores = model.scores(X, y)
+    y_pred = model.predict(X)
+    return {
+        'scores': scores,
+        'avg_score': np.mean(scores),
+        'true_dist': label2dist(y),
+        'predict_dist': label2dist(y_pred),
+    }
 
 
 def save_model(model, model_save_path=config.model_save_path):

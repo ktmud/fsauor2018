@@ -25,7 +25,7 @@ class DummyTransform(BaseEstimator):
         return self
 
     def transform(self, X):
-        return np.array(X['content'].str.len())[:, None]
+        return np.array(X.str.len())[:, None]
 
 
 class Tfidf(TfidfTransformer):

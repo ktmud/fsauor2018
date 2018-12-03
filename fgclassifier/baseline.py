@@ -1,4 +1,3 @@
-
 """
 A Baseline Model.
 
@@ -20,6 +19,8 @@ logger.setLevel(logging.INFO)
 
 
 class MultiOutputClassifier(MultiOutputClassifier_):
+    """MultioutputClassifier with the ability to calculate F1-score
+    for each output"""
 
     def scores(self, X, y):
         """Return f1 score on a test dataset"""
@@ -97,16 +98,21 @@ class Baseline(Pipeline):
             df.to_csv(save_to, encoding="utf_8_sig", index=False)
         return df
 
-    def scores(self, *args, **kwargs):
-        return self.steps[-1][1].scores(*args, **kwargs)
+    def scores(self, X, y):
+        """Scores of all multiple output"""
+        Xt = X
+        for _, transform in self.steps[:-1]:
+            if transform is not None:
+                Xt = transform.transform(Xt)
+        return self.steps[-1][1].scores(Xt, y)
 
 
 class Dummy(Baseline):
+    """Dummy model"""
 
     def __init__(self, classifier, **kwargs):
         steps = [
             ('dummy_transform', DummyTransform()),
-            ('classify', MultiOutputClassifier(classifier))
         ]
-        super(Baseline, self).__init__(steps)
+        super(Dummy, self).__init__(classifier, steps=steps)
 

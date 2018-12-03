@@ -9,14 +9,14 @@ import numpy as np
 from sklearn.externals import joblib
 from fgclassifier import models, classifiers
 from fgclassifier.features import fm_spec
-from fgclassifier.models import Baseline
+from fgclassifier.models import Baseline, Dummy
 from fgclassifier.utils import read_data, save_model, get_dataset
 
 logger = logging.getLogger(__name__)
 
 
 def fm_cross_check(fmns, clss, fm_cache=None, X_train=None, X_test=None,
-                   y_train=None, y_test=None, results={}):
+                   y_train=None, y_test=None, model_cls=Baseline, results={}):
     """Feature Model Cross Check"""
     all_avg_scores = results['avg'] = results.get('avg', {})
     all_scores = results['all'] = results.get('all', {})
@@ -32,7 +32,7 @@ def fm_cross_check(fmns, clss, fm_cache=None, X_train=None, X_test=None,
         for cls in clss:
             logger.info(f'Train for {fmn} -> {cls}...')
             Classifier = getattr(classifiers, cls)
-            model = Baseline((cls, Classifier), fm=cache['model'])
+            model = model_cls((cls, Classifier), fm=cache['model'])
             model.fit(X_train, y_train)
             all_scores[fmn][cls] = model.scores(X_test, y_test)
             f1 = all_avg_scores[fmn][cls] = np.mean(all_scores[fmn][cls])

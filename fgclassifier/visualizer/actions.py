@@ -12,7 +12,7 @@ from collections import Counter
 from fgclassifier.visualizer.options import dataset_choices, fm_choices
 from fgclassifier.visualizer.options import clf_choices
 from fgclassifier.visualizer.highlight import highlight_noun_chunks
-from fgclassifier.utils import get_dataset, load_model, read_data
+from fgclassifier.utils import get_dataset, load_model, read_data, get_stats
 
 
 def parse_inputs(dataset='train_en', keyword=None,
@@ -35,6 +35,17 @@ def parse_inputs(dataset='train_en', keyword=None,
     totals = [df.shape[0] for df in dfs]  # total number of reviews
     seed = int(seed) if seed.isdigit() else 42
     return dict(locals())
+
+
+def predict_proba(clf, model, X):
+    if clf in ('Logistic', 'LDA'):
+        # Only LogisticRegression and LinearDiscriminantAnalysis supports
+        # the probablisitc view.
+        probas = model.predict_proba(X)
+        probas = [x.tolist() for x in probas]
+    else:
+        probas = None
+    return probas
 
 
 def predict_one(dataset, dfs, totals, seed, fm, clf, **kwargs):
@@ -63,13 +74,7 @@ def predict_one(dataset, dfs, totals, seed, fm, clf, **kwargs):
             review['content_raw'], lang
         ).replace('\n', '<br>')
         del review['content_raw']
-        if clf in ('Logistic', 'LDA'):
-            # Only LogisticRegression and LinearDiscriminantAnalysis supports
-            # the probablisitc view.
-            probas = model.predict_proba(X)
-            probas = [x.tolist() for x in probas]
-        else:
-            probas = None
+        probas = predict_proba(clf, model, X)
         
         true_labels = y.values
         predict_labels = model.predict(X)
@@ -82,12 +87,13 @@ def predict_one(dataset, dfs, totals, seed, fm, clf, **kwargs):
         predict_label_counts = [Counter(x) for x in predict_labels]
 
     label_names = y.columns.tolist()
-    n_total_labels = len(label_names)
+    n_total_labels = len(label_names)  # number of labels to predict
     return {
         'global_count': global_count,
         'review': review,
         'label_names': label_names,
         'n_total_labels': n_total_labels,
+        'n_correct_labels': n_correct_labels,
         'n_correct_labels_html': render_template(
             'single/correct_count.jinja', **locals()
         ),
@@ -106,8 +112,7 @@ def predict_text(text, fm, clf, **kwargs):
     X = pd.Series([text], name='content')
     model = load_model(fm, clf)
     predict_labels = model.predict(X)
-    probas = model.predict_proba(X)
-    probas = [x.tolist() for x in probas]
+    probas = predict_proba(clf, model, X)
     predict_labels = predict_labels.tolist()
     predict_label_counts = [Counter(x) for x in predict_labels]
     return {
