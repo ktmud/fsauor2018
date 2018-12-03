@@ -8,5 +8,6 @@ misc/google-cloud
 .RDataTmp
 .RData
 .Rhistory
+local_config.py
 
 .webassets-cache/
