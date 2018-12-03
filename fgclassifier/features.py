@@ -76,28 +76,28 @@ def is_list_or_tuple(obj):
 # Feature model specifications
 # For Chinese
 fm_spec = {
-    'count': Count(ngram_range=(1, 5), min_df=0.001, max_df=0.99),
+    'count': Count(ngram_range=(1, 5), min_df=0.005, max_df=0.99),
     'tfidf': ['count', Tfidf()],
     'lsa_200': ['tfidf', SVD(n_components=200)],
     'lsa_500': ['tfidf', SVD(n_components=500)],
     'lsa_1k': ['tfidf', SVD(n_components=1000)],
 
     # smaller vocabulary (removed more stop and infrequent words)
-    'count_sv': Count(ngram_range=(1, 5), min_df=0.02, max_df=0.99),
+    'count_sv': Count(ngram_range=(1, 5), min_df=0.01, max_df=0.99),
     'tfidf_sv': ['count_sv', Tfidf()],
     'tfidf_sv_dense': ['tfidf_sv', SparseToDense()],
     'lsa_200_sv': ['tfidf_sv', SVD(n_components=200)],
     'lsa_500_sv': ['tfidf_sv', SVD(n_components=500)],
 
     # For English
-    'count_en': Count(ngram_range=(1, 4), min_df=0.01, stop_words='english'),
+    'count_en': Count(ngram_range=(1, 5), min_df=0.01, stop_words='english'),
     'tfidf_en': ['count_en', Tfidf()],
     'tfidf_en_dense': ['tfidf_en', SparseToDense()],
     'lsa_200_en': ['tfidf_en', SVD(n_components=200)],
     'lsa_500_en': ['tfidf_en', SVD(n_components=500)],
     'lsa_1k_en': ['tfidf_en', SVD(n_components=1000)],
 
-    'count_en_sv': Count(ngram_range=(1, 4), min_df=0.02, stop_words='english'),
+    'count_en_sv': Count(ngram_range=(1, 5), min_df=0.02, stop_words='english'),
     'tfidf_en_sv': ['count_en_sv', Tfidf()],
     'tfidf_en_sv_dense': ['tfidf_en_sv', SparseToDense()],
     'lsa_200_en_sv': ['tfidf_en_sv', SVD(n_components=200)],
