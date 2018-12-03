@@ -3,12 +3,13 @@
 """
 Highlight Sentiment Tags
 """
-import re
 from functools import lru_cache
 
 import spacy
 from textblob import TextBlob
 from snownlp import SnowNLP
+
+from fgclassifier.embedding import split_sentences
 
 
 @lru_cache(2)
@@ -60,23 +61,6 @@ def highlight_noun_chunks(text, lang='en'):
                                           sentiment, replacements)
         html += '<span class="sentence">' + sentence + '</span>'
     return _show_highlight(html, replacements)
-
-
-# Find Chinese sentences
-RE_SENTENCE = re.compile(r'.*?[。….？！?!；~～]+') 
-RE_BLANK_AND_MARK = re.compile(r'\s+([。….？！?!；~～])')
-
-
-def split_sentences(text):
-    """Split Chinese sentences"""
-    # replace consequetive "<space><mark>"
-    text = RE_BLANK_AND_MARK.sub(r'\1', text)
-    seen_one = False
-    for sent in RE_SENTENCE.findall(text):
-        seen_one = True
-        yield sent.strip()
-    if not seen_one:
-        yield text.strip()
 
 
 def zh_noun_chunks_iterator(obj):

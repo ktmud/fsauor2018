@@ -5,52 +5,37 @@ For Word Embedding Features
 """
 import re
 
-# -------- For Word Embeddings ---------
-RE_EXCL = re.compile('！+')
-RE_QUES = re.compile('？+')
+from sklearn.base import BaseEstimator
+from gensim.sklearn_api import W2VTransformer
 
 
-def split_by(s, regexp, char):
-    if char in s.strip(char):
-        tmp = regexp.split(s)
-        last = tmp.pop()
-        ret = [x + char for x in tmp]
-        ret.append(last)  # add last sentence back
-        return ret
+class Text2Tokens(BaseEstimator):
+    """Transform tokens to splitted"""
+
+    def fit(self):
+        """Fit the model"""
+        return self
+
+    def transform(self, X):
+        """Transform"""
+        return [x.split() for x in X]
 
 
-def article_to_sentences(articles, split_sentence=True):
-    sentences, aids, slens = [], [], []
-    for aid, article in enumerate(articles):
-        if not split_sentence:
-            tokens = article.split()
-            sentences.append(tokens)
-            aids.append(aid)
-            slens.append(len(tokens))
-            continue
-        ss = article.split('。')
-        while ss:
-            s = ss.pop(0).strip()
-            if not s:
-                continue
-            tmp = split_by(s, RE_EXCL, '！')
-            if tmp:
-                ss = tmp + ss
-                continue
-                
-            tmp = split_by(s, RE_QUES, '？')
-            if tmp:
-                ss = tmp + ss
-                continue
-                
-            tokens = s.split()
-            sentences.append(tokens)
-            # keep a record of article ids and sentence length
-            # so that we know which sentence/word belongs to
-            # which article
-            aids.append(aid)
-            slens.append(len(tokens))
-    return sentences, aids, slens
+# More robust split sentences
+RE_SENTENCE = re.compile(r'.*?[。….？！?!；~～]+') 
+RE_BLANK_AND_MARK = re.compile(r'\s+([。….？！?!；~～])')
+
+
+def split_sentences(text):
+    """Split Chinese sentences"""
+    # replace consequetive "<space><mark>"
+    text = RE_BLANK_AND_MARK.sub(r'\1', text)
+    seen_one = False
+    for sent in RE_SENTENCE.findall(text):
+        seen_one = True
+        yield sent.strip()
+    if not seen_one:
+        yield text.strip()
 
 
 def content_to_corpus(df, txt_path, print_sample=10):

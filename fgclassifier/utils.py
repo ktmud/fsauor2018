@@ -149,7 +149,7 @@ def persistent(storage_path=config.model_save_path):
 
 def label2dist(y):
     """y (nx20x4) labels to distributions (20x4)"""
-    counts = [y[col].value_counts(sort=False) for col in y]
+    counts = [y[col].value_counts(sort=False) for col in y.columns]
     return (
         pd.concat(counts, axis=1).sort_index().T / y.shape[0]
     ).values.tolist()
@@ -162,7 +162,7 @@ def get_stats(dataset, *args, **kwargs):
     X, y = read_data(get_dataset(dataset))
     model = load_model(*args, **kwargs)
     scores = model.scores(X, y)
-    y_pred = model.predict(X)
+    y_pred = pd.DataFrame(model.predict(X), index=y.index, columns=y.columns)
     return {
         'scores': scores,
         'avg_score': np.mean(scores),
