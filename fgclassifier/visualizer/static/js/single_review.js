@@ -2,7 +2,8 @@
  * Single Review predictions
  */
 import {
-  $
+  $,
+  initHoverTips
 } from "./helpers.js"
 import AsyncUpdater from './async_updater.js'
 
@@ -35,33 +36,6 @@ const labelcounts = (counts) => {
   })
 }
 
-const initHoverTips = (bars, renderTooltip) => {
-  let tooltip = d3.select('body')
-    .append('div').attr('class', 'tooltip')
-
-  let lastBar = -1;
-  let t_hideTooltip = 0;
-  bars.on("mouseover", () => {
-    clearTimeout(t_hideTooltip);
-    tooltip.attr('class', 'tooltip active')
-      .style('transition', 'none')
-  }).on("mouseout", () => {
-    t_hideTooltip = setTimeout(() => {
-      tooltip.attr('class', 'tooltip')
-        .style('transition', '.2s all')
-    })
-  }).on("mousemove", function mousemove(d, i) {
-    let [xm, ym] = [d3.event.pageX + 12, d3.event.pageY];
-    let closestGroup = d3.select(this).node().closest('g')
-    let groupId = d3.select(closestGroup).attr('group-id')
-    tooltip.style("transform", "translate(" + xm + "px," + ym + "px)");
-    if (i !== lastBar) {
-      lastBar = groupId + String(i)
-      tooltip.html(renderTooltip(d, groupId, i))
-    }
-  });
-}
-
 class SingleReviewChart extends AsyncUpdater {
 
   constructor(elem) {
@@ -84,25 +58,53 @@ class SingleReviewChart extends AsyncUpdater {
       this.fetchAndUpdate()
     })
 
-    this.root.selectAll('.review-text').on('click', () => {
-      let node = d3.event.target
-      if (!node.classList.contains('sentence')) {
-        node = node.closest('.sentence')
+    let reviewText = this.root.selectAll('.review-text').on('mouseup', () => {
+      // current sentence node
+      let curNode = d3.event.target
+      if (!curNode.classList.contains('sentence')) {
+        curNode = curNode.closest('.sentence')
       }
-      if (!node) return;
-      
-      // cancel selection
-      if (node.classList.contains('active')) {
-        this.fetchAndUpdate();
-        return
+      // all sentence nodes
+      let nodes = reviewText.selectAll('.sentence').nodes()
+
+      // activate selected nodes
+      let sel = window.getSelection()
+      let text = '' // selected text
+
+      if (curNode && curNode.classList.contains('active') && sel.toString() === '') {
+        this.fetchAndUpdate()
+        return;
       }
 
-      node.parentNode.querySelectorAll('.sentence.active').forEach((elem) => {
-        elem.classList.remove('active')
+      nodes.forEach((node) => {
+        // deactivate all nodes
+        node.classList.remove('active')
+        node.classList.remove('is-first')
+        node.classList.remove('is-last')
       })
-      node.classList.add('active')
+
+      let filtered = nodes.filter((node) => {
+        return node == curNode || sel.containsNode(node, true)
+      })
+      let last = filtered.length - 1
+
+      filtered.forEach((node, i) => {
+        node.classList.add('active')
+        if (i == 0) {
+          node.classList.add('is-first')
+        }
+        if (i == last) {
+          node.classList.add('is-last')
+        }
+        text += node.innerText;
+      })
+
+      sel.removeAllRanges()
+
       this.fetchAndUpdate({
-        params: { text: d3.select(node).text() },
+        params: {
+          text
+        },
         endpoint: '/predict_text',
         fields: ['fm', 'clf']
       })
@@ -117,7 +119,14 @@ class SingleReviewChart extends AsyncUpdater {
 
   render(rawData) {
     if (rawData) {
-      this.data = rawData
+      this.data = {
+        ...this.data,
+        ...rawData
+      }
+      this.data.review = rawData.review;
+      this.data.n_correct_labels_html = rawData.n_correct_labels_html;
+      this.data.has_true_labels = !!rawData.true_labels;
+
       // only update text when there's new data passed in
       if (this.data.review) {
         this.updateReviewText()
@@ -243,19 +252,19 @@ class SingleReviewChart extends AsyncUpdater {
       if (isInit) {
         let bars = container.selectAll('g.layer')
           .data(probas).enter().append('g')
-            .attr('class', 'layer')
-            .attr('group-id', (d, i) => i)
-            .attr('transform', (d, i) => `translate(0,${i * (barheight + barmargin)})`)
-            .selectAll('rect')
-            .data((d) => d).enter()
-              .append('rect')
-              .style('fill', (d, i) => cmap[i])
-              .attr('x', (d, i) => xScale(i))
-              .attr('height', (d) => yScale(d))
-              .attr('y', (d) => barheight - yScale(d))
-              .attr('width', fullwidth / n_dim)
+          .attr('class', 'layer')
+          .attr('group-id', (d, i) => i)
+          .attr('transform', (d, i) => `translate(0,${i * (barheight + barmargin)})`)
+          .selectAll('rect')
+          .data((d) => d).enter()
+          .append('rect')
+          .style('fill', (d, i) => cmap[i])
+          .attr('x', (d, i) => xScale(i))
+          .attr('height', (d) => yScale(d))
+          .attr('y', (d) => barheight - yScale(d))
+          .attr('width', fullwidth / n_dim)
 
-        initHoverTips(bars, function(d, i, j) {
+        initHoverTips(bars, function (d, i, j) {
           return labeltext[j] + ': ' + d
         })
       } else {
@@ -275,17 +284,17 @@ class SingleReviewChart extends AsyncUpdater {
       // add the stacked bar layers
       let bars = container.selectAll('g.layer')
         .data(layers).enter().append('g')
-          .attr('class', 'layer')
-          .attr('group-id', (d, i) => i)
-          .style('fill', (d, i) => cmap[i])
-          .selectAll('rect')
-          .data((d) => d).enter()
-            .append('rect')
-            .attr('fill-opacity', alpha)
-            .attr('x', (d) => xScale(d[0]))
-            .attr('y', (d, i) => i * (barheight + barmargin))
-            .attr('width', (d) => xScale(d[1] - d[0]))
-            .attr('height', barheight)
+        .attr('class', 'layer')
+        .attr('group-id', (d, i) => i)
+        .style('fill', (d, i) => cmap[i])
+        .selectAll('rect')
+        .data((d) => d).enter()
+        .append('rect')
+        .attr('fill-opacity', alpha)
+        .attr('x', (d) => xScale(d[0]))
+        .attr('y', (d, i) => i * (barheight + barmargin))
+        .attr('width', (d) => xScale(d[1] - d[0]))
+        .attr('height', barheight)
       initHoverTips(bars, tooltipTmpl)
     } else {
       container
@@ -296,6 +305,7 @@ class SingleReviewChart extends AsyncUpdater {
             .data(layers[i])
             .transition()
             .duration(400)
+            .attr('fill-opacity', alpha)
             .attr('x', (d) => xScale(d[0]))
             .attr('width', (d) => xScale(d[1] - d[0]))
         })
@@ -309,7 +319,6 @@ class SingleReviewChart extends AsyncUpdater {
       this.initBricks()
     }
 
-
     let fullwidth = (this.$('.chart').clientWidth - labelWidth - 30) / 2;
     fullwidth = Math.max(80, fullwidth)
     let xoffset = labelWidth + 8
@@ -317,9 +326,13 @@ class SingleReviewChart extends AsyncUpdater {
     let titlex = fullwidth / 2
     let titley = -8
     let configs = {
-      fullwidth, xoffset, yoffset, titlex, titley
+      fullwidth,
+      xoffset,
+      yoffset,
+      titlex,
+      titley
     }
-    
+
     // Add bars.
     // Proba is a 3D Array:
     //  [
@@ -360,6 +373,7 @@ class SingleReviewChart extends AsyncUpdater {
       titlex: 12,
       xoffset: xoffset + fullwidth + barHeight + 6,
       fullwidth: barHeight,
+      alpha: this.data.has_true_labels ? 1 : 0.4,
       tooltipTmpl: (d, i) => {
         return `Actual:<br>${labeltext[i]}`
       }
@@ -380,7 +394,7 @@ class SingleReviewChart extends AsyncUpdater {
 
   updateCorrectCount() {
     let html = this.data.n_correct_labels_html
-    html = html || 'We don\'t know the actual labels.'
+    html = html || 'We don\'t know the true labels.'
     this.html('.correct-count', html);
   }
 
@@ -410,14 +424,14 @@ class SingleReviewChart extends AsyncUpdater {
     let root = d3.select(this.$('.overall-bars'))
     let counts;
     let configs = {
-       root,
-       barheight: 16,
-       fullwidth: 100,
-       xoffset: 70,
-       yoffset: 0,
-       titlex: -8,
-       titley: 12,
-       titleAnchor: 'end'
+      root,
+      barheight: 16,
+      fullwidth: 100,
+      xoffset: 70,
+      yoffset: 0,
+      titlex: -8,
+      titley: 12,
+      titleAnchor: 'end'
     }
     counts = labelcounts(this.data.predict_label_counts);
     this.buildBricks(counts, 'predicted', configs)

@@ -10,6 +10,11 @@
     position: relative;
 }
 
+.section-header {
+    position: relative;
+    margin-bottom: 20px;
+}
+
 .section-loader {
     position: absolute;
     left: 0;
@@ -74,8 +79,10 @@ h4.title {
 
 .help-text {
     font-size: 0.9em;
-    margin: 0 10px;
     color: darkgray;
+}
+.form .help-text {
+    margin: 0 10px;
 }
 
 p + p {

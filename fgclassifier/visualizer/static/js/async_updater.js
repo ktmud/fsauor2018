@@ -35,7 +35,7 @@ class AsyncUpdater {
   enterLoading() {
     this.t_loading = setTimeout(() => {
       this.addClass('is-loading')
-    }, 200);
+    }, 250);
   }
 
   exitLoading() {
@@ -127,6 +127,7 @@ class AsyncUpdater {
     }
 
     // if targeting other endpoint, don't update history
+    endpoint = endpoint || this.endpoint
     if (typeof updateHistory == 'undefined' && endpoint != this.endpoint) {
       updateHistory = false;
     }
@@ -151,7 +152,7 @@ class AsyncUpdater {
       window.history.pushState(null, null, new_qs);
     }
 
-    return d3.json(`${endpoint || this.endpoint}${new_qs}`);
+    return d3.json(`${endpoint}${new_qs}`);
   }
 }
 

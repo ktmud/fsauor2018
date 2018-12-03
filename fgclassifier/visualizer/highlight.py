@@ -10,9 +10,6 @@ import spacy
 from textblob import TextBlob
 from snownlp import SnowNLP
 
-# Find Chinese sentences
-RE_ZH_SENT = re.compile(r'.*?[。...？！?!；~～]+')
-
 
 @lru_cache(2)
 def spacy_load(lang='en'):
@@ -44,15 +41,13 @@ def highlight_noun_chunks(text, lang='en'):
     nlp = spacy_load(lang)
     html = ''
     replacements = []
-    blob = TextBlob(text)
-    for sent in blob.sentences:
-        sentence = sent.string
-        score = sent.sentiment.polarity
-        senti = 'neutral'
+    for sentence in split_sentences(text):
+        score = TextBlob(sentence).sentiment.polarity
+        sentiment = 'neutral'
         if score > 0.1:
-            senti = 'positive'
+            sentiment = 'positive'
         elif score < -0.1:
-            senti = 'negative'
+            sentiment = 'negative'
         # Find the longest noun_chunk in the text, assign the whole
         # sentence's sentiment to it.
         chunks = sorted(nlp(sentence).noun_chunks, key=lambda x: -len(x))
@@ -61,19 +56,27 @@ def highlight_noun_chunks(text, lang='en'):
         for chunk in chunks[:2]:
             # the chunk must has at least two words
             if len(chunk) > 1:
-                sentence = _sub_highlight(sentence, chunk.text, senti, replacements)
+                sentence = _sub_highlight(sentence, chunk.text,
+                                          sentiment, replacements)
         html += '<span class="sentence">' + sentence + '</span>'
     return _show_highlight(html, replacements)
 
 
-def zh_split_sents(text):
+# Find Chinese sentences
+RE_SENTENCE = re.compile(r'.*?[。….？！?!；~～]+') 
+RE_BLANK_AND_MARK = re.compile(r'\s+([。….？！?!；~～])')
+
+
+def split_sentences(text):
     """Split Chinese sentences"""
+    # replace consequetive "<space><mark>"
+    text = RE_BLANK_AND_MARK.sub(r'\1', text)
     seen_one = False
-    for sent in RE_ZH_SENT.findall(text):
+    for sent in RE_SENTENCE.findall(text):
         seen_one = True
-        yield sent
+        yield sent.strip()
     if not seen_one:
-        yield text
+        yield text.strip()
 
 
 def zh_noun_chunks_iterator(obj):
@@ -121,7 +124,7 @@ def zh_highlight_noun_chunks(text):
     nlp = spacy_load('zh')
     html = ''
     replacements = []
-    for sent in zh_split_sents(text):
+    for sent in split_sentences(text):
         # Sentiment score from SnowNLP is at [0, 1] range
         score = SnowNLP(sent).sentiments
         senti = 'neutral'

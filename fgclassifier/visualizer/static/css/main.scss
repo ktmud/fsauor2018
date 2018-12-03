@@ -20,17 +20,13 @@
     right: 10px;
     top: 10px;
     .button:not(:last-child):not(.is-fullwidth) {
-      margin-right: 0px;
+      margin-right: 3px;
     }
 }
 
 article.single-review {
   position: relative;
-}
-
-.section-header {
-    position: relative;
-    margin-bottom: 20px;
+  min-height: 500px;
 }
 
 #dataset-help {
@@ -44,6 +40,8 @@ article.single-review {
 }
 
 .chart {
+  margin-bottom: 20px;
+
   .section-footer {
     padding-top: 10px;
     padding-left: 168px;
@@ -74,25 +72,46 @@ article.single-review {
   }
 }
 
+.review-text {
+  padding: 1px 0;
+}
 
 span.sentence {
-  display: inline-block;
+  display: block;
   margin-right: 1px;
   padding: 3px 6px;
-  border: 1px solid #fff;
-  border-radius: 3px;
+  border: 1px solid rgba(255,255,255,0);
+  border-width: 0 1px;
+  outline: 1px solid rgba(0,0,0,0);
+
   &::selection, ::selection {
-    background: #f9f9f9;
+    background: #d0f3ff;
+    color: #003;
   }
-  
-  &:hover, &.active {
-    background: #fff;
-    border: 1px solid rgba(0,0,0,0.2);
-    box-shadow: 0 1px 2px rgba(0,0,0,0.2);
+
+  &:hover {
+    outline-color: rgba(0,0,0,0.2);
   }
+
   &.active {
-    border: 1px solid #3498db;
-    box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+    border-color: #fff #3498db;
+    border-style: solid;
+    outline: none;
+    &.is-first {
+      border-radius: 3px 3px 0 0;
+      border-top: 1px solid #3498db;
+      margin-top: -1px;
+    }
+    &.is-last {
+      border-radius: 0 0 3px 3px;
+      border-bottom: 1px solid #3498db;
+      box-shadow: 0 1px 0 rgba(0,0,0,0.1);
+      margin-bottom: 1px;
+      margin-bottom: -1px;
+    }
+    &.is-first.is-last {
+      border-radius: 3px;
+    }
   }
 }
 

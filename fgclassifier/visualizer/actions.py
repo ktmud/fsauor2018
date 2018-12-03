@@ -16,7 +16,7 @@ from fgclassifier.utils import get_dataset, load_model, read_data
 
 
 def parse_inputs(dataset='train_en', keyword=None,
-                 fm='lsa_1k_en', clf='lda', seed='42', **kwargs):
+                 fm='lsa_1k_en', clf='lda', seed='49', **kwargs):
     """Predict sentiments for one single review"""
     if keyword is None or isinstance(keyword, str):
         keyword = [keyword]
