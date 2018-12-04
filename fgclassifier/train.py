@@ -5,7 +5,9 @@ import os
 import argparse
 import logging
 import numpy as np
+import time
 
+from collections import defaultdict
 from sklearn.externals import joblib
 from fgclassifier import models, classifiers
 from fgclassifier.features import fm_spec
@@ -18,12 +20,18 @@ logger = logging.getLogger(__name__)
 def fm_cross_check(fmns, clss, fm_cache=None, X_train=None, X_test=None,
                    y_train=None, y_test=None, model_cls=Baseline, results={}):
     """Feature Model Cross Check"""
-    avg_test_scores = results['test_avg'] = results.get('test_avg', {})
+    avg_test_scores = results['test_avg'] = results.get(
+        'test_avg', defaultdict(dict))
     test_scores = results['test'] = results.get('test', {})
-    avg_train_scores = results['train_avg'] = results.get('train_avg', {})
-    train_scores = results['train'] = results.get('train', {})
-    models = results['models'] = results.get(
-        'models', {})  # save modes as well
+    avg_train_scores = results['train_avg'] = results.get(
+        'train_avg', defaultdict(dict))
+    train_scores = results['train'] = results.get('train', defaultdict(dict))
+    # save modes as well
+    models = results['models'] = results.get('models', defaultdict(dict))
+    train_time = results['train_time'] = results.get(
+        'train_time', defaultdict(dict))
+    test_time = results['test_time'] = results.get(
+        'test_time', defaultdict(dict))
 
     # Test for all Feature models
     for fmn in fmns:
@@ -32,23 +40,30 @@ def fm_cross_check(fmns, clss, fm_cache=None, X_train=None, X_test=None,
         logger.info('')
         cache = fm_cache[fmn]
         # Test on all major classifiers
-        for cls in clss:
-            logger.info(f'Train for {fmn} -> {cls}...')
-            Classifier = getattr(classifiers, cls)
-            model = model_cls((cls, Classifier), fm=cache['model'])
+        for clf in clss:
+            tick = time.time()
+            logger.info(f'Train for {fmn} -> {clf}...')
+
+            Classifier = getattr(classifiers, clf)
+            model = model_cls((clf, Classifier), fm=cache['model'])
             model.fit(X_train, y_train)
 
-            train_scores[fmn][cls] = model.scores(X_train, y_train)
-            train_f1 = avg_train_scores[fmn][cls] = np.mean(
-                train_scores[fmn][cls])
+            train_scores[fmn][clf] = model.scores(X_train, y_train)
+            train_f1 = avg_train_scores[fmn][clf] = np.mean(
+                train_scores[fmn][clf])
 
-            test_scores[fmn][cls] = model.scores(X_test, y_test)
-            test_f1 = avg_test_scores[fmn][cls] = np.mean(test_scores[fmn][cls])
+            train_time[fmn][clf] = time.time() - tick
+            tick = time.time()
+
+            test_scores[fmn][clf] = model.scores(X_test, y_test)
+            test_f1 = avg_test_scores[fmn][clf] = np.mean(
+                test_scores[fmn][clf])
+            test_time[fmn][clf] = time.time() - tick
 
             logger.info(
                 '-------------------------------------------------------')
             logger.info(
-                f'【{fmn} -> {cls}】 Train: {train_f1:.4f}, Test: {test_f1:.4f}')
+                f'【{fmn} -> {clf}】 Train: {train_f1:.4f}, Test: {test_f1:.4f}')
             logger.info(
                 '-------------------------------------------------------')
             models[model.name] = model
