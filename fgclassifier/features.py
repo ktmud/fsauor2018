@@ -88,7 +88,7 @@ def is_list_or_tuple(obj):
 # Feature model specifications
 # For Chinese
 fm_spec = {
-    'count': Count(ngram_range=(1, 5), min_df=0.005, max_df=0.99,
+    'count': Count(ngram_range=(1, 5), min_df=0.01, max_df=0.8,
                    tokenizer=lambda x: x.split()),
     'tfidf': ['count', Tfidf()],
     'lsa_200': ['tfidf', SVD(n_components=200)],
@@ -96,7 +96,7 @@ fm_spec = {
     'lsa_1k': ['tfidf', SVD(n_components=1000)],
 
     # smaller vocabulary (removed more stop and infrequent words)
-    'count_sv': Count(ngram_range=(1, 5), min_df=0.008, max_df=0.9,
+    'count_sv': Count(ngram_range=(1, 5), min_df=0.02, max_df=0.8,
                       tokenizer=lambda x: x.split()),
     'tfidf_sv': ['count_sv', Tfidf()],
     'tfidf_sv_dense': ['tfidf_sv', SparseToDense()],
@@ -104,7 +104,7 @@ fm_spec = {
     'lsa_200_sv': ['tfidf_sv', SVD(n_components=200)],
     'lsa_500_sv': ['tfidf_sv', SVD(n_components=500)],
 
-    'count_tiny': Count(ngram_range=(1, 5), min_df=0.01, max_df=0.8,
+    'count_tiny': Count(ngram_range=(1, 5), min_df=0.02, max_df=0.6,
                         tokenizer=lambda x: x.split()),
     'tfidf_tiny': ['count_tiny', Tfidf()],
     'tfidf_tiny_dense': ['tfidf_tiny', SparseToDense()],

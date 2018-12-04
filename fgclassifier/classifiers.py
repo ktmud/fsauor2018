@@ -12,6 +12,8 @@ from sklearn.ensemble import RandomForestClassifier, ExtraTreesClassifier
 from sklearn.dummy import DummyClassifier
 from sklearn.multioutput import MultiOutputClassifier
 
+from sklearn.neural_network import MLPClassifier
+
 DummyStratified = DummyClassifier(strategy='stratified')
 DummyMostFrequent = DummyClassifier(strategy='most_frequent')
 ExtraTree = ExtraTreesClassifier(n_estimators=50, max_depth=10)
@@ -19,7 +21,16 @@ RandomForest = RandomForestClassifier(n_estimators=50, max_depth=10)
 
 # These are default parameters,
 # we initialize an instance here just to suppress warnings
-Logistic = LogisticRegressionCV(
+LogisticCV = LogisticRegressionCV(
+    solver='lbfgs',
+    multi_class='auto',
+    n_jobs=-1,
+    max_iter=200,
+    Cs=(0.0001, 0.001, 0.01, 0.1),
+    cv=5,
+    class_weight='balanced'
+)
+Logistic = LogisticRegression(
     solver='lbfgs',
     multi_class='auto',
     n_jobs=-1,
@@ -27,7 +38,7 @@ Logistic = LogisticRegressionCV(
     class_weight='balanced'
 )
 Ridge = RidgeClassifierCV(
-    alphas=(0.01, 0.1, 0.5, 1.0, 5.0, 10.0)
+    alphas=(0.001, 0.01, 0.1, 0.5, 1.0, 5.0, 10.0)
 )
 LDA = LinearDiscriminantAnalysis()
 QDA = QuadraticDiscriminantAnalysis(reg_param=0.0001)
@@ -47,7 +58,25 @@ SVM_Poly3 = SVC(
     probability=True
 )
 
-
 # Stochastic Gradient Descent with SVM
-SGD_LinearSVC = SGDClassifier(
-    max_iter=5000, tol=1e-6, alpha=1e-6)
+SGD_SVC = SGDClassifier(
+    loss='hinge',
+    learning_rate='optimal',
+    class_weight='balanced',
+    n_jobs=-1, early_stopping=True,
+    max_iter=1000, tol=1e-4, alpha=1e-4
+)
+SGD_Logistic = SGDClassifier(
+    loss='log',
+    learning_rate='optimal',
+    class_weight='balanced',
+    n_jobs=-1, early_stopping=True,
+    max_iter=1000, tol=1e-4, alpha=1e-4
+)
+SGD_Huber = SGDClassifier(
+    loss='modified_huber',
+    learning_rate='optimal',
+    class_weight='balanced',
+    n_jobs=-1, early_stopping=True,
+    max_iter=1000, tol=1e-4, alpha=1e-4
+)

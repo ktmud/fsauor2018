@@ -13,6 +13,7 @@ from sklearn.multioutput import MultiOutputClassifier as MultiOutputClassifier_
 
 from fgclassifier.features import DummyTransform, fm_spec, ensure_named_steps
 from fgclassifier.utils import read_data
+from fgclassifier import classifiers
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
@@ -55,6 +56,9 @@ class Baseline(Pipeline):
             steps = [fm]
         else:
             steps = steps or []
+
+        if isinstance(classifier, str) and hasattr(classifiers, classifier):
+            classifier = (classifier, getattr(classifiers, classifier))
 
         # add classifier as the last step
         if classifier is not None:

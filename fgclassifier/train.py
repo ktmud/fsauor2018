@@ -18,10 +18,10 @@ logger = logging.getLogger(__name__)
 def fm_cross_check(fmns, clss, fm_cache=None, X_train=None, X_test=None,
                    y_train=None, y_test=None, model_cls=Baseline, results={}):
     """Feature Model Cross Check"""
-    all_avg_scores = results['avg'] = results.get('avg', {})
-    all_scores = results['all'] = results.get('all', {})
-    all_avg_train_scores = results['avg_train'] = results.get('avg_train', {})
-    all_train_scores = results['all_train'] = results.get('all_train', {})
+    avg_test_scores = results['test_avg'] = results.get('test_avg', {})
+    test_scores = results['test'] = results.get('test', {})
+    avg_train_scores = results['train_avg'] = results.get('train_avg', {})
+    train_scores = results['train'] = results.get('train', {})
     models = results['models'] = results.get(
         'models', {})  # save modes as well
 
@@ -38,12 +38,12 @@ def fm_cross_check(fmns, clss, fm_cache=None, X_train=None, X_test=None,
             model = model_cls((cls, Classifier), fm=cache['model'])
             model.fit(X_train, y_train)
 
-            all_train_scores[fmn][cls] = model.scores(X_train, y_train)
-            train_f1 = all_avg_train_scores[fmn][cls] = np.mean(
-                all_train_scores[fmn][cls])
+            train_scores[fmn][cls] = model.scores(X_train, y_train)
+            train_f1 = avg_train_scores[fmn][cls] = np.mean(
+                train_scores[fmn][cls])
 
-            all_scores[fmn][cls] = model.scores(X_test, y_test)
-            test_f1 = all_avg_scores[fmn][cls] = np.mean(all_scores[fmn][cls])
+            test_scores[fmn][cls] = model.scores(X_test, y_test)
+            test_f1 = avg_test_scores[fmn][cls] = np.mean(test_scores[fmn][cls])
 
             logger.info(
                 '-------------------------------------------------------')
