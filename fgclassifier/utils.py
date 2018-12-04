@@ -9,9 +9,11 @@ import jieba
 import csv
 import pandas as pd
 import numpy as np
+import hashlib
 
 import config
 
+from datetime import datetime
 from collections import Counter
 from functools import lru_cache
 from sklearn.externals import joblib
@@ -101,7 +103,8 @@ def read_data(data_path, flavor='tokenized', return_df=False,
         df = read_csv(data_path, flavor=flavor, **kwargs)
 
     if sample_n:
-        logger.info(f'Take {sample_n} samples with random state {random_state}')
+        logger.info(
+            f'Take {sample_n} samples with random state {random_state}')
         df = df.sample(sample_n, random_state=random_state)
 
     # X is just 1D strings, y is 20-D labels
@@ -128,21 +131,26 @@ def get_dataset(dataset, keyword=None):
     else:
         # if Chinese, needs to add a raw column
         df = read_csv(data_path, 'tokenized')
-        df['content_raw'] = read_csv(data_path, 'raw')['content'].str.strip('"')
+        df['content_raw'] = read_csv(data_path, 'raw')[
+            'content'].str.strip('"')
     if keyword:
         df = df[df['content_raw'].str.contains(keyword, case=False)]
     return df
 
 
-def persistent(storage_path=config.model_save_path):
+def persistent(func, ttl=604800, storage_path=config.model_save_path):
     """Save function output in disk"""
     def wrapper(func):
-        def wraped(*args, **kwargs):
-            key = hash((args, *kwargs.items()))
-            fpath = f'{storage_path}/cache/{key}.pkl'
+        def wraped(*args):
+            # cache for 1 week
+            ts = str(round(datetime.now().timestamp() / ttl))
+            key = '--'.join([ts, *args])
+            # key = hashlib.md5(key.encode('utf-8')).hexdigest()[:7]
+            fpath = os.path.join(storage_path, f'cache--{key}.pkl')
             if os.path.exists(fpath):
+                logger.info('Load cache %s', fpath)
                 return joblib.load(fpath)
-            ret = func(*args, **kwargs)
+            ret = func(*args)
             joblib.dump(ret, fpath)
             return ret
         return wraped
@@ -151,20 +159,20 @@ def persistent(storage_path=config.model_save_path):
 
 def label2dist(y):
     """y (nx20x4) labels to distributions (20x4)"""
-    counts = [y[col].value_counts(sort=False) for col in y.columns]
-    return (
-        pd.concat(counts, axis=1).sort_index().T / y.shape[0]
-    ).values.tolist()
+    counts = [Counter(y[col]) for col in y.columns]
+    counts = [[c.get(x, 0) for x in [-2, -1, 0, 1]] for c in counts]
+    return (np.array(counts) / len(y)).tolist()
 
 
-# @lru_cache(maxsize=4)
-# @persistent()
+@lru_cache(10)
+@persistent('stats')
 def get_stats(dataset, *args, **kwargs):
     """Get global performance stats"""
     X, y = read_data(get_dataset(dataset))
     model = load_model(*args, **kwargs)
     scores = model.scores(X, y)
-    y_pred = pd.DataFrame(model.predict(X), index=y.index, columns=y.columns)
+    y_pred = pd.DataFrame(data=model.predict(X),
+                          index=y.index, columns=y.columns)
     return {
         'scores': scores,
         'avg_score': np.mean(scores),
