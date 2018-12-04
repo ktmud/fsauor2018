@@ -91,15 +91,16 @@ def is_list_or_tuple(obj):
 # For Chinese
 fm_spec = {
     'hashing': HashingVectorizer(tokenizer=tokenize_zh),
-    'count': Count(ngram_range=(1, 5), min_df=0.01, max_df=0.9,
+    'count': Count(ngram_range=(1, 5), min_df=0.005, max_df=0.99,
                    tokenizer=tokenize_zh),
     'tfidf': ['count', Tfidf()],
+    'tfidf_dense': ['tfidf', SparseToDense()],
     'lsa_200': ['tfidf', SVD(n_components=200)],
     'lsa_500': ['tfidf', SVD(n_components=500)],
     'lsa_1k': ['tfidf', SVD(n_components=1000)],
 
     # smaller vocabulary (removed more stop and infrequent words)
-    'count_sv': Count(ngram_range=(1, 5), min_df=0.02, max_df=0.9,
+    'count_sv': Count(ngram_range=(1, 5), min_df=0.01, max_df=0.99,
                       tokenizer=tokenize_zh),
     'tfidf_sv': ['count_sv', Tfidf()],
     'tfidf_sv_dense': ['tfidf_sv', SparseToDense()],
@@ -107,11 +108,12 @@ fm_spec = {
     'lsa_200_sv': ['tfidf_sv', SVD(n_components=200)],
     'lsa_500_sv': ['tfidf_sv', SVD(n_components=500)],
 
-    'count_tiny': Count(ngram_range=(1, 5), min_df=0.02, max_df=0.6,
+    'count_tiny': Count(ngram_range=(1, 5), min_df=0.03, max_df=0.6,
                         tokenizer=tokenize_zh),
     'tfidf_tiny': ['count_tiny', Tfidf()],
     'tfidf_tiny_dense': ['tfidf_tiny', SparseToDense()],
     'tfidf_tiny_minmax': ['tfidf_tiny_minmax', MinMaxScaler()],
+    'lsa_200_tiny': ['tfidf_tiny', SVD(n_components=200)],
     'lsa_500_tiny': ['tfidf_tiny', SVD(n_components=500)],
 
     'word2vec': [Text2Tokens(),
