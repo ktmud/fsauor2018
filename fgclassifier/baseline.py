@@ -27,16 +27,17 @@ class MultiOutputClassifier(MultiOutputClassifier_):
         """Return f1 score on a test dataset"""
         y_pred = self.predict(X)
         scores = []
-        logger.info('[Validate]: F1 Scores')
         for i, label in enumerate(y.columns):
             score = f1_score(y[label], y_pred[:, i], average='macro')
             scores.append(score)
-            logger.info('  {: <40s}\t{:.4f}'.format(label, score))
+            logger.debug('  {: <40s}\t{:.4f}'.format(label, score))
         return scores
 
     def score(self, X, y):
         scores = self.scores(X, y)
-        return np.mean(scores)
+        score = np.mean(scores)
+        logger.info(' F1 Score: %s' % score)
+        return score
 
 
 class Baseline(Pipeline):
