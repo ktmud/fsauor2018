@@ -54,6 +54,15 @@ class Count(CountVectorizer):
         return ret
 
 
+class CountChinese(Count):
+
+    def fit_transform(self, raw_documents, y=None):
+        # a precomputed vocabulary should make things
+        self.vocabulary = set(' '.join(raw_documents).split())
+        self._validate_vocabulary()
+        return super().fit_transform(raw_documents, y=y)
+
+
 class SparseToDense(BaseEstimator):
     """Return content length as features.
     do nothing to the labels"""
@@ -79,28 +88,37 @@ def is_list_or_tuple(obj):
 # Feature model specifications
 # For Chinese
 fm_spec = {
-    'count': Count(ngram_range=(1, 6), min_df=0.005, max_df=0.99),
+    'count': Count(ngram_range=(1, 5), min_df=0.005, max_df=0.99,
+                   tokenizer=lambda x: x.split()),
     'tfidf': ['count', Tfidf()],
     'lsa_200': ['tfidf', SVD(n_components=200)],
     'lsa_500': ['tfidf', SVD(n_components=500)],
     'lsa_1k': ['tfidf', SVD(n_components=1000)],
 
+    # smaller vocabulary (removed more stop and infrequent words)
+    'count_sv': Count(ngram_range=(1, 5), min_df=0.008, max_df=0.9,
+                      tokenizer=lambda x: x.split()),
+    'tfidf_sv': ['count_sv', Tfidf()],
+    'tfidf_sv_dense': ['tfidf_sv', SparseToDense()],
+    'tfidf_sv_minmax': ['tfidf_sv_minmax', MinMaxScaler()],
+    'lsa_200_sv': ['tfidf_sv', SVD(n_components=200)],
+    'lsa_500_sv': ['tfidf_sv', SVD(n_components=500)],
+
+    'count_tiny': Count(ngram_range=(1, 5), min_df=0.01, max_df=0.8,
+                        tokenizer=lambda x: x.split()),
+    'tfidf_tiny': ['count_tiny', Tfidf()],
+    'tfidf_tiny_dense': ['tfidf_tiny', SparseToDense()],
+    'tfidf_tiny_minmax': ['tfidf_tiny_minmax', MinMaxScaler()],
+    'lsa_500_tiny': ['tfidf_tiny', SVD(n_components=500)],
+
     'word2vec': [Text2Tokens(),
-                 W2VTransformer(size=400, min_count=5, window=10, iter=10)],
+                 W2VTransformer(size=300, min_count=5, max_vocab_size=50000,
+                                sample=0.5, window=10, iter=10)],
     'word2vec_minmax': ['word2vec_minmax', MinMaxScaler()],
 
     'word2vec_en': [Text2Tokens(tokenizer=tokenize_en),
                     W2VTransformer(size=400, min_count=3, window=10, iter=10)],
     'word2vec_en_minmax': ['word2vec_en', MinMaxScaler()],
-
-    # smaller vocabulary (removed more stop and infrequent words)
-    'count_sv': Count(ngram_range=(1, 6), min_df=0.01, max_df=0.99),
-    'tfidf_sv': ['count_sv', Tfidf()],
-    'tfidf_sv_dense': ['tfidf_sv', SparseToDense()],
-    'tfidf_sv_minmax': ['tfidf_sv_minmax', MinMaxScaler()],
-
-    'lsa_200_sv': ['tfidf_sv', SVD(n_components=200)],
-    'lsa_500_sv': ['tfidf_sv', SVD(n_components=500)],
 
     # For English
     'count_en': Count(ngram_range=(1, 6), min_df=0.01, stop_words='english'),
