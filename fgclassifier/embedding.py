@@ -4,25 +4,57 @@
 For Word Embedding Features
 """
 import re
+import numpy as np
 
 from sklearn.base import BaseEstimator
-from gensim.sklearn_api import W2VTransformer
+from gensim.sklearn_api import W2VTransformer as W2VTransformer_
+from gensim.parsing.preprocessing import remove_stopwords,  preprocess_string
+from gensim.parsing.preprocessing import stem_text, strip_punctuation
+
+
+EN_FILTERS = [stem_text, strip_punctuation]
+
+
+def tokenize_zh(s):
+    """Tokenize by splitting by space and remove characters"""
+    tmp = (x.strip(' .。\'\"“”‘’~～') for x in s.lower().split())
+    return [s for s in tmp if s]
+
+
+def tokenize_en(s):
+    return preprocess_string(s, EN_FILTERS)
+
+
+class W2VTransformer(W2VTransformer_):
+
+    def transform(self, X):
+        """Make sure transform returns the same type of data as fit"""
+        wv = self.gensim_model
+        ret = []
+        for words in X:
+            vectors = np.vstack(wv[word][None, :] for word in words if word in wv)
+            ret.append(np.mean(vectors, axis=0))
+        return np.vstack(ret)
 
 
 class Text2Tokens(BaseEstimator):
     """Transform tokens to splitted"""
 
-    def fit(self):
+    def __init__(self, tokenizer=None):
+        self._tokenizer = tokenizer or tokenize_zh
+
+    def fit(self, X, y=None, **kwargs):
         """Fit the model"""
         return self
 
     def transform(self, X):
         """Transform"""
-        return [x.split() for x in X]
+        tokenize = self._tokenizer
+        return [tokenize(x) for x in X]
 
 
 # More robust split sentences
-RE_SENTENCE = re.compile(r'.*?[。….？！?!；~～]+') 
+RE_SENTENCE = re.compile(r'.*?[。….？！?!；~～]+')
 RE_BLANK_AND_MARK = re.compile(r'\s+([。….？！?!；~～])')
 
 

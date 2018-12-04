@@ -20,12 +20,14 @@ from tqdm import tqdm
 logging.getLogger('jieba').setLevel(logging.INFO)
 logger = logging.getLogger(__name__)
 CURRENT_PATH = os.path.dirname(os.path.realpath(__file__))
-jieba.enable_parallel(4)
+
+if os.name != 'nt':
+    jieba.enable_parallel(4)
 
 
 def load_user_dict():
     fpath = os.path.join(CURRENT_PATH, 'jieba/user_dict.txt')
-    for word in open(fpath).read().strip().split('\n'):
+    for word in open(fpath, encoding='utf-8').read().strip().split('\n'):
         jieba.add_word(word)
         jieba.suggest_freq(word, True)
 

@@ -13,7 +13,7 @@ from sklearn.feature_extraction.text import CountVectorizer, TfidfTransformer
 from sklearn.decomposition import TruncatedSVD
 from sklearn.decomposition import LatentDirichletAllocation as LatentDirichlet
 
-from fgclassifier.embedding import Text2Tokens, W2VTransformer
+from fgclassifier.embedding import Text2Tokens, W2VTransformer, tokenize_en
 
 
 logger = logging.getLogger(__name__)
@@ -85,8 +85,10 @@ fm_spec = {
     'lsa_500': ['tfidf', SVD(n_components=500)],
     'lsa_1k': ['tfidf', SVD(n_components=1000)],
 
-    'word2vec': [Text2Tokens(), W2VTransformer(size=256, window=10)],
-    'word2vec_en': [Text2Tokens(), W2VTransformer(size=100, window=10)],
+    'word2vec': [Text2Tokens(),
+                 W2VTransformer(size=400, min_count=3, window=10, iter=10)],
+    'word2vec_en': [Text2Tokens(tokenizer=tokenize_en),
+                    W2VTransformer(size=400, min_count=3, window=10, iter=10)],
 
     # smaller vocabulary (removed more stop and infrequent words)
     'count_sv': Count(ngram_range=(1, 5), min_df=0.01, max_df=0.99),
