@@ -16,7 +16,7 @@ EN_FILTERS = [stem_text, strip_punctuation]
 
 
 def tokenize_zh(s):
-    """Tokenize by splitting by space and remove characters"""
+    """Tokenize by splitting by space and remove punctuations"""
     tmp = (x.strip(' .。\'\"“”‘’~～') for x in s.lower().split())
     return [s for s in tmp if s]
 
