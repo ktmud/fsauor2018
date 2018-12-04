@@ -27,12 +27,12 @@ Logistic = LogisticRegression(
 )
 Ridge = RidgeClassifierCV(alphas=(0.01, 0.1, 0.5, 1.0, 5.0, 10.0))
 LDA = LinearDiscriminantAnalysis()
-QDA = QuadraticDiscriminantAnalysis(reg_param=0.01)
+QDA = QuadraticDiscriminantAnalysis(reg_param=0.001)
 RBF = SVC(kernel='rbf', gamma='scale',
           C=0.1, class_weight='balanced', cache_size=1000)
-SVM_Poly2 = SVC(kernel='poly', degree=2,
+SVM_Poly2 = SVC(kernel='poly', degree=2, gamma='scale',
                 C=0.1, class_weight='balanced', cache_size=1000)
-SVM_Poly3 = SVC(kernel='poly', degree=3,
+SVM_Poly3 = SVC(kernel='poly', degree=3, gamma='scale',
                 C=0.1, class_weight='balanced', cache_size=1000)
 
 
