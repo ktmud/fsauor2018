@@ -41,6 +41,7 @@ def fm_cross_check(fmns, clss, fm_cache=None, X_train=None, X_test=None,
             all_train_scores[fmn][cls] = model.scores(X_train, y_train)
             train_f1 = all_avg_train_scores[fmn][cls] = np.mean(
                 all_train_scores[fmn][cls])
+
             all_scores[fmn][cls] = model.scores(X_test, y_test)
             test_f1 = all_avg_scores[fmn][cls] = np.mean(all_scores[fmn][cls])
 

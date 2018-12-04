@@ -11,7 +11,7 @@ from sklearn.pipeline import Pipeline
 from sklearn.base import BaseEstimator
 from sklearn.feature_extraction.text import CountVectorizer, TfidfTransformer
 from sklearn.decomposition import TruncatedSVD
-from sklearn.decomposition import LatentDirichletAllocation as LatentDirichlet
+from sklearn.preprocessing import MinMaxScaler
 
 from fgclassifier.embedding import Text2Tokens, W2VTransformer, tokenize_en
 
@@ -89,6 +89,7 @@ fm_spec = {
                  W2VTransformer(size=400, min_count=3, window=10, iter=10)],
     'word2vec_en': [Text2Tokens(tokenizer=tokenize_en),
                     W2VTransformer(size=400, min_count=3, window=10, iter=10)],
+    'word2vec_en_minmax': ['word2vec_en', MinMaxScaler()],
 
     # smaller vocabulary (removed more stop and infrequent words)
     'count_sv': Count(ngram_range=(1, 5), min_df=0.01, max_df=0.99),
@@ -170,6 +171,30 @@ def ensure_named_steps(steps, spec=fm_spec, cache=None):
     return steps_
 
 
+def fit_cache(action_name):
+    """A decorator to enable cache"""
+
+    def wrapper(func):
+
+        def wrapped(self, X, *args, **kwargs):
+            cache_name = self._final_estimator_name
+            cache = self.cache
+            cachekey = f'{action_name}_{len(X)}_i{X.index[0]}'
+
+            if cache and cachekey in cache:
+                logger.info(f'  {cache_name}: {action_name} use cache.')
+                return cache[cachekey]
+
+            ret = func(self, X, *args, **kwargs)
+            if cache is not None:
+                cache[cachekey] = ret
+            return ret
+
+        return wrapped
+
+    return wrapper
+
+
 class FeaturePipeline(Pipeline):
     """
     FeaturePipeline with spec and cache support.
@@ -232,29 +257,15 @@ class FeaturePipeline(Pipeline):
         """Feature model name is just the final estimator name"""
         return self._final_estimator_name
 
+    @fit_cache('fit_transform')
     def fit_transform(self, X, y=None, **fit_params):
         """Fit transform the training data and save the results in cache"""
-        cache_name = self._final_estimator_name
-        cache = self.cache
-        if cache and 'train' in cache:
-            logger.info(f'  {cache_name}: fit_transform use cache.')
-            return cache['train']
-        Xt = super().fit_transform(X, y, **fit_params)
-        if cache is not None:
-            cache['train'] = Xt
-        return Xt
+        return super().fit_transform(X, y, **fit_params)
 
+    @fit_cache('transform')
     def transform(self, X):
         """Transform the testing data and save the results in cache"""
-        cache_name = self._final_estimator_name
-        cache = self.cache
-        if cache and 'test' in cache:
-            logger.info(f'  {cache_name}: transform use cache.')
-            return cache['test']
-        Xt = super().transform(X)
-        if cache is not None:
-            cache['test'] = Xt
-        return Xt
+        return super().transform(X)
 
 
 # ------- Additional helpers and basic pipelines ---------
