@@ -9,7 +9,7 @@ from flask import Flask, send_from_directory
 from flask import request, jsonify, render_template
 from flask_socketio import SocketIO
 from flask_assets import Environment
-from flask.ext.autoindex import AutoIndex
+from flask_autoindex import AutoIndex
 
 from fgclassifier.visualizer import actions
 from fgclassifier.visualizer.options import dataset_choices, fm_choices
