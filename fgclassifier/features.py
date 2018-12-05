@@ -52,13 +52,13 @@ class Count(CountVectorizer):
     def transform(self, raw_documents):
         logger.debug(f'Transform with CountVectorizer...')
         ret = super().transform(raw_documents)
-        logger.info('Vocab Size: %s', len(self.vocabulary_))
+        logger.debug('Vocab Size: %s', len(self.vocabulary_))
         return ret
 
     def fit_transform(self, raw_documents, y=None):
         logger.debug(f'Fit & Transform CountVectorizer...')
         ret = super().fit_transform(raw_documents, y=y)
-        logger.info('Vocab Size: %s', len(self.vocabulary_))
+        logger.debug('Vocab Size: %s', len(self.vocabulary_))
         return ret
 
 
