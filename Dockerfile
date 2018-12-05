@@ -13,18 +13,17 @@ RUN pip install Flask==1.0.2 Flask-Cors==3.0.3 Flask-SocketIO==3.0.2 Flask-Asset
 RUN pip install eventlet==0.24.1
 RUN pip install TextBlob==0.15.2
 RUN pip install snownlp==0.12.3
-
-# Install SpaCY language models
-RUN pip install spacy==2.0.17
-RUN pip install zh_core_web_sm-2.0.5.tar.gz en_core_web_sm-2.0.0.tar.gz
-RUN rm zh_core_web_sm-2.0.5.tar.gz en_core_web_sm-2.0.0.tar.gz
 RUN pip install Flask-AutoIndex==0.6.2
+
 # Install gensim
 RUN pip install gensim==3.6.0
-RUN pip install xgboost==0.81
+RUN pip install spacy==2.0.18
 RUN pip install msgpack==0.5.6
+# Install SpaCY language models
+RUN pip install zh_core_web_sm-2.0.5.tar.gz en_core_web_sm-2.0.0.tar.gz
+RUN rm zh_core_web_sm-2.0.5.tar.gz en_core_web_sm-2.0.0.tar.gz
 
-
+RUN pip install xgboost==0.81
 
 # Prepare the environment more... (download nltk data, etc)
 ADD ./fgclassifier/prepare.py /tmp/prepare.py
