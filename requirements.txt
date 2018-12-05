@@ -8,5 +8,6 @@ Flask-Assets==0.12
 Flask-AutoIndex==0.6.2
 spacy==2.0.17
 textblob==0.15.2
+gensim==3.6.0
 https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-2.0.0/en_core_web_sm-2.0.0.tar.gz
 https://github.com/howl-anderson/Chinese_models_for_SpaCy/releases/download/v2.0.5/zh_core_web_sm-2.0.5.tar.gz
