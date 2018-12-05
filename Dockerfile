@@ -21,6 +21,8 @@ RUN rm zh_core_web_sm-2.0.5.tar.gz en_core_web_sm-2.0.0.tar.gz
 RUN pip install Flask-AutoIndex==0.6.2
 # Install gensim
 RUN pip install gensim==3.6.0
+RUN pip install xgboost==0.81
+
 
 
 # Prepare the environment more... (download nltk data, etc)

@@ -9,10 +9,12 @@ from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
 from sklearn.discriminant_analysis import QuadraticDiscriminantAnalysis
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.ensemble import RandomForestClassifier, ExtraTreesClassifier
+from sklearn.ensemble import AdaBoostClassifier, GradientBoostingClassifier
 from sklearn.dummy import DummyClassifier
 from sklearn.multioutput import MultiOutputClassifier
-
 from sklearn.neural_network import MLPClassifier
+
+from xgboost import XGBClassifier
 
 DummyStratified = DummyClassifier(strategy='stratified')
 DummyMostFrequent = DummyClassifier(strategy='most_frequent')
@@ -80,3 +82,15 @@ SGD_Huber = SGDClassifier(
     n_jobs=-1, early_stopping=True,
     max_iter=1000, tol=1e-4, alpha=1e-4
 )
+
+# Ensemble Methods -------
+AdaBoost = AdaBoostClassifier(
+    base_estimator=DecisionTreeClassifier(max_depth=1),
+    n_estimators=100,
+)
+
+GradientBoost = GradientBoostingClassifier(
+    n_estimators=100
+)
+
+XGB = XGBClassifier()
