@@ -97,7 +97,7 @@ def is_list_or_tuple(obj):
 # For Chinese
 fm_spec = {
     'hashing': HashingVectorizer(tokenizer=tokenize_zh),
-    'count': Count(ngram_range=(1, 5), min_df=5, max_df=0.99,
+    'count': Count(ngram_range=(1, 5), min_df=5, max_df=0.9,
                    max_features=4000, tokenizer=tokenize_zh),
     'tfidf': ['count', Tfidf()],
     'tfidf_dense': ['tfidf', SparseToDense()],
@@ -108,13 +108,14 @@ fm_spec = {
     'lsa_1k_minmax': ['lsa_1k', MinMaxScaler()],
 
     # smaller vocabulary (removed more stop and infrequent words)
-    'count_sv': Count(ngram_range=(1, 5), min_df=10, max_df=0.8,
+    'count_sv': Count(ngram_range=(1, 5), min_df=5, max_df=0.8,
                       max_features=2000, tokenizer=tokenize_zh),
     'tfidf_sv': ['count_sv', Tfidf()],
     'tfidf_sv_dense': ['tfidf_sv', SparseToDense()],
     'tfidf_sv_minmax': ['tfidf_sv_minmax', MinMaxScaler()],
     'lsa_200_sv': ['tfidf_sv', SVD(n_components=200)],
     'lsa_500_sv': ['tfidf_sv', SVD(n_components=500)],
+    'lsa_1k_sv': ['tfidf_sv', SVD(n_components=1000)],
     'lsa_500_sv_minmax': ['lsa_500_sv', MinMaxScaler()],
     'lsa_1k_sv_minmax': ['lsa_1k_sv', MinMaxScaler()],
 
