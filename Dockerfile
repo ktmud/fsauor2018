@@ -22,6 +22,7 @@ RUN pip install Flask-AutoIndex==0.6.2
 # Install gensim
 RUN pip install gensim==3.6.0
 RUN pip install xgboost==0.81
+RUN pip install msgpack==0.5.6
 
 
 
