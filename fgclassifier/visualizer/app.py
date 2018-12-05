@@ -9,10 +9,13 @@ from flask import Flask, send_from_directory
 from flask import request, jsonify, render_template
 from flask_socketio import SocketIO
 from flask_assets import Environment
+from flask.ext.autoindex import AutoIndex
 
 from fgclassifier.visualizer import actions
 from fgclassifier.visualizer.options import dataset_choices, fm_choices
 from fgclassifier.visualizer.options import clf_choices
+
+from fgclassifier.utils import get_stats
 
 
 app = Flask(__name__)
@@ -54,6 +57,26 @@ def predict_text():
     inputs = dict(request.args.items())
     return jsonify(actions.predict_text(**inputs))
 
+
+@app.route('/model_stats')
+def model_stats():
+    """Predict for user-inputted text"""
+    args = request.args
+    dataset = args.get('dataset', 'valid_en')
+    fm = args.get('fm', 'dummy')
+    clf = args.get('clf', 'DummyStratified')
+    return jsonify(get_stats(dataset, fm, clf))
+
+
+# Add autoindex for data directory
+files_index = AutoIndex(app, browse_root=os.getenv('DATA_ROOT', 'data'),
+                        add_url_rules=False)
+
+
+@app.route('/files')
+@app.route('/files/<path:path>')
+def autoindex(path='.'):
+    return files_index.render_autoindex(path)
 
 if __name__ == '__main__':
     port = os.environ.get('PORT', 5000)

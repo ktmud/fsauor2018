@@ -24,6 +24,7 @@ testb_data_path = f"{data_root}/test-b/sentiment_analysis_testb.csv"
 
 train_en_data_path = f"{data_root}/english_train.csv"
 valid_en_data_path = f"{data_root}/english_valid.csv"
+test_en_data_path = f"{data_root}/english_test.csv"
 
 testa_predict_out_path = f"{data_root}/testa_prediction.csv"
 testb_predict_out_path = f"{data_root}/testb_prediction.csv"

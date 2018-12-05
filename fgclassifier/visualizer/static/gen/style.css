@@ -164,7 +164,7 @@ svg {
   text-align: right; }
 
 text {
-  font-size: 14px; }
+  font-size: 13px; }
 
 text.level1-label {
   font-weight: bold; }
@@ -235,7 +235,7 @@ article.single-review {
   margin-bottom: 20px; }
   .chart .section-footer {
     padding-top: 10px;
-    padding-left: 168px;
+    padding-left: 143px;
     color: gray; }
   .chart .overall-sentiments {
     display: inline-block; }
@@ -287,8 +287,32 @@ span.sentence {
     span.sentence.active.is-first.is-last {
       border-radius: 3px; }
 
-.brick-bars text {
+.brick-bars text, .cat-score-title {
   font-size: 13px; }
 
 div#fm-help {
   width: 250px; }
+
+text.cat-score {
+  font-size: 14px;
+  fill: #666; }
+
+.below-average {
+  color: #f46d43; }
+
+.above-average {
+  color: #66bd63; }
+
+.overall-f1 {
+  position: absolute;
+  right: 18px;
+  bottom: 18px;
+  border: solid 1px #ccc;
+  border-radius: 3px;
+  padding: 2px 5px 0;
+  height: 38px;
+  text-align: center; }
+  .overall-f1 h5 {
+    font-size: 9px; }
+  .overall-f1 .overall-f1-score {
+    font-weight: 600; }

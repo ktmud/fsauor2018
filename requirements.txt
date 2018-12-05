@@ -5,6 +5,7 @@ Flask==1.0.2
 Flask-Cors==3.0.3
 Flask-SocketIO==3.0.2
 Flask-Assets==0.12
+Flask-AutoIndex==0.6.2
 spacy==2.0.17
 textblob==0.15.2
 https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-2.0.0/en_core_web_sm-2.0.0.tar.gz

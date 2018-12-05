@@ -36,7 +36,7 @@ class MultiOutputClassifier(MultiOutputClassifier_):
     def score(self, X, y):
         scores = self.scores(X, y)
         score = np.mean(scores)
-        logger.info(' F1 Score: %s' % score)
+        logger.info(' F1 Score: %s', score)
         return score
 
 

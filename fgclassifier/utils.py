@@ -13,6 +13,7 @@ import hashlib
 
 import config
 
+from tempfile import gettempdir
 from datetime import datetime
 from collections import Counter
 from functools import lru_cache
@@ -138,7 +139,7 @@ def get_dataset(dataset, keyword=None):
     return df
 
 
-def persistent(func, ttl=604800, storage_path=config.model_save_path):
+def persistent(func, ttl=604800, storage_path=gettempdir()):
     """Save function output in disk"""
     def wrapper(func):
         def wraped(*args):
@@ -166,14 +167,17 @@ def label2dist(y):
 
 @lru_cache(10)
 @persistent('stats')
-def get_stats(dataset, *args, **kwargs):
-    """Get global performance stats"""
+def get_stats(dataset, fm, clf):
+    """Get performance stats of a model on the selected dataset"""
     X, y = read_data(get_dataset(dataset))
-    model = load_model(*args, **kwargs)
+    model = load_model(fm, clf)
     scores = model.scores(X, y)
     y_pred = pd.DataFrame(data=model.predict(X),
                           index=y.index, columns=y.columns)
     return {
+        'dataset': dataset,
+        'fm': fm,
+        'clf': clf,
         'scores': scores,
         'avg_score': np.mean(scores),
         'true_dist': label2dist(y),

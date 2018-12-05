@@ -12,7 +12,7 @@ from collections import Counter
 from fgclassifier.visualizer.options import dataset_choices, fm_choices
 from fgclassifier.visualizer.options import clf_choices
 from fgclassifier.visualizer.highlight import highlight_noun_chunks
-from fgclassifier.utils import get_dataset, load_model, read_data, get_stats
+from fgclassifier.utils import get_dataset, load_model, read_data
 
 
 def parse_inputs(dataset='train_en', keyword=None,
@@ -52,13 +52,9 @@ def predict_one(dataset, dfs, totals, seed, fm, clf, **kwargs):
     """Predict for a random review"""
     lang = 'en' if '_en' in dataset else 'zh'
     X, y = read_data(dfs[0])
-    global_count = pd.concat(
-        [y[col].value_counts(sort=False)
-         for col in y], axis=1).sort_index().T.values.tolist()
     if totals[0] == 0:
         review = {
             'id': 'N/A',
-            'global_count': global_count,
             'content_html': '--  No matching reviews found. Please remove keyword. --'
         }
         true_labels, probas = None, None
@@ -89,7 +85,6 @@ def predict_one(dataset, dfs, totals, seed, fm, clf, **kwargs):
     label_names = y.columns.tolist()
     n_total_labels = len(label_names)  # number of labels to predict
     return {
-        'global_count': global_count,
         'review': review,
         'label_names': label_names,
         'n_total_labels': n_total_labels,

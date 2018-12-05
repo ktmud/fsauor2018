@@ -6,12 +6,13 @@ import { $, debounce } from "./helpers.js"
  */
 class AsyncUpdater {
 
-  constructor(elem) {
+  constructor(elem, name) {
     // Please udpate these in subclasses
     this.fields = null;  // input/select fields this udpater depends on
     this.endpoint = null;  // API endpoint
     this.rawData = null;   // cached raw data from last request
     this.data = null;  // processed data ready for updating content
+    this.name = name || 'updater'
     this.prepare(elem)
   }
 
@@ -71,23 +72,23 @@ class AsyncUpdater {
    */
   prepare(elem) {
     d3.select(window)
-      .on('resize', debounce(this.render.bind(this), 100))
-      .on('popstate', () => {
+      .on(`resize.${this.name}`, debounce(this.render.bind(this), 100))
+      .on(`popstate.${this.name}`, () => {
         this.fetchAndUpdate({ qs: location.search }, false)
       })
 
     this.root = d3.select(elem)
-    this.root.selectAll('form').on('submit', () => {
+    this.root.selectAll('form').on(`submit.${this.name}`, () => {
       this.fetchAndUpdate()
       d3.event.preventDefault()
     })
-    let self = this
-    this.root.selectAll('.foldable .toggle').on('click', function() {
-      self.toggleClass('folded', this.closest('.foldable'))
-    })
 
-    this.root.selectAll('.dropdown-trigger').on('click', function() {
-      self.toggleClass('is-active', this.closest('.dropdown'))
+    this.root.selectAll('select, input').on(`change.${this.name}`, () => {
+      let elem = d3.event.target;
+      // if of corresponding fields
+      if (~this.fields.indexOf(elem.name)) {
+        this.fetchAndUpdate()
+      }
     })
   }
 
@@ -140,6 +141,11 @@ class AsyncUpdater {
         p[k] = elem.value;
       }
     });
+
+    // handle language (if dataset is not English, remove _en from feature model)
+    if ('dataset' in p && 'fm' in p && !~p['dataset'].indexOf('en')) {
+      p['fm'] = p['fm'].replace('_en', '')
+    }
 
     // construct new query strings
     let new_qs = [];

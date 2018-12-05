@@ -5,17 +5,15 @@ import {
   $,
   initHoverTips
 } from "./helpers.js"
+import {
+  level1Width,
+  labelWidth,
+  statsWidth,
+  barHeight,
+  label2idx,
+  labeltext
+} from './consts.js'
 import AsyncUpdater from './async_updater.js'
-
-const labelWidth = 230;
-const barHeight = 29;
-const label2idx = {
-  '-2': 0,
-  '-1': 1,
-  '0': 2,
-  '1': 3
-};
-const labeltext = ['Not Mentioned', 'Negative', 'Neutral', 'Positive'];
 
 const label2probas = (labels) => {
   return labels.map((row) => {
@@ -38,12 +36,27 @@ const labelcounts = (counts) => {
 
 class SingleReviewChart extends AsyncUpdater {
 
-  constructor(elem) {
-    super(elem)
+  constructor(elem, name) {
+    super(elem, name)
     // to make a prediction, we need all parameters
     this.fields = ['dataset', 'keyword', 'seed', 'fm', 'clf']
     this.endpoint = '/predict'
+  }
 
+  prepare(elem) {
+    super.prepare(elem)
+    this.bricks = this.root.select('.bricks')
+    this.prepareMore()
+  }
+
+  prepareMore() {
+    let self = this
+    this.root.selectAll('.foldable .toggle').on('click', function() {
+      self.toggleClass('folded', this.closest('.foldable'))
+    })
+    this.root.selectAll('.dropdown-trigger').on('click', function() {
+      self.toggleClass('is-active', this.closest('.dropdown'))
+    })
     this.root.selectAll('.prev-seed').on('click', () => {
       let elem = $('#inp-seed')
       elem.value = Math.max(parseInt(elem.value, 0) - 1, 0)
@@ -54,10 +67,6 @@ class SingleReviewChart extends AsyncUpdater {
       elem.value = Math.min(parseInt(elem.value, 0) + 1, 99999999)
       this.fetchAndUpdate()
     })
-    this.root.selectAll('select, input').on('change', () => {
-      this.fetchAndUpdate()
-    })
-
     let reviewText = this.root.selectAll('.review-text').on('mouseup', () => {
       // current sentence node
       let curNode = d3.event.target
@@ -111,12 +120,6 @@ class SingleReviewChart extends AsyncUpdater {
     })
   }
 
-  prepare(elem) {
-    super.prepare(elem)
-    this.bricks = this.root.select('.bricks')
-    this.bars = this.root.select('.bars')
-  }
-
   render(rawData) {
     if (rawData) {
       this.data = {
@@ -141,12 +144,16 @@ class SingleReviewChart extends AsyncUpdater {
 
   initBricks() {
 
+    // process label names
     let labels = this.data['label_names']
     let level1 = {}
     labels.forEach(function (item) {
       let tmp = item.split('_')
       let name = tmp.shift()
       let name2 = tmp.join(' ')
+      if (name == 'environment') {
+        name = 'environmt'
+      }
       if (name2 == 'distance from business district') {
         name2 = 'dist from biz district'
       } else if (name2 == 'willing to consume again') {
@@ -181,7 +188,7 @@ class SingleReviewChart extends AsyncUpdater {
       .style('stroke', '#eee').style('stroke-width', 1)
 
     level1_g.append('text')
-      .attr('x', 85).attr('y', 8)
+      .attr('x', level1Width).attr('y', 8)
       .attr('class', 'level1-label')
       .attr('text-anchor', 'end')
       .attr('alignment-baseline', 'hanging')
@@ -230,6 +237,7 @@ class SingleReviewChart extends AsyncUpdater {
     let variant_cls = `${variant.replace(' ', '-')}-bars`
     let container = root.selectAll(`g.${variant_cls}`)
     let isInit = !container.size()
+    let title = container.selectAll('text.brick-title')
 
     if (isInit) {
       container = root.append('g')
@@ -237,14 +245,15 @@ class SingleReviewChart extends AsyncUpdater {
         .attr('transform', `translate(${xoffset},${yoffset})`)
       if (showtitle) {
         // Add title text
-        container.append('text')
+        title = container.append('text')
+          .attr('class', 'brick-title')
           .text(variant)
-          .attr('x', titlex)
-          .attr('y', titley)
           .attr('fill-opacity', alpha)
           .attr('text-anchor', titleAnchor)
       }
     }
+
+    title.attr('x', titlex).attr('y', titley)
 
     if (orient == 'vertical') {
       let yScale = d3.scaleLinear().domain([0, domainMax]).range([0, barHeight])
@@ -313,14 +322,24 @@ class SingleReviewChart extends AsyncUpdater {
 
   }
 
+  /**
+   * Full width of 4 segment bars
+   */
+  getFullwidth() {
+    let fullwidth = (
+      this.$('.chart').clientWidth - labelWidth -
+      statsWidth - barHeight * 2 - 40
+    )
+    return Math.max(80, fullwidth)
+  }
+
   updateBricks() {
     let level1_g = this.bricks.selectAll('g.level1')
     if (level1_g.size() == 0) {
       this.initBricks()
     }
 
-    let fullwidth = (this.$('.chart').clientWidth - labelWidth - 30) / 2;
-    fullwidth = Math.max(80, fullwidth)
+    let fullwidth = this.getFullwidth()
     let xoffset = labelWidth + 8
     let yoffset = 20
     let titlex = fullwidth / 2
@@ -379,17 +398,6 @@ class SingleReviewChart extends AsyncUpdater {
       }
     })
 
-    if (this.data['global_count']) {
-      let margin = 12
-      let width = fullwidth - barHeight * 2 - margin
-      this.buildBricks(this.data['global_count'], 'global', {
-        ...configs,
-        xoffset: xoffset + fullwidth + 2 * barHeight + margin,
-        titlex: width / 2,
-        fullwidth: width,
-        alpha: 0.4,
-      })
-    }
   }
 
   updateCorrectCount() {

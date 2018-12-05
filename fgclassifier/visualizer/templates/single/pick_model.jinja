@@ -81,6 +81,10 @@
                 {% include "single/correct_count.jinja" %}
             </span>
         </div>
+        <div class="overall-f1">
+            <h5 class="badge">Overall F1</h5>
+            <span class="overall-f1-score"></span>
+        </div>
     </div>
 </div>
 
@@ -90,5 +94,6 @@
  <em>P</em>: the predicted sentiment labels. <br>
  <em>A</em>: the actual sentiment labels. <br>
  <em>global</em>: the global distribution of the labels in the selected dataset.</p>
- <em>F1</em>: F1 score on the selected dataset.</p>
+ <em>F1</em>: F1 score of predictions on the selected dataset
+ (either <span class="below-average">below average</span> or <span class="above-average">above average</span>).</p>
 </div>
