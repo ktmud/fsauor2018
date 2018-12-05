@@ -11,18 +11,34 @@ import pandas as pd
 import numpy as np
 import hashlib
 
-import config
+import threading
+from collections import defaultdict
+from functools import lru_cache, _make_key
 
+import config
 from tempfile import gettempdir
 from datetime import datetime
 from collections import Counter
-from functools import lru_cache
 from sklearn.externals import joblib
 from tqdm import tqdm
 
 logging.getLogger('jieba').setLevel(logging.INFO)
 logger = logging.getLogger(__name__)
 CURRENT_PATH = os.path.dirname(os.path.realpath(__file__))
+
+
+def threadsafe_lru(*cache_args, **cache_kwargs):
+    cache_wrap = lru_cache(*cache_args, **cache_kwargs)
+    def wrapper(func):
+        func = cache_wrap(func)
+        lock_dict = defaultdict(threading.Lock)
+        def _thread_lru(*args, **kwargs):
+            key = _make_key(args, kwargs, typed=False)
+            with lock_dict[key]:
+                return func(*args, **kwargs)
+        return _thread_lru
+    return wrapper
+
 
 if os.name != 'nt':
     jieba.enable_parallel(4)
@@ -120,7 +136,7 @@ def read_data(data_path, flavor='tokenized', return_df=False,
     return X, y
 
 
-@lru_cache(maxsize=10)
+@threadsafe_lru(maxsize=10)
 def get_dataset(dataset, keyword=None):
     """Get a dataset DataFrame, including the raw content and tokenized content
     and filter it by keywords"""
@@ -157,6 +173,7 @@ def persistent(subdir, storage_path=config.data_root, ttl=604800):
                 return joblib.load(fpath)
             ret = func(*args)
             joblib.dump(ret, fpath)
+            logger.info('Saved cache %s', fpath)
             return ret
         return wraped
     return wrapper
@@ -169,12 +186,13 @@ def label2dist(y):
     return (np.array(counts) / len(y)).tolist()
 
 
-@lru_cache(10)
+@threadsafe_lru(10)
 @persistent('stats')
 def get_stats(dataset, fm, clf):
     """Get performance stats of a model on the selected dataset"""
     X, y = read_data(get_dataset(dataset))
     model = load_model(fm, clf)
+    logging.info('Running stats for %s...', model.name)
     scores = model.scores(X, y)
     y_pred = pd.DataFrame(data=model.predict(X),
                           index=y.index, columns=y.columns)
@@ -201,8 +219,7 @@ def save_model(model, model_save_path=config.model_save_path):
     logger.info("Saving model... Done.")
 
 
-
-@lru_cache(maxsize=5)
+@threadsafe_lru(maxsize=5)
 def load_model(feature_model, classifier, model='Baseline',
                model_save_path=config.model_save_path):
     if model == 'Baseline':
@@ -215,4 +232,7 @@ def load_model(feature_model, classifier, model='Baseline',
         filename = filename.replace(classifier, 'SGD_' + classifier)
 
     model_path = os.path.join(model_save_path, filename)
-    return joblib.load(model_path)
+    logger.info('Loading model %s', filename)
+    model = joblib.load(model_path)
+    logger.info('Loading %s done.', filename)
+    return model
