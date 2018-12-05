@@ -139,15 +139,19 @@ def get_dataset(dataset, keyword=None):
     return df
 
 
-def persistent(func, ttl=604800, storage_path=gettempdir()):
+def persistent(subdir, storage_path=config.data_root, ttl=604800):
     """Save function output in disk"""
+    outdir = os.path.join(storage_path, subdir)
+    if not os.path.exists(outdir):
+        os.mkdir(outdir)
+
     def wrapper(func):
         def wraped(*args):
             # cache for 1 week
             ts = str(round(datetime.now().timestamp() / ttl))
-            key = '--'.join([ts, *args])
+            key = '--'.join([*args, ts])
             # key = hashlib.md5(key.encode('utf-8')).hexdigest()[:7]
-            fpath = os.path.join(storage_path, f'cache--{key}.pkl')
+            fpath = os.path.join(outdir, f'{key}.pkl')
             if os.path.exists(fpath):
                 logger.info('Load cache %s', fpath)
                 return joblib.load(fpath)

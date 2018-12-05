@@ -23,8 +23,10 @@ export default class ModelStatsUpdater extends SingleReviewChart {
     if (rawData) {
       this.data = rawData
     }
-    this.updateScores()
-    this.updateDistBars()
+    if (this.data) {
+      this.updateScores()
+      this.updateDistBars()
+    }
   }
 
   prepareMore() {
