@@ -1,1 +1,5 @@
+WAIT=5
+TIMEOUT=20
+ATTEMPTS=5
+
 /                       The Anatomy of a Restaurant Review
