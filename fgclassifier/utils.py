@@ -197,6 +197,7 @@ def save_model(model, model_save_path=config.model_save_path):
     logger.info("Saving model... Done.")
 
 
+
 @lru_cache(maxsize=5)
 def load_model(feature_model, classifier, model='Baseline',
                model_save_path=config.model_save_path):
@@ -204,5 +205,10 @@ def load_model(feature_model, classifier, model='Baseline',
         filename = f'{feature_model}_{classifier}.pkl'
     else:
         filename = f'{feature_model}_{model}_{classifier}.pkl'
+
+    # if file does not exist, try load the SGD version
+    if classifier in ('SVC', 'Logistic') and not os.path.exists(filename):
+        filename = filename.replace(classifier, 'SGD_' + classifier)
+
     model_path = os.path.join(model_save_path, filename)
     return joblib.load(model_path)
