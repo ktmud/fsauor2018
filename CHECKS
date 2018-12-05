@@ -1,6 +1,2 @@
-WAIT=10
-TIMEOUT=20
-ATTEMPTS=5
-
 /                       The Anatomy of a Restaurant Review
 /model_stats?dataset=train_en&fm=lsa_1k_en&clf=LDA    "clf":"LDA"
