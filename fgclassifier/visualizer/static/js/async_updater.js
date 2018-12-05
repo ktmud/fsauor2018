@@ -142,11 +142,6 @@ class AsyncUpdater {
       }
     });
 
-    // handle language (if dataset is not English, remove _en from feature model)
-    if ('dataset' in p && 'fm' in p && !~p['dataset'].indexOf('en')) {
-      p['fm'] = p['fm'].replace('_en', '')
-    }
-
     // construct new query strings
     let new_qs = [];
     for (let k of Object.keys(p)) {

@@ -58,7 +58,7 @@ class Count(CountVectorizer):
     def fit_transform(self, raw_documents, y=None):
         logger.debug(f'Fit & Transform CountVectorizer...')
         ret = super().fit_transform(raw_documents, y=y)
-        logger.debug('Vocab Size: %s', len(self.vocabulary_))
+        logger.info('Vocab Size: %s', len(self.vocabulary_))
         return ret
 
 
@@ -97,22 +97,26 @@ def is_list_or_tuple(obj):
 # For Chinese
 fm_spec = {
     'hashing': HashingVectorizer(tokenizer=tokenize_zh),
-    'count': Count(ngram_range=(1, 5), min_df=0.005, max_df=0.99,
-                   tokenizer=tokenize_zh),
+    'count': Count(ngram_range=(1, 5), min_df=5, max_df=0.99,
+                   max_features=4000, tokenizer=tokenize_zh),
     'tfidf': ['count', Tfidf()],
     'tfidf_dense': ['tfidf', SparseToDense()],
     'lsa_200': ['tfidf', SVD(n_components=200)],
     'lsa_500': ['tfidf', SVD(n_components=500)],
     'lsa_1k': ['tfidf', SVD(n_components=1000)],
+    'lsa_500_minmax': ['lsa_500', MinMaxScaler()],
+    'lsa_1k_minmax': ['lsa_1k', MinMaxScaler()],
 
     # smaller vocabulary (removed more stop and infrequent words)
-    'count_sv': Count(ngram_range=(1, 5), min_df=0.01, max_df=0.99,
-                      tokenizer=tokenize_zh),
+    'count_sv': Count(ngram_range=(1, 5), min_df=10, max_df=0.8,
+                      max_features=2000, tokenizer=tokenize_zh),
     'tfidf_sv': ['count_sv', Tfidf()],
     'tfidf_sv_dense': ['tfidf_sv', SparseToDense()],
     'tfidf_sv_minmax': ['tfidf_sv_minmax', MinMaxScaler()],
     'lsa_200_sv': ['tfidf_sv', SVD(n_components=200)],
     'lsa_500_sv': ['tfidf_sv', SVD(n_components=500)],
+    'lsa_500_sv_minmax': ['lsa_500_sv', MinMaxScaler()],
+    'lsa_1k_sv_minmax': ['lsa_1k_sv', MinMaxScaler()],
 
     'count_tiny': Count(ngram_range=(1, 5), min_df=0.03, max_df=0.6,
                         tokenizer=tokenize_zh),
@@ -139,7 +143,8 @@ fm_spec = {
     'lsa_500_en': ['tfidf_en', SVD(n_components=500)],
     'lsa_1k_en': ['tfidf_en', SVD(n_components=1000)],
 
-    'count_en_sv': Count(ngram_range=(1, 6), min_df=0.02, stop_words='english'),
+    'count_en_sv': Count(ngram_range=(1, 6), min_df=0.02,
+                         stop_words='english'),
     'tfidf_en_sv': ['count_en_sv', Tfidf()],
     'tfidf_en_sv_dense': ['tfidf_en_sv', SparseToDense()],
     'lsa_200_en_sv': ['tfidf_en_sv', SVD(n_components=200)],

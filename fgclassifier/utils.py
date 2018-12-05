@@ -16,7 +16,6 @@ from collections import defaultdict
 from functools import lru_cache, _make_key
 
 import config
-from tempfile import gettempdir
 from datetime import datetime
 from collections import Counter
 from sklearn.externals import joblib
@@ -29,14 +28,18 @@ CURRENT_PATH = os.path.dirname(os.path.realpath(__file__))
 
 def threadsafe_lru(*cache_args, **cache_kwargs):
     cache_wrap = lru_cache(*cache_args, **cache_kwargs)
+
     def wrapper(func):
         func = cache_wrap(func)
         lock_dict = defaultdict(threading.Lock)
+
         def _thread_lru(*args, **kwargs):
             key = _make_key(args, kwargs, typed=False)
             with lock_dict[key]:
                 return func(*args, **kwargs)
+
         return _thread_lru
+
     return wrapper
 
 

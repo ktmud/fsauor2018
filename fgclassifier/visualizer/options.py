@@ -16,12 +16,11 @@ dataset_choices = OrderedDict([
 
 # Feature model choices -------
 fm_choices = OrderedDict([
-    ('lsa_200_en', 'TF-IDF -> SVD(200)'),
     ('lsa_500_en', 'TF-IDF -> SVD(500)'),
     ('lsa_1k_en', 'TF-IDF -> SVD(1000)'),
-    ('tfidf_en_sv_dense', 'TF-IDF(SM)'),
-    ('lsa_200_en_sv', 'TF-IDF(SM) -> SVD(200)'),
     ('lsa_500_en_sv', 'TF-IDF(SM) -> SVD(500)'),
+    ('tfidf_en_sv_dense', 'TF-IDF(SM)'),
+    ('word2vec', 'Word2Vec'),
 ])
 
 # Classifier choices ---------
@@ -31,4 +30,5 @@ clf_choices = OrderedDict([
     ('Logistic', 'Logistic Regression'),
     ('LinearSVC', 'Linear SVM Classifier'),
     ('Ridge', 'Ridge Classifier'),
+    ('ComplementNB', 'Complement Naive Bayes'),
 ])

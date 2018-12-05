@@ -54,17 +54,17 @@ def predict():
 @app.route('/predict_text')
 def predict_text():
     """Predict for user-inputted text"""
-    inputs = dict(request.args.items())
+    inputs = actions.parse_inputs(**dict(request.args.items()))
     return jsonify(actions.predict_text(**inputs))
 
 
 @app.route('/model_stats')
 def model_stats():
     """Predict for user-inputted text"""
-    args = request.args
-    dataset = args.get('dataset')
-    fm = args.get('fm')
-    clf = args.get('clf')
+    inputs = actions.parse_inputs(**dict(request.args.items()))
+    dataset = inputs.get('dataset')
+    fm = inputs.get('fm')
+    clf = inputs.get('clf')
     if not dataset or not fm or not clf:
         return jsonify({
             'error': 'wrong parameters'

@@ -18,11 +18,6 @@ from fgclassifier.utils import get_dataset, load_model, read_data
 def parse_inputs(dataset='train_en', keyword=None,
                  fm='lsa_1k_en', clf='lda', seed='49', **kwargs):
     """Predict sentiments for one single review"""
-    if keyword is None or isinstance(keyword, str):
-        keyword = [keyword]
-    # DataFrames for all keywords
-    keywords = keyword
-
     # make sure values are valid
     if dataset not in dataset_choices:
         dataset = 'train_en'
@@ -31,6 +26,19 @@ def parse_inputs(dataset='train_en', keyword=None,
     if clf not in clf_choices:
         clf = 'LDA'
 
+    # handle language
+    #   - if dataset is not English
+    #   - remove _en from model names
+    if '_en' not in dataset:
+        dataset = dataset.replace('_en', '')
+        fm = fm.replace('_en', '')
+        print(fm)
+
+    if keyword is None or isinstance(keyword, str):
+        keyword = [keyword]
+    # DataFrames for all keywords
+    keywords = keyword
+
     dfs = [get_dataset(dataset, keyword=x) for x in keywords]  # filtered reviews
     totals = [df.shape[0] for df in dfs]  # total number of reviews
     seed = int(seed) if seed.isdigit() else 42
@@ -38,7 +46,7 @@ def parse_inputs(dataset='train_en', keyword=None,
 
 
 def predict_proba(clf, model, X):
-    if clf in ('Logistic', 'LDA'):
+    if clf in ('Logistic', 'LDA', 'SDG_Logistic'):
         # Only LogisticRegression and LinearDiscriminantAnalysis supports
         # the probablisitc view.
         probas = model.predict_proba(X)
