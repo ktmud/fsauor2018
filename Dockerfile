@@ -18,7 +18,6 @@ RUN pip install snownlp==0.12.3
 RUN pip install spacy==2.0.17
 RUN pip install zh_core_web_sm-2.0.5.tar.gz en_core_web_sm-2.0.0.tar.gz
 RUN rm zh_core_web_sm-2.0.5.tar.gz en_core_web_sm-2.0.0.tar.gz
-
 RUN pip install Flask-AutoIndex==0.6.2
 
 # Prepare the environment more... (download nltk data, etc)

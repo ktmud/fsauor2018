@@ -74,6 +74,7 @@ files_index = AutoIndex(app, browse_root=os.getenv('DATA_ROOT', 'data'),
 
 
 @app.route('/files')
+@app.route('/files/')
 @app.route('/files/<path:path>')
 def autoindex(path='.'):
     return files_index.render_autoindex(path)
