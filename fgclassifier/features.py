@@ -36,27 +36,27 @@ class DummyTransform(BaseEstimator):
 class Tfidf(TfidfTransformer):
 
     def fit_transform(self, *args, **kwargs):
-        logger.info('Fit & Transform TF-IDF...')
+        logger.debug('Fit & Transform TF-IDF...')
         return super().fit_transform(*args, **kwargs)
 
 
 class SVD(TruncatedSVD):
 
     def fit_transform(self, *args, **kwargs):
-        logger.info('Fit & Transform TruncatedSVD...')
+        logger.debug('Fit & Transform TruncatedSVD...')
         return super().fit_transform(*args, **kwargs)
 
 
 class Count(CountVectorizer):
 
     def transform(self, raw_documents):
-        logger.info(f'Transform with CountVectorizer...')
+        logger.debug(f'Transform with CountVectorizer...')
         ret = super().transform(raw_documents)
         logger.info('Vocab Size: %s', len(self.vocabulary_))
         return ret
 
     def fit_transform(self, raw_documents, y=None):
-        logger.info(f'Fit & Transform CountVectorizer...')
+        logger.debug(f'Fit & Transform CountVectorizer...')
         ret = super().fit_transform(raw_documents, y=y)
         logger.info('Vocab Size: %s', len(self.vocabulary_))
         return ret

@@ -62,9 +62,13 @@ def predict_text():
 def model_stats():
     """Predict for user-inputted text"""
     args = request.args
-    dataset = args.get('dataset', 'valid_en')
-    fm = args.get('fm', 'dummy')
-    clf = args.get('clf', 'DummyStratified')
+    dataset = args.get('dataset')
+    fm = args.get('fm')
+    clf = args.get('clf')
+    if not dataset or not fm or not clf:
+        return jsonify({
+            'error': 'wrong parameters'
+        })
     return jsonify(get_stats(dataset, fm, clf))
 
 
