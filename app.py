@@ -15,4 +15,4 @@ if __name__ == '__main__':
     parser.add_argument('--port', '-p', type=int, default=5000)
     args = parser.parse_args()
     logging.info(f'Starting dev server at http://0.0.0.0:{args.port}')
-    socketio.run(app, port=args.port, debug=True, threaded=True)
+    socketio.run(app, port=args.port, debug=True)
