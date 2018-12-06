@@ -115,7 +115,9 @@ class SingleReviewChart extends AsyncUpdater {
           text
         },
         endpoint: '/predict_text',
-        fields: ['fm', 'clf']
+        // dataset is needed for inferring the language
+        fields: ['dataset', 'fm', 'clf'],
+        updateHistory: false,
       })
     })
   }

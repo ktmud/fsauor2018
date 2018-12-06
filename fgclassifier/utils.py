@@ -222,7 +222,7 @@ def save_model(model, model_save_path=config.model_save_path):
     logger.info("Saving model... Done.")
 
 
-@threadsafe_lru(maxsize=5)
+@threadsafe_lru(maxsize=10)
 def load_model(feature_model, classifier, model='Baseline',
                model_save_path=config.model_save_path):
     if model == 'Baseline':

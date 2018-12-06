@@ -152,3 +152,27 @@ text.cat-score {
     font-weight: 600;
   }
 }
+
+
+.is-loading {
+  .section-loader.for-single {
+    display: none;
+    right: 173px;
+  }
+  .section-loader.for-global {
+    display: none;
+    left: auto;
+    width: 173px;
+  }
+  &.is-loading-single {
+    .section-loader.for-single {
+      display: block;
+    }
+  }
+  &.is-loading-global {
+    .section-loader.for-global {
+      display: block;
+    }
+  }
+}
+

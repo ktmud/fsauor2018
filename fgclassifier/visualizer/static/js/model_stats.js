@@ -17,6 +17,7 @@ export default class ModelStatsUpdater extends SingleReviewChart {
     super(elem, name)
     this.fields = ['dataset', 'fm', 'clf']
     this.endpoint = '/model_stats'
+    this.loaderDelay = 1500
   }
 
   render(rawData) {
