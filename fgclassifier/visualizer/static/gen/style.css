@@ -317,7 +317,7 @@ text.cat-score {
   .overall-f1 .overall-f1-score {
     font-weight: 600; }
 
-.is-loading .section-loader.for-single {
+.is-loading .chart .section-loader.for-single {
   display: none;
   right: 173px; }
 

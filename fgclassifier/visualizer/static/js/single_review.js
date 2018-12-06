@@ -51,10 +51,10 @@ class SingleReviewChart extends AsyncUpdater {
 
   prepareMore() {
     let self = this
-    this.root.selectAll('.foldable .toggle').on('click', function() {
+    this.root.selectAll('.foldable .toggle').on('click', function () {
       self.toggleClass('folded', this.closest('.foldable'))
     })
-    this.root.selectAll('.dropdown-trigger').on('click', function() {
+    this.root.selectAll('.dropdown-trigger').on('click', function () {
       self.toggleClass('is-active', this.closest('.dropdown'))
     })
     this.root.selectAll('.prev-seed').on('click', () => {
@@ -130,8 +130,15 @@ class SingleReviewChart extends AsyncUpdater {
       }
       this.data.review = rawData.review;
       this.data.n_correct_labels_html = rawData.n_correct_labels_html;
-      this.data.has_true_labels = !!rawData.true_labels;
+      this.data.has_true_labels = (
+        !!rawData.true_labels && rawData.true_labels[0][0] !== null
+      );
 
+      if (this.data.has_true_labels) {
+        this.data.true_probas = label2probas(this.data['true_labels'])[0];
+      } else {
+        this.data.true_probas = d3.range(20).map((i) => [1, 0, 0, 0]);
+      }
       // only update text when there's new data passed in
       if (this.data.review) {
         this.updateReviewText()
@@ -306,7 +313,9 @@ class SingleReviewChart extends AsyncUpdater {
         .attr('y', (d, i) => i * (barheight + barmargin))
         .attr('width', (d) => xScale(d[1] - d[0]))
         .attr('height', barheight)
+
       initHoverTips(bars, tooltipTmpl)
+
     } else {
       container
         .transition().duration(400)
@@ -384,19 +393,16 @@ class SingleReviewChart extends AsyncUpdater {
       }
     })
 
-    if (this.data['true_labels']) {
-      true_probas = label2probas(this.data['true_labels'])[0];
-    } else {
-      true_probas = d3.range(20).map((i) => [1, 0, 0, 0]);
-    }
+    let has_true_labels = this.data['has_true_labels']
+    true_probas = this.data['true_probas']
     this.buildBricks(true_probas, 'A', {
       ...configs,
       titlex: 12,
       xoffset: xoffset + fullwidth + barHeight + 6,
       fullwidth: barHeight,
-      alpha: this.data.has_true_labels ? 1 : 0.4,
+      alpha: has_true_labels ? 1 : 0.4,
       tooltipTmpl: (d, i) => {
-        return `Actual:<br>${labeltext[i]}`
+        return has_true_labels ? `Actual:<br>${labeltext[i]}` : ''
       }
     })
 
@@ -445,11 +451,15 @@ class SingleReviewChart extends AsyncUpdater {
     }
     counts = labelcounts(this.data.predict_label_counts);
     this.buildBricks(counts, 'predicted', configs)
+
     if (this.data.true_label_counts) {
       counts = labelcounts(this.data.true_label_counts);
+    } else {
+      counts = [[20, 0, 0, 0]]
     }
     configs = {
       ...configs,
+      alpha: this.data.has_true_labels ? 1 : 0.4,
       yoffset: 17,
     }
     this.buildBricks(counts, 'actual', configs)

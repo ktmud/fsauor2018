@@ -7,6 +7,7 @@ export const label2idx = {
   '-2': 0,
   '-1': 1,
   '0': 2,
-  '1': 3
+  '1': 3,
+  'null': 0
 };
 export const labeltext = ['Not Mentioned', 'Negative', 'Neutral', 'Positive'];

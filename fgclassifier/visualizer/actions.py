@@ -12,7 +12,7 @@ from collections import Counter
 from fgclassifier.visualizer.options import dataset_choices, fm_choices
 from fgclassifier.visualizer.options import clf_choices
 from fgclassifier.visualizer.highlight import highlight_noun_chunks
-from fgclassifier.utils import get_dataset, load_model, read_data
+from fgclassifier.utils import get_dataset, load_model, read_data, tokenize
 
 
 def parse_inputs(dataset='train_en', keyword=None,
@@ -73,14 +73,15 @@ def predict_one(dataset, dfs, totals, seed, fm, clf, **kwargs):
         X, y = read_data(random_review)
         model = load_model(fm, clf)
         review = random_review.to_dict('records')[0]
-        # Add highlighted HTML's
-        review['content_html'] = highlight_noun_chunks(
-            review['content_raw'], lang
-        ).replace('\n', '<br>')
-        del review['content_raw']
+        review = {
+            'id': review['id'],
+            'content_html': highlight_noun_chunks(
+                review['content_raw'], lang
+            ).replace('\n', '<br>')
+        }
         probas = predict_proba(clf, model, X)
         
-        true_labels = y.values
+        true_labels = y.replace({ np.nan: None }).values
         predict_labels = model.predict(X)
         # number of correct predictions
         n_correct_labels = np.sum(true_labels == predict_labels,
@@ -110,13 +111,18 @@ def predict_one(dataset, dfs, totals, seed, fm, clf, **kwargs):
     }
 
 
-def predict_text(text, fm, clf, **kwargs):
+def predict_text(text, fm, clf, dataset, **kwargs):
     """Predict for user inputed text"""
     if not text:
         return {
             'error': 400,
             'message': 'Must provide text.'
         }
+
+    # if Chinese, we need to tokenize (word segmentation)
+    if '_en' not in dataset:
+        text = tokenize(text)
+    
     X = pd.Series([text], name='content')
     model = load_model(fm, clf)
     predict_labels = model.predict(X)
