@@ -11,7 +11,7 @@ from collections import Counter
 
 from fgclassifier.visualizer.options import dataset_choices, fm_choices
 from fgclassifier.visualizer.options import clf_choices
-from fgclassifier.visualizer.highlight import highlight_noun_chunks
+from fgclassifier.visualizer.highlight import highlight_subsetence
 from fgclassifier.utils import get_dataset, load_model, read_data, tokenize
 
 
@@ -75,7 +75,7 @@ def predict_one(dataset, dfs, totals, seed, fm, clf, **kwargs):
         review = random_review.to_dict('records')[0]
         review = {
             'id': review['id'],
-            'content_html': highlight_noun_chunks(
+            'content_html': highlight_subsetence(
                 review['content_raw'], lang
             ).replace('\n', '<br>')
         }
