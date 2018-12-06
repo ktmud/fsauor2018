@@ -18,8 +18,8 @@ data_root = os.environ.get("DATA_ROOT", "data")
 
 model_save_path = f"{data_root}/models/"
 train_data_path = f"{data_root}/chinese_train.csv"
-valid_data_path = f"{data_root}/chinse_valid.csv"
-test_data_path = f"{data_root}/chinse_test.csv"
+valid_data_path = f"{data_root}/chinese_valid.csv"
+test_data_path = f"{data_root}/chinese_test.csv"
 
 train_en_data_path = f"{data_root}/english_train.csv"
 valid_en_data_path = f"{data_root}/english_valid.csv"
