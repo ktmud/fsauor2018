@@ -112,6 +112,11 @@ def predict_one(dataset, dfs, totals, seed, fm, clf, **kwargs):
 
 def predict_text(text, fm, clf, **kwargs):
     """Predict for user inputed text"""
+    if not text:
+        return {
+            'error': 400,
+            'message': 'Must provide text.'
+        }
     X = pd.Series([text], name='content')
     model = load_model(fm, clf)
     predict_labels = model.predict(X)
@@ -119,6 +124,8 @@ def predict_text(text, fm, clf, **kwargs):
     predict_labels = predict_labels.tolist()
     predict_label_counts = [Counter(x) for x in predict_labels]
     return {
+        'fm': fm,
+        'clf': clf,
         'predict_label_counts': predict_label_counts,
         'predict_labels': predict_labels,
         'probas': probas,
