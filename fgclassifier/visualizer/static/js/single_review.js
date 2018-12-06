@@ -136,7 +136,8 @@ class SingleReviewChart extends AsyncUpdater {
 
       if (this.data.has_true_labels) {
         this.data.true_probas = label2probas(this.data['true_labels'])[0];
-      } else {
+      } else if (this.data.review) {
+        // update new true probas if specified a review id (not partial text)
         this.data.true_probas = d3.range(20).map((i) => [1, 0, 0, 0]);
       }
       // only update text when there's new data passed in
