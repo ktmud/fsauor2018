@@ -15,6 +15,7 @@ class AsyncUpdater {
     this.name = name || 'updater'
     this.prepare(elem)
     this.loaderDelay = 300;
+    this._lastRequest = null;
   }
 
   fetchAndUpdate(opts) {
@@ -23,15 +24,24 @@ class AsyncUpdater {
     if (this.t_loading != null) {
       clearTimeout(this.t_loading);
     }
-    if (this.req && this.req.abort) {
-      this.req.abort();
+    let req = this._lastRequest
+    if (req && req.abort) {
+      req.abort();
     }
 
     this.enterLoading()
-    this.req = this.fetchData(opts).then((res) => {
-      this.render(res);
-      this.exitLoading()
+    req = this._lastRequest = this.fetchData(opts)
+    return req.then((res) => {
+      // only do the update for the last request
+      if (this._lastRequest == req) {
+        this.render(res);
+        this.exitLoading()
+      }
     })
+  }
+
+  isParamStale(params) {
+
   }
 
   enterLoading() {
