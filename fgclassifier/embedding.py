@@ -8,7 +8,7 @@ import numpy as np
 
 from sklearn.base import BaseEstimator
 from gensim.sklearn_api import W2VTransformer as W2VTransformer_
-from gensim.parsing.preprocessing import remove_stopwords,  preprocess_string
+from gensim.parsing.preprocessing import preprocess_string
 from gensim.parsing.preprocessing import stem_text, strip_punctuation
 
 
@@ -32,7 +32,10 @@ class W2VTransformer(W2VTransformer_):
         wv = self.gensim_model
         ret = []
         for words in X:
-            vectors = np.vstack(wv[word][None, :] for word in words if word in wv)
+            vectors = np.vstack(
+                wv[word][None, :] for word in words
+                if word in wv
+            )
             ret.append(np.mean(vectors, axis=0))
         return np.vstack(ret)
 

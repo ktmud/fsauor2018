@@ -82,12 +82,6 @@ class SparseToDense(BaseEstimator):
         return X.toarray()
 
 
-class OverSample(BaseEstimator):
-
-    def __init__(self, *args, **kwargs):
-        return super().__init__(*args, **kwargs)
-
-
 # ------- Feature Builder -----------------
 def is_list_or_tuple(obj):
     return isinstance(obj, tuple) or isinstance(obj, list)
@@ -108,7 +102,7 @@ fm_spec = {
     'lsa_1k_minmax': ['lsa_1k', MinMaxScaler()],
 
     # smaller vocabulary (removed more stop and infrequent words)
-    'count_sv': Count(ngram_range=(1, 5), min_df=5, max_df=0.8,
+    'count_sv': Count(ngram_range=(1, 5), min_df=5, max_df=0.6,
                       max_features=2000, tokenizer=tokenize_zh),
     'tfidf_sv': ['count_sv', Tfidf()],
     'tfidf_sv_dense': ['tfidf_sv', SparseToDense()],
