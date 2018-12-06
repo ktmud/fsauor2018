@@ -16,12 +16,14 @@ dataset_choices = OrderedDict([
 
 # Feature model choices -------
 fm_choices = OrderedDict([
-    ('count_en', 'Word Count'),
-    ('count_en_sv', 'Word Count(SM)'),
-    ('lsa_500_en', 'TF-IDF -> SVD(500)'),
-    ('lsa_1k_en', 'TF-IDF -> SVD(1000)'),
-    ('lsa_500_en_sv', 'TF-IDF(SM) -> SVD(500)'),
-    ('tfidf_en_sv_dense', 'TF-IDF(SM)'),
+    ('count_en', 'Word Count(4K)'),
+    ('count_en_sv', 'Word Count(2K)'),
+    ('tfidf_en_sv', 'TF-IDF(4K)'),
+    ('lsa_500_en', 'TF-IDF(4K) -> SVD(500)'),
+    ('lsa_1k_en', 'TF-IDF(4K) -> SVD(1K)'),
+    ('tfidf_en_sv', 'TF-IDF(2K)'),
+    ('lsa_500_en_sv', 'TF-IDF(2K) -> SVD(500)'),
+    ('lsa_1k_en_sv', 'TF-IDF(2K) -> SVD(1K)'),
     ('word2vec_en', 'Word2Vec'),
 ])
 

@@ -5,8 +5,7 @@
             <div class="select">
                 <select name="fm" id="sel-fm">
                     {% for opt, opt_disp in fm_choices.items() %}
-                    <option value="{{ opt }}" {% if fm==opt %} selected="selected" {% endif %}>{{
-                        opt_disp }}</option>
+                        <option value="{{ opt }}"{% if fm == opt or fm == opt.replace('_en', '') %} selected="selected"{% endif %}>{{ opt_disp }}</option>
                     {% endfor %}
                 </select>
             </div>
@@ -25,8 +24,8 @@
                                 <p>Select how to build the features.</p>
                                 <p>Models available are the best-performing ones for the correponding
                                  structure.</p>
-                                <p>(SM): smaller vocabulary.<br>
-                                   (200): 200 components.</p>
+                                <p>TF-IDF(4K): vocab size 4,000.<br>
+                                   SVD(500): 500 components.</p>
                                 <p>For details, <a href="https://github.com/ktmud/fsauor2018/" target="_blank">click here</a>.
                             </div>
                         </div>

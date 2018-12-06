@@ -25,6 +25,8 @@ def parse_inputs(dataset='train_en', keyword=None,
         fm = 'lsa_1k_en'
     if clf not in clf_choices:
         clf = 'LDA'
+    
+    # Silently fallback Naive Bayes to tfidf features
     if clf == 'ComplementNB' and 'lsa' in fm:
         fm = 'tfidf_sv' if '_sv' in fm else 'tfidf'
         if '_en' in fm:

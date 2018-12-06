@@ -245,6 +245,9 @@ def load_model(feature_model, classifier, model='Baseline',
     # if file does not exist, try load the SGD version
     if classifier in ('SVC', 'Logistic') and not os.path.exists(filename):
         filename = filename.replace(classifier, 'SGD_' + classifier)
+    # if tfidf features, try dense version as well
+    if 'tfidf' in feature_model and not os.path.exists(filename):
+        filename = filename.replace(feature_model, feature_model + '_dense')
 
     model_path = os.path.join(model_save_path, filename)
     logger.info('Loading model %s', filename)
