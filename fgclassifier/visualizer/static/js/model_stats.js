@@ -71,7 +71,7 @@ export default class ModelStatsUpdater extends SingleReviewChart {
     } else {
       title = title.transition().duration(300)
       g = g.transition().duration(300)
-      scores = scores.data(this.data['scores'])
+      scores = scores.data(all_scores)
         .transition().duration(300)
     }
     title.attr('transform', `translate(${xoffset - 10 + scoreWidth / 2}, 13)`)

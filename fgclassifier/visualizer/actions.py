@@ -111,7 +111,7 @@ def predict_one(dataset, dfs, totals, seed, fm, clf, **kwargs):
     }
 
 
-def predict_text(text, fm, clf, dataset, **kwargs):
+def predict_text(text, fm, clf, dataset, **_):
     """Predict for user inputed text"""
     if not text:
         return {

@@ -153,26 +153,29 @@ text.cat-score {
   }
 }
 
+.section-loader.for-global {
+    left: auto;
+    width: 173px;
+}
+.chart .section-loader.for-single {
+    right: 173px;
+}
 
 .is-loading {
-  .chart .section-loader.for-single {
+  .section-loader.for-single {
     display: none;
-    right: 173px;
   }
   .section-loader.for-global {
     display: none;
-    left: auto;
-    width: 173px;
-  }
-  &.is-loading-single {
-    .section-loader.for-single {
-      display: block;
-    }
-  }
-  &.is-loading-global {
-    .section-loader.for-global {
-      display: block;
-    }
   }
 }
-
+.is-loading-single {
+  .section-loader.for-single {
+    display: block;
+  }
+}
+.is-loading-global {
+  .section-loader.for-global {
+    display: block;
+  }
+}

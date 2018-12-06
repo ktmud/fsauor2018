@@ -317,17 +317,21 @@ text.cat-score {
   .overall-f1 .overall-f1-score {
     font-weight: 600; }
 
-.is-loading .chart .section-loader.for-single {
-  display: none;
-  right: 173px; }
-
-.is-loading .section-loader.for-global {
-  display: none;
+.section-loader.for-global {
   left: auto;
   width: 173px; }
 
-.is-loading.is-loading-single .section-loader.for-single {
+.chart .section-loader.for-single {
+  right: 173px; }
+
+.is-loading .section-loader.for-single {
+  display: none; }
+
+.is-loading .section-loader.for-global {
+  display: none; }
+
+.is-loading-single .section-loader.for-single {
   display: block; }
 
-.is-loading.is-loading-global .section-loader.for-global {
+.is-loading-global .section-loader.for-global {
   display: block; }

@@ -11,7 +11,7 @@ dataset_choices = OrderedDict([
     ('test_en', 'Testing'),
     ('train', 'Training (Chinese)'),
     ('valid', 'Validation (Chinese)'),
-    ('testa', 'Testing (Chinese)'),
+    ('test', 'Testing (Chinese)'),
 ])
 
 # Feature model choices -------
