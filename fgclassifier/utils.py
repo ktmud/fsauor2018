@@ -242,14 +242,18 @@ def load_model(feature_model, classifier, model='Baseline',
     else:
         filename = f'{feature_model}_{model}_{classifier}.pkl'
 
-    # if file does not exist, try load the SGD version
-    if classifier in ('SVC', 'Logistic') and not os.path.exists(filename):
-        filename = filename.replace(classifier, 'SGD_' + classifier)
-    # if tfidf features, try dense version as well
-    if 'tfidf' in feature_model and not os.path.exists(filename):
-        filename = filename.replace(feature_model, feature_model + '_dense')
-
     model_path = os.path.join(model_save_path, filename)
+
+    # if file does not exist, try load the SGD version
+    if classifier in ('SVC', 'Logistic') and not os.path.exists(model_path):
+        filename = filename.replace(classifier, 'SGD_' + classifier)
+        model_path = os.path.join(model_save_path, filename)
+    # if tfidf features, try dense version as well
+
+    if 'tfidf' in feature_model and not os.path.exists(model_path):
+        filename = filename.replace(feature_model, feature_model + '_dense')
+        model_path = os.path.join(model_save_path, filename)
+
     logger.info('Loading model %s', filename)
     model = joblib.load(model_path)
     logger.info('Loading %s done.', filename)

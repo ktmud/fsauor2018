@@ -26,14 +26,16 @@ def parse_inputs(dataset='train_en', keyword=None,
     if clf not in clf_choices:
         clf = 'LDA'
     
+    lang = 'en' if '_en' in fm else 'zh'
     # Silently fallback Naive Bayes to tfidf features
     # and count to tfidf for non-supported classifiers
     if (clf == 'ComplementNB' and 'lsa' in fm) or (
         clf in ('LDA', 'Ridge') and 'count' in fm
     ):
         fm = 'tfidf_sv' if '_sv' in fm else 'tfidf'
-        if '_en' in fm:
+        if lang == 'en':
             fm += '_en'
+        print(fm)
 
     # handle language
     #   - if dataset is not English
