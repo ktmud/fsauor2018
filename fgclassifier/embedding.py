@@ -57,8 +57,23 @@ class Text2Tokens(BaseEstimator):
 
 
 # More robust split sentences
-RE_SENTENCE = re.compile(r'.*?[。….？！?!；~～]+')
+RE_SENTENCE = re.compile(r'.*?[。….？！?!；~～]+[\)）\"]*')
+# subsentence include splitting by commas
+RE_SUBSENTENCE = re.compile(r'((.+?)([，,；:：。….？！?!；~～]+[\)）\"]*|$))')
 RE_BLANK_AND_MARK = re.compile(r'\s+([。….？！?!；~～])')
+
+
+def split_subsentences(text):
+    """Split Chinese sentences"""
+    # replace consequetive "<space><mark><space><mark>"
+    # with just marks
+    text = RE_BLANK_AND_MARK.sub(r'\1', text)
+    seen_one = False
+    for sent, g1, g2 in RE_SUBSENTENCE.findall(text):
+        seen_one = True
+        yield sent.strip(), g1, g2
+    if not seen_one:
+        yield text.strip(), text.strip(), ''
 
 
 def split_sentences(text):

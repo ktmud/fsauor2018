@@ -17,15 +17,16 @@ logging.basicConfig(
 data_root = os.environ.get("DATA_ROOT", "data")
 
 model_save_path = f"{data_root}/models/"
-train_data_path = f"{data_root}/train/sentiment_analysis_trainingset.csv"
-valid_data_path = f"{data_root}/valid/sentiment_analysis_validationset.csv"
-testa_data_path = f"{data_root}/test-a/sentiment_analysis_testa.csv"
-testb_data_path = f"{data_root}/test-b/sentiment_analysis_testb.csv"
+train_data_path = f"{data_root}/chinese_train.csv"
+valid_data_path = f"{data_root}/chinese_valid.csv"
+test_data_path = f"{data_root}/chinese_test.csv"
 
 train_en_data_path = f"{data_root}/english_train.csv"
 valid_en_data_path = f"{data_root}/english_valid.csv"
 test_en_data_path = f"{data_root}/english_test.csv"
 
+testa_data_path = f"{data_root}/test-a/sentiment_analysis_testa.csv"
+testb_data_path = f"{data_root}/test-b/sentiment_analysis_testb.csv"
 testa_predict_out_path = f"{data_root}/testa_prediction.csv"
 testb_predict_out_path = f"{data_root}/testb_prediction.csv"
 

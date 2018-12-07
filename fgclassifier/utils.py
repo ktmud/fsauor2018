@@ -140,19 +140,21 @@ def read_data(data_path, flavor='tokenized', return_df=False,
 
 
 @threadsafe_lru(maxsize=10)
-def get_dataset(dataset, keyword=None):
+def get_dataset(dataset, include_raw=True, keyword=None):
     """Get a dataset DataFrame, including the raw content and tokenized content
     and filter it by keywords"""
     data_path = getattr(config, f'{dataset}_data_path')
     if 'english' in data_path:
         df = read_csv(data_path)
-        # For english, the raw content is the same
-        df['content_raw'] = df['content']
+        if include_raw or keyword:
+            # For english, the raw content is the same
+            df['content_raw'] = df['content']
     else:
         # if Chinese, needs to add a raw column
         df = read_csv(data_path, 'tokenized')
-        df['content_raw'] = read_csv(data_path, 'raw')[
-            'content'].str.strip('"')
+        if include_raw or keyword:
+            df['content_raw'] = read_csv(data_path, 'raw')[
+                'content'].str.strip('"')
     if keyword:
         df = df[df['content_raw'].str.contains(keyword, case=False)]
     return df
@@ -193,20 +195,30 @@ def label2dist(y):
 @persistent('stats')
 def get_stats(dataset, fm, clf):
     """Get performance stats of a model on the selected dataset"""
-    X, y = read_data(get_dataset(dataset))
+    X, y = read_data(get_dataset(dataset, include_raw=False))
     model = load_model(fm, clf)
     logging.info('Running stats for %s...', model.name)
-    scores = model.scores(X, y)
-    y_pred = pd.DataFrame(data=model.predict(X),
-                          index=y.index, columns=y.columns)
-    return {
+    y_pred = pd.DataFrame(
+        data=model.predict(X), index=y.index, columns=y.columns)
+    ret = {
         'dataset': dataset,
         'fm': fm,
         'clf': clf,
-        'scores': scores,
-        'avg_score': np.mean(scores),
-        'true_dist': label2dist(y),
         'predict_dist': label2dist(y_pred),
+    }
+
+    # if this is a test dataset, there is no true labels,
+    # hence no scores
+    if 'test' in dataset:
+        return ret
+
+    scores = model.scores(X, y)
+
+    return {
+        **ret,
+        'true_dist': label2dist(y),
+        'avg_score': np.mean(scores),
+        'scores': scores,
     }
 
 
@@ -222,7 +234,7 @@ def save_model(model, model_save_path=config.model_save_path):
     logger.info("Saving model... Done.")
 
 
-@threadsafe_lru(maxsize=5)
+@threadsafe_lru(maxsize=10)
 def load_model(feature_model, classifier, model='Baseline',
                model_save_path=config.model_save_path):
     if model == 'Baseline':
@@ -230,11 +242,18 @@ def load_model(feature_model, classifier, model='Baseline',
     else:
         filename = f'{feature_model}_{model}_{classifier}.pkl'
 
-    # if file does not exist, try load the SGD version
-    if classifier in ('SVC', 'Logistic') and not os.path.exists(filename):
-        filename = filename.replace(classifier, 'SGD_' + classifier)
-
     model_path = os.path.join(model_save_path, filename)
+
+    # if file does not exist, try load the SGD version
+    if classifier in ('SVC', 'Logistic') and not os.path.exists(model_path):
+        filename = filename.replace(classifier, 'SGD_' + classifier)
+        model_path = os.path.join(model_save_path, filename)
+    # if tfidf features, try dense version as well
+
+    if 'tfidf' in feature_model and not os.path.exists(model_path):
+        filename = filename.replace(feature_model, feature_model + '_dense')
+        model_path = os.path.join(model_save_path, filename)
+
     logger.info('Loading model %s', filename)
     model = joblib.load(model_path)
     logger.info('Loading %s done.', filename)

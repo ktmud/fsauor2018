@@ -11,24 +11,28 @@ dataset_choices = OrderedDict([
     ('test_en', 'Testing'),
     ('train', 'Training (Chinese)'),
     ('valid', 'Validation (Chinese)'),
-    ('testa', 'Testing (Chinese)'),
+    ('test', 'Testing (Chinese)'),
 ])
 
 # Feature model choices -------
 fm_choices = OrderedDict([
-    ('lsa_500_en', 'TF-IDF -> SVD(500)'),
-    ('lsa_1k_en', 'TF-IDF -> SVD(1000)'),
-    ('lsa_500_en_sv', 'TF-IDF(SM) -> SVD(500)'),
-    ('tfidf_en_sv_dense', 'TF-IDF(SM)'),
-    ('word2vec', 'Word2Vec'),
+    ('count_en', 'Word Count(4K)'),
+    ('count_en_sv', 'Word Count(2K)'),
+    ('tfidf_en_sv', 'TF-IDF(4K)'),
+    ('lsa_500_en', 'TF-IDF(4K) -> SVD(500)'),
+    ('lsa_1k_en', 'TF-IDF(4K) -> SVD(1K)'),
+    ('tfidf_en_sv', 'TF-IDF(2K)'),
+    ('lsa_500_en_sv', 'TF-IDF(2K) -> SVD(500)'),
+    ('lsa_1k_en_sv', 'TF-IDF(2K) -> SVD(1K)'),
+    ('word2vec_en', 'Word2Vec'),
 ])
 
 # Classifier choices ---------
 clf_choices = OrderedDict([
     # Only LDA and Logistic supports predict a probability
     ('LDA', 'Linear Discriminant Analysis'),
-    ('Logistic', 'Logistic Regression'),
-    ('LinearSVC', 'Linear SVM Classifier'),
+    ('SGD_Logistic', 'Logistic Regression'),
+    ('SGD_SVC', 'Linear SVM Classifier'),
     ('Ridge', 'Ridge Classifier'),
     ('ComplementNB', 'Complement Naive Bayes'),
 ])

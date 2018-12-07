@@ -10,6 +10,7 @@ from textblob import TextBlob
 from snownlp import SnowNLP
 
 from fgclassifier.embedding import split_sentences
+from fgclassifier.embedding import RE_SUBSENTENCE, split_subsentences
 
 
 @lru_cache(2)
@@ -61,6 +62,41 @@ def highlight_noun_chunks(text, lang='en'):
                                           sentiment, replacements)
         html += '<span class="sentence">' + sentence + '</span>'
     return _show_highlight(html, replacements)
+
+
+def highlight_subsetence(text, lang='en'):
+    """Highlight noun chunks with sentiments, wrap with HTML tags"""
+    html = ''
+    for sentence in split_sentences(text):
+        html += '<span class="sentence">'
+        # highlight the longest two noun chunks
+        for subsentence, g1, g2 in split_subsentences(sentence):
+            sentiment = None  # none is neutral
+            if lang == 'zh':
+                score = SnowNLP(subsentence).sentiments * 2 - 1
+                if score > 0.5:
+                    sentiment = 'positive'
+                elif score < -0.5:
+                    sentiment = 'negative'
+            else:
+                score = TextBlob(subsentence).sentiment.polarity
+                if score > 0.29:
+                    sentiment = 'positive'
+                elif score < -0.29:
+                    sentiment = 'negative'
+
+            if sentiment:
+                senti_s = (
+                    f'<span class="{sentiment}" ' +
+                    f'title="{score:.2f}">'
+                )
+                senti_e = f'</span>'
+            else:
+                senti_s = f'<span title="{score:.2f}">'
+                senti_e = f'</span>'
+            html += f'{senti_s}{g1}{senti_e}{g2}'
+        html += '</span>'
+    return html
 
 
 def zh_noun_chunks_iterator(obj):

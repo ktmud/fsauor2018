@@ -127,23 +127,23 @@ fm_spec = {
     'word2vec_minmax': ['word2vec_minmax', MinMaxScaler()],
 
     'word2vec_en': [Text2Tokens(tokenizer=tokenize_en),
-                    W2VTransformer(size=400, min_count=3, window=10, iter=10)],
+                    W2VTransformer(size=300, min_count=3, window=10, iter=10)],
     'word2vec_en_minmax': ['word2vec_en', MinMaxScaler()],
 
     # For English
-    'count_en': Count(ngram_range=(1, 6), min_df=0.01, stop_words='english'),
+    'count_en': Count(ngram_range=(1, 6), min_df=3, stop_words='english',
+                      max_features=4000),
     'tfidf_en': ['count_en', Tfidf()],
     'tfidf_en_dense': ['tfidf_en', SparseToDense()],
-    'lsa_200_en': ['tfidf_en', SVD(n_components=200)],
     'lsa_500_en': ['tfidf_en', SVD(n_components=500)],
     'lsa_1k_en': ['tfidf_en', SVD(n_components=1000)],
 
-    'count_en_sv': Count(ngram_range=(1, 6), min_df=0.02,
-                         stop_words='english'),
+    'count_en_sv': Count(ngram_range=(1, 6), min_df=3, stop_words='english',
+                         max_features=2000),
     'tfidf_en_sv': ['count_en_sv', Tfidf()],
     'tfidf_en_sv_dense': ['tfidf_en_sv', SparseToDense()],
-    'lsa_200_en_sv': ['tfidf_en_sv', SVD(n_components=200)],
     'lsa_500_en_sv': ['tfidf_en_sv', SVD(n_components=500)],
+    'lsa_1k_en_sv': ['tfidf_en_sv', SVD(n_components=1000)],
 }
 
 

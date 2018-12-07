@@ -316,3 +316,22 @@ text.cat-score {
     font-size: 9px; }
   .overall-f1 .overall-f1-score {
     font-weight: 600; }
+
+.section-loader.for-global {
+  left: auto;
+  width: 173px; }
+
+.chart .section-loader.for-single {
+  right: 173px; }
+
+.is-loading .section-loader.for-single {
+  display: none; }
+
+.is-loading .section-loader.for-global {
+  display: none; }
+
+.is-loading-single .section-loader.for-single {
+  display: block; }
+
+.is-loading-global .section-loader.for-global {
+  display: block; }

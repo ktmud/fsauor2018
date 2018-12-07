@@ -55,7 +55,8 @@ def predict():
 def predict_text():
     """Predict for user-inputted text"""
     inputs = actions.parse_inputs(**dict(request.args.items()))
-    return jsonify(actions.predict_text(**inputs))
+    text = request.args.get('text')
+    return jsonify(actions.predict_text(text, **inputs))
 
 
 @app.route('/model_stats')

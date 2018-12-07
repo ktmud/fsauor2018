@@ -17,6 +17,7 @@ export default class ModelStatsUpdater extends SingleReviewChart {
     super(elem, name)
     this.fields = ['dataset', 'fm', 'clf']
     this.endpoint = '/model_stats'
+    this.loaderDelay = 300
   }
 
   render(rawData) {
@@ -43,6 +44,12 @@ export default class ModelStatsUpdater extends SingleReviewChart {
   updateScores() {
     let xoffset = this.getXoffset() + statsWidth - scoreWidth + 10
     let avg_score = this.data['avg_score']
+    if (typeof avg_score == 'undefined') {
+      avg_score = '-'
+    } else {
+      avg_score = avg_score.toFixed(3)
+    }
+    let all_scores = this.data['scores'] || Array(20)
     let title = this.bricks.select('text.cat-score-title')
     let scores = this.bricks.selectAll('text.cat-score')
     let g = this.bricks.select('g.cat-scores')
@@ -55,24 +62,24 @@ export default class ModelStatsUpdater extends SingleReviewChart {
       g = scores = this.bricks.append('g')
         .attr('class', 'cat-scores')
       scores = g.selectAll('g.scores')
-        .data(this.data['scores']).enter()
+        .data(all_scores).enter()
         .append('text')
         .attr('class', 'cat-score')
-        .attr('text-anchor', 'begin')
+        .attr('text-anchor', 'middle')
         .attr('transform', (d, i) =>
-          `translate(0, ${barHeight / 2 + 5 + i * (barHeight + 1)})`)
+          `translate(20, ${barHeight / 2 + 5 + i * (barHeight + 1)})`)
     } else {
       title = title.transition().duration(300)
       g = g.transition().duration(300)
-      scores = scores.data(this.data['scores'])
+      scores = scores.data(all_scores)
         .transition().duration(300)
     }
     title.attr('transform', `translate(${xoffset - 10 + scoreWidth / 2}, 13)`)
     g.attr('transform', `translate(${xoffset}, 20)`)
-    scores.text((d) => d.toFixed(3))
-      .style('fill', (d) => d < avg_score ? '#f46d43' : '#66bd63')
-    
-    this.html('.overall-f1-score', this.data['avg_score'].toFixed(3))
+    scores.text((d) => d ? d.toFixed(3) : '-')
+      .style('fill', (d) => d ? (d < avg_score ? '#f46d43' : '#66bd63') : 'gray')
+
+    this.html('.overall-f1-score', avg_score)
   }
 
   updateDistBars() {
@@ -102,24 +109,33 @@ export default class ModelStatsUpdater extends SingleReviewChart {
       })
     }
     // update true distribution
+    let true_dist, has_true_dist
     if (this.data['true_dist']) {
-      this.buildBricks(this.data['true_dist'], 'global actual', {
-        barheight,
-        barmargin,
-        yoffset: yoffset + barheight,
-        xoffset: xoffset,
-        showtitle: false,
-        fullwidth: width,
-        alpha: 0.7,
-        tooltipTmpl: (d, i) => {
-          let dd = d[1] - d[0]
-          if (dd < 1) {
-            dd = dd.toFixed(2);
-          }
-          return `Actual<br>${labeltext[i]}: ${dd}`
-        }
-      })
+      has_true_dist = true
+      true_dist = this.data['true_dist']
+    } else {
+      has_true_dist = false
+      true_dist = d3.range(20).map((i) => [1, 0, 0, 0]);
     }
+    this.buildBricks(true_dist, 'global actual', {
+      barheight,
+      barmargin,
+      yoffset: yoffset + barheight,
+      xoffset: xoffset,
+      showtitle: false,
+      fullwidth: width,
+      alpha: has_true_dist ? 0.7 : 0.5,
+      tooltipTmpl: (d, i) => {
+        if (!has_true_dist) {
+          return ''
+        }
+        let dd = d[1] - d[0]
+        if (dd < 1) {
+          dd = dd.toFixed(2);
+        }
+        return `Actual<br>${labeltext[i]}: ${dd}`
+      }
+    })
 
   }
 
