@@ -4,8 +4,6 @@ Fine-grained Sentiment Analysis on User Reviews
 This is a solution for the [Fine-grained Sentiment Analysis of User Reviews](https://challenger.ai/competition/fsauor2018) challenge
 from AI Challenger.
 
-A fine visualization of the predictions: http://review-sentiments.yjc.me/
-
 ## Dataset
 
 The original Chinese dataset can be [downloaded here](https://drive.google.com/file/d/1YYRWKJmahhVW7ZmzGeEtlKqDl4h-v0wG/view).
@@ -35,6 +33,16 @@ Or run:
 ```
 
 ### Visualize the Results
+
+We've build a visualization tool to evaluate the performance of different models.
+You can dive into a single review and check why a model predicted the given results
+by rerun the prediction on arbitrary sentence segments in a review. The visualization
+also allows you to see which sentiment aspects the model find it particularly difficult
+to predict.
+
+For a detailed description of how we designed and implemented the visualization, [check here](https://docs.google.com/document/d/1T6TkbO62Rf3h5-jnMj7DGh_AKYtkmPCvAuUN7Adgvb0/edit).
+A demo of the visualization can be found here: http://review-sentiments.yjc.me/
+
 
 ```
 python app.py --port 500
