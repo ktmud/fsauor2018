@@ -40,9 +40,11 @@ by rerun the prediction on arbitrary sentence segments in a review. The visualiz
 also allows you to see which sentiment aspects the model find it particularly difficult
 to predict.
 
-For a detailed description of how we designed and implemented the visualization, [check here](https://docs.google.com/document/d/1T6TkbO62Rf3h5-jnMj7DGh_AKYtkmPCvAuUN7Adgvb0/edit).
 A demo of the visualization can be found here: http://review-sentiments.yjc.me/
 
+For a detailed description of how we designed and implemented the visualization, [check here](https://docs.google.com/document/d/1T6TkbO62Rf3h5-jnMj7DGh_AKYtkmPCvAuUN7Adgvb0/edit).
+
+To run the visualization locally:
 
 ```
 python app.py --port 500
