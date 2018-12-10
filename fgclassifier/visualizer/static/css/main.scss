@@ -179,3 +179,41 @@ text.cat-score {
     display: block;
   }
 }
+
+.legend {
+  font-size: 11px;
+  text-align: right;
+  margin-bottom: 20px;
+}
+.legend-title {
+  display: inline-block;
+  color: gray;
+}
+.legend-item {
+  display: inline-block;
+  margin-left: 10px;
+  padding-left: 16px;
+  position: relative;
+  &:before {
+    content: '';
+    background: #ccc;
+    display: block;
+    position: absolute;
+    width: 12px;
+    height: 12px;
+    left: 0;
+    top: 2px;
+  }
+  &.not-mentioned:before {
+    background: Gainsboro;
+  }
+  &.negative:before {
+    background: #d7191c;
+  }
+  &.neutral:before {
+    background: #abd9e9;
+  }
+  &.positive:before {
+    background: #1a9641;
+  }
+}

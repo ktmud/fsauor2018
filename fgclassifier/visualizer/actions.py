@@ -57,7 +57,8 @@ def parse_inputs(dataset='train_en', keyword=None,
 
 
 def predict_proba(clf, model, X):
-    if clf in ('Logistic', 'LDA', 'SDG_Logistic'):
+    if clf in ('Logistic', 'LDA',
+               'SGD_Logistic'):
         # Only LogisticRegression and LinearDiscriminantAnalysis supports
         # the probablisitc view.
         probas = model.predict_proba(X)

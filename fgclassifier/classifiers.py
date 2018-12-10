@@ -66,21 +66,22 @@ SGD_SVC = SGDClassifier(
     learning_rate='optimal',
     class_weight='balanced',
     n_jobs=-1, early_stopping=True,
-    max_iter=1000, tol=1e-4, alpha=1e-4
+    max_iter=4000, tol=1e-5, alpha=1e-4
 )
 SGD_Logistic = SGDClassifier(
     loss='log',
     learning_rate='optimal',
     class_weight='balanced',
+    penalty='L1',
     n_jobs=-1, early_stopping=True,
-    max_iter=1000, tol=1e-4, alpha=1e-4
+    max_iter=4000, tol=1e-4, alpha=1e-4
 )
 SGD_Huber = SGDClassifier(
     loss='modified_huber',
     learning_rate='optimal',
     class_weight='balanced',
     n_jobs=-1, early_stopping=True,
-    max_iter=1000, tol=1e-4, alpha=1e-4
+    max_iter=4000, tol=1e-5, alpha=1e-4
 )
 
 # Ensemble Methods -------

@@ -47,6 +47,19 @@ class SVD(TruncatedSVD):
         return super().fit_transform(*args, **kwargs)
 
 
+class SmartSVD(TruncatedSVD):
+
+    def __init__(self, p_components):
+        self.p_components = p_components
+    
+    def fit_transform(self, X, y=None, **kwargs):
+        if self.p_components == 1:
+            return X
+        self.n_components = int(X.shape[1] * self.p_components)
+        logger.info('SVD feature size %s', self.n_components)
+        return super().fit_transform(X, y, **kwargs)
+
+
 class Count(CountVectorizer):
 
     def transform(self, raw_documents):

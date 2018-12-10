@@ -335,3 +335,35 @@ text.cat-score {
 
 .is-loading-global .section-loader.for-global {
   display: block; }
+
+.legend {
+  font-size: 11px;
+  text-align: right;
+  margin-bottom: 20px; }
+
+.legend-title {
+  display: inline-block;
+  color: gray; }
+
+.legend-item {
+  display: inline-block;
+  margin-left: 10px;
+  padding-left: 16px;
+  position: relative; }
+  .legend-item:before {
+    content: '';
+    background: #ccc;
+    display: block;
+    position: absolute;
+    width: 12px;
+    height: 12px;
+    left: 0;
+    top: 2px; }
+  .legend-item.not-mentioned:before {
+    background: Gainsboro; }
+  .legend-item.negative:before {
+    background: #d7191c; }
+  .legend-item.neutral:before {
+    background: #abd9e9; }
+  .legend-item.positive:before {
+    background: #1a9641; }

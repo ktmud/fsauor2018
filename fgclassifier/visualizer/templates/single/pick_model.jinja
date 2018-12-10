@@ -73,6 +73,13 @@
             </span>
         </button>
     </div>
+    <div class="legend">
+        <div class="legend-title">Sentiment</div>
+        <div class="legend-item not-mentioned">Not mentioned</div>
+        <div class="legend-item negative">Negative</div>
+        <div class="legend-item neutral">Neutral</div>
+        <div class="legend-item positive">Positive</div>
+    </div>
     <svg class="bricks"></svg>
     <div class="section-footer">
         <div class="overall-sentiments">
@@ -97,5 +104,6 @@
  <em>A</em>: the actual sentiment labels. <br>
  <em>global</em>: the global distribution of the labels in the selected dataset.</p>
  <em>F1</em>: F1 score of predictions on the selected dataset
- (either <span class="below-average">below average</span> or <span class="above-average">above average</span>).</p>
+ (<span class="below-average">highlighted</span> are scores more than one standard deviation below the average).
+ 
 </div>

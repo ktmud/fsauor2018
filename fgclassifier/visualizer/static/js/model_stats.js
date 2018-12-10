@@ -11,6 +11,14 @@ import SingleReviewChart from './single_review.js'
 // width for displaying the scores
 let scoreWidth = 60
 
+const scoreColor = (d, mu, sd) => {
+  if (!d) return 'gray';
+  if (d < mu - sd) {
+    return '#f46d43';
+  }
+  return '#666';
+}
+
 export default class ModelStatsUpdater extends SingleReviewChart {
 
   constructor(elem, name) {
@@ -76,8 +84,11 @@ export default class ModelStatsUpdater extends SingleReviewChart {
     }
     title.attr('transform', `translate(${xoffset - 10 + scoreWidth / 2}, 13)`)
     g.attr('transform', `translate(${xoffset}, 20)`)
+
+    let mu = avg_score
+    let sd = d3.deviation(all_scores)
     scores.text((d) => d ? d.toFixed(3) : '-')
-      .style('fill', (d) => d ? (d < avg_score ? '#f46d43' : '#66bd63') : 'gray')
+      .style('fill', (d) => scoreColor(d, mu, sd))
 
     this.html('.overall-f1-score', avg_score)
   }
