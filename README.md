@@ -8,8 +8,8 @@ from AI Challenger.
 
 The original Chinese dataset can be [downloaded here](https://drive.google.com/file/d/1YYRWKJmahhVW7ZmzGeEtlKqDl4h-v0wG/view).
 
-We also translated 1/10 of the training data to English, using Google Translate API.
-The English dataset is already included in the repository.
+We also translated 1/10 of the training data to English, using Google Translate API,
+which is already included in this repository.
 
 ## Getting Started
 
@@ -51,6 +51,11 @@ python app.py --port 500
 ```
 
 Change `--port` as your like.
+
+#### Evaluation of the Visualization
+
+For the evaluation of the visualization, refer to [this document](https://docs.google.com/document/d/1ONDPSIAXydlr-vt-93-e2tNOBhQXbRYb96ZrBsn2ygE/edit).
+
 
 ## Deploy
 
