@@ -160,7 +160,7 @@ def get_dataset(dataset, include_raw=True, keyword=None):
     return df
 
 
-def persistent(subdir, storage_path=config.data_root, ttl=604800):
+def persistent(subdir, storage_path=config.data_root, ttl=2592000):
     """Save function output in disk"""
     outdir = os.path.join(storage_path, subdir)
     if not os.path.exists(outdir):
