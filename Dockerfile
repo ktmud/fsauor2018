@@ -29,6 +29,8 @@ RUN pip install xgboost==0.81
 ADD ./fgclassifier/prepare.py /tmp/prepare.py
 RUN python /tmp/prepare.py
 
+RUN pip install pattern==3.6.0
+
 # Add source code
 ADD ./fgclassifier /app/fgclassifier
 ADD ./config.py /app/config.py
