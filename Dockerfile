@@ -29,6 +29,7 @@ RUN pip install xgboost==0.81
 ADD ./fgclassifier/prepare.py /tmp/prepare.py
 RUN python /tmp/prepare.py
 
+RUN apt install mysql-client
 RUN pip install pattern==3.6.0
 
 # Add source code
