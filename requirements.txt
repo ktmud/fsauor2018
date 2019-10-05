@@ -11,5 +11,6 @@ textblob==0.15.2
 gensim==3.6.0
 xgboost==0.81
 msgpack==0.5.6
+pattern==3.6.0
 https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-2.0.0/en_core_web_sm-2.0.0.tar.gz#egg=en_core_web_sm-2.0.0
 https://github.com/howl-anderson/Chinese_models_for_SpaCy/releases/download/v2.0.5/zh_core_web_sm-2.0.5.tar.gz#egg=zh_core_web_sm-2.0.5
