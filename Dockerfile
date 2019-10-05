@@ -1,5 +1,5 @@
 # Use Intel Python
-FROM intelpython/intelpython3_core:2019.1
+FROM intelpython/intelpython3_core:2019.4
 
 WORKDIR /app
 
