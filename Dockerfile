@@ -3,6 +3,9 @@ FROM intelpython/intelpython3_core:2019.4
 
 WORKDIR /app
 
+RUN apt-get install -y mysql-client-core
+RUN pip install pattern==3.6.0
+
 RUN wget --quiet https://github.com/howl-anderson/Chinese_models_for_SpaCy/releases/download/v2.0.5/zh_core_web_sm-2.0.5.tar.gz
 RUN wget --quiet https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-2.0.0/en_core_web_sm-2.0.0.tar.gz
 
@@ -28,9 +31,6 @@ RUN pip install xgboost==0.81
 # Prepare the environment more... (download nltk data, etc)
 ADD ./fgclassifier/prepare.py /tmp/prepare.py
 RUN python /tmp/prepare.py
-
-RUN apt-get install -y mysql-client
-RUN pip install pattern==3.6.0
 
 # Add source code
 ADD ./fgclassifier /app/fgclassifier
