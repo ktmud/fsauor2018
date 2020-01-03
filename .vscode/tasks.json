@@ -2,6 +2,11 @@
     // See https://go.microsoft.com/fwlink/?LinkId=733558
     // for the documentation about the tasks.json format
     "version": "2.0.0",
+    "options": {
+        "env": {
+            "PATH": "/anaconda2/envs/fsauor/bin:/anaconda2/condabin:/Users/jessey/.yarn/bin:/Users/jessey/.config/yarn/global/node_modules/.bin:/Users/jessey/.poetry/bin:/Users/jessey/.local/bin:/Library/Java/JavaVirtualMachines/jdk1.8.0_181.jdk/Contents/Home/bin:/usr/local/opt/coreutils/libexec/gnubin:/usr/local/cuda/bin:bin:lib/python2.7/bin:/usr/local/opt/openssl/bin:/anaconda2/bin:/Users/jessey/anaconda2/bin:/Users/jessey/bin:/Users/jessey/anaconda3/bin:/Users/jessey/.yarn/bin:/Users/jessey/.config/yarn/global/node_modules/.bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/Library/TeX/texbin:/Users/jessey/.local/bin:/Users/jessey/workspace/bin:/Users/jessey/.fzf/bin"
+        }
+    },
     "tasks": [
         {
             "label": "Train - SVC",
@@ -12,6 +17,12 @@
                 "-m", "fgclassifier.train",
                 "-c", "SVC"
             ],
+        },
+        {
+            "label": "Build Docker container",
+            "type": "shell",
+            "group": "test",
+            "command": "docker build . -t ktmud/fsauor2018"
         },
         {
             "label": "Train - LinearSVC",

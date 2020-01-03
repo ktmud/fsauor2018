@@ -1,5 +1,4 @@
-Fine-grained Sentiment Analysis on User Reviews
------------------------------------------------
+## Fine-grained Sentiment Analysis on User Reviews
 
 This is a solution for the [Fine-grained Sentiment Analysis of User Reviews](https://challenger.ai/competition/fsauor2018) challenge
 from AI Challenger.
@@ -56,7 +55,6 @@ Change `--port` as your like.
 
 For the evaluation of the visualization, refer to [this document](https://docs.google.com/document/d/1ONDPSIAXydlr-vt-93-e2tNOBhQXbRYb96ZrBsn2ygE/edit).
 
-
 ## Deploy
 
 The visualization can be easily deployed via [Dokku](https://github.com/dokku/dokku).
@@ -81,21 +79,20 @@ dokku storage:mount review-sentiments /var/lib/dokku/data/storage/review-sentime
 
 Then upload the dataset and the pre-trained models to your host:
 
-```
-scp -r data/* /var/lib/dokku/data/storage/review-sentiments
+```bash
+ssh your-host "mkdir -p /var/lib/dokku/data/storage/review-sentiments"
+scp -r data/* your-host:/var/lib/dokku/data/storage/review-sentiments
 ```
 
 You can also download pre-trained models [here](http://review-sentiments.yjc.me/files/models/).
 
-
 ## Local Development
-
 
 ### With Docker
 
 I recommend using the Docker image:
 
-```
+```bash
 docker build -t ktmud/fgclassifier .
 docker-compose up
 ```
@@ -110,12 +107,12 @@ host machine and make user it is accessible by Docker.
 
 ### Without Docker
 
-To run the app without Docker, install the required packages 
+To run the app without Docker, install the required packages
 via `requirements.txt`, then make sure the data (and pre-trained models)
 are in your `DATA_ROOT` (take a look at `config.py` for how file paths are
 defined).
 
-```
+```bash
 pip install -r requirement.txt
 export DATA_ROOT="./data"
 python fgclassifier/prepare.py

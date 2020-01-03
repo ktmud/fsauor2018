@@ -82,7 +82,7 @@ if __name__ == '__main__':
     parser.add_argument('-c', '--classifier', default='SVC',
                         choices=classifier_choices,
                         help='Classifier used by the model')
-    parser.add_argument('--train', default=10000,
+    parser.add_argument('--train', default=5000,
                         help='Number of training sample to use')
     parser.add_argument('--valid', default=1000,
                         help='Number of validation sample to use')
@@ -92,8 +92,20 @@ if __name__ == '__main__':
 
     Model = getattr(models, args.model)
     Classifier = getattr(classifiers, args.classifier)
-    X_train, Y_train = read_data(get_dataset('train'), sample_n=args.train)
-    X_valid, Y_valid = read_data(get_dataset('valid'), sample_n=args.valid)
+    df_train = get_dataset('train')
+    df_valid = get_dataset('valid')
+    n_train_total, n_valid_total = df_train.shape[0], df_valid.shape[0]
+    n_train_sample, n_valid_sample = args.train, args.valid
+    if n_train_sample > n_train_total:
+        logging.warning(f'Training sample size ({n_train_sample}) cannot be '
+                     f'larger than the training dataset (n={n_train_total}).')
+        n_train_sample = n_train_total
+    if n_valid_sample > n_valid_total:
+        logging.warning(f'Validation sample size ({n_valid_sample}) cannot be '
+                     f'larger than the validation dataset (n={n_valid_total}).')
+        n_valid_sample = n_valid_total
+    X_train, Y_train = read_data(df_train, sample_n=n_train_sample)
+    X_valid, Y_valid = read_data(df_valid, sample_n=n_valid_sample)
     model = Model(classifier=Classifier,
                   steps=[args.feature_model],
                   memory='data/feature_cache')

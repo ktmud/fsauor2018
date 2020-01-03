@@ -109,7 +109,7 @@ def tokenize_csv(filename, flavor='tokenized'):
 
     df.to_csv(output, index=False,
               quoting=csv.QUOTE_NONNUMERIC, encoding='utf-8')
-    logger.info('Saved to {output}.')
+    logger.info(f'Saved to {output}.')
     return df
 
 

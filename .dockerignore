@@ -1,0 +1,7 @@
+.git/
+data/
+literature/
+notebooks
+tex/
+misc/
+*.pyc

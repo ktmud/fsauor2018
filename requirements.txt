@@ -1,4 +1,4 @@
-scikit-learn==0.20.1
+scikit-learn==0.22.1
 pandas==0.23.4
 jieba==0.39
 Flask==1.0.2
