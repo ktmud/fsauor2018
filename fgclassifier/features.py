@@ -146,6 +146,7 @@ fm_spec = {
     # For English
     'count_en': Count(ngram_range=(1, 6), min_df=3, stop_words='english',
                       max_features=4000),
+    'count_en_dense': ['count_en', SparseToDense()],
     'tfidf_en': ['count_en', Tfidf()],
     'tfidf_en_dense': ['tfidf_en', SparseToDense()],
     'lsa_500_en': ['tfidf_en', SVD(n_components=500)],
@@ -153,6 +154,7 @@ fm_spec = {
 
     'count_en_sv': Count(ngram_range=(1, 6), min_df=3, stop_words='english',
                          max_features=2000),
+    'count_en_sv_dense': ['count_en_sv', SparseToDense()],
     'tfidf_en_sv': ['count_en_sv', Tfidf()],
     'tfidf_en_sv_dense': ['tfidf_en_sv', SparseToDense()],
     'lsa_500_en_sv': ['tfidf_en_sv', SVD(n_components=500)],

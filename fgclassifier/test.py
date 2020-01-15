@@ -6,7 +6,7 @@ Load the model and run on test data
 import os
 import argparse
 
-from sklearn.externals import joblib
+import joblib
 from fgclassifier import classifiers
 from fgclassifier.features import FeaturePipeline
 from fgclassifier.utils import read_data, read_csv

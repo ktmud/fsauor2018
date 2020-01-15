@@ -9,6 +9,12 @@
     },
     "tasks": [
         {
+            "label": "Build Docker container",
+            "type": "shell",
+            "group": "test",
+            "command": "docker build . -t ktmud/fsauor2018"
+        },
+        {
             "label": "Train - SVC",
             "type": "shell",
             "group": "test",
@@ -17,12 +23,6 @@
                 "-m", "fgclassifier.train",
                 "-c", "SVC"
             ],
-        },
-        {
-            "label": "Build Docker container",
-            "type": "shell",
-            "group": "test",
-            "command": "docker build . -t ktmud/fsauor2018"
         },
         {
             "label": "Train - LinearSVC",
@@ -41,7 +41,7 @@
             "command": "${config:python.pythonPath}",
             "args":[
                 "-m", "fgclassifier.train",
-                "-c", "SGD_LinearSVC"
+                "-c", "SGD_SVC"
             ],
         },
         {
@@ -106,6 +106,15 @@
                 "-m", "fgclassifier.train",
                 "-m", "Dummy",
                 "-c", "DummyStratified"
+            ],
+        },
+        {
+            "label": "Train All",
+            "type": "shell",
+            "group": "test",
+            "command": "${config:python.pythonPath}",
+            "args":[
+                "-m", "fgclassifier.train_all",
             ],
         },
     ]

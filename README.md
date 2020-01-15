@@ -46,7 +46,7 @@ For a detailed description of how we designed and implemented the visualization,
 To run the visualization locally:
 
 ```
-python app.py --port 500
+python app.py --port 5000
 ```
 
 Change `--port` as your like.
@@ -71,17 +71,16 @@ git remote add dokku dokku@your-host/review-sentiments
 git push dokku  # first push automatically creates the app
 
 dokku config:set review-sentiments FLASK_SECRECT_KEY=`openssl rand -base64 16`
-dokku config:set review-sentiments DATA_ROOT=/opt/storage
 
 # For storing pre-trained models
-dokku storage:mount review-sentiments /var/lib/dokku/data/storage/review-sentiments:/opt/storage
+dokku storage:mount review-sentiments /var/lib/dokku/data/storage/review-sentiments:/app/data
 ```
 
 Then upload the dataset and the pre-trained models to your host:
 
 ```bash
-ssh your-host "mkdir -p /var/lib/dokku/data/storage/review-sentiments"
-scp -r data/* your-host:/var/lib/dokku/data/storage/review-sentiments
+ssh dokku@your-host "mkdir -p /var/lib/dokku/data/storage/review-sentiments"
+scp -r data/* root@your-host:/var/lib/dokku/data/storage/review-sentiments
 ```
 
 You can also download pre-trained models [here](http://review-sentiments.yjc.me/files/models/).
@@ -101,9 +100,6 @@ Note that `docker-compose` will add storage mapping between
 your host machine and the Docker container, and set required
 variables.
 
-You need to set DATA_ROOT to `/opt/storage/` and
-create a `/opt/storage/` folder on your
-host machine and make user it is accessible by Docker.
 
 ### Without Docker
 
@@ -114,7 +110,6 @@ defined).
 
 ```bash
 pip install -r requirement.txt
-export DATA_ROOT="./data"
 python fgclassifier/prepare.py
 python app.py
 ```

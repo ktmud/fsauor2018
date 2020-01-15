@@ -6,7 +6,7 @@ Actions users can take
 import numpy as np
 import pandas as pd
 
-from flask import request, render_template
+from flask import render_template
 from collections import Counter
 
 from fgclassifier.visualizer.options import dataset_choices, fm_choices
@@ -15,27 +15,40 @@ from fgclassifier.visualizer.highlight import highlight_subsetence
 from fgclassifier.utils import get_dataset, load_model, read_data, tokenize
 
 
-def parse_inputs(dataset='train_en', keyword=None,
-                 fm='lsa_1k_en', clf='lda', seed='49', **kwargs):
-    """Predict sentiments for one single review"""
+def parse_model_choice(fm, clf, dataset=None):
+    """Ensure model choices are argument"""
     # make sure values are valid
-    if dataset not in dataset_choices:
-        dataset = 'train_en'
     if fm not in fm_choices:
         fm = 'lsa_1k_en'
     if clf not in clf_choices:
         clf = 'LDA'
-    
+
     lang = 'en' if '_en' in fm else 'zh'
-    # Silently fallback Naive Bayes to tfidf features
-    # and count to tfidf for non-supported classifiers
-    if (clf == 'ComplementNB' and 'lsa' in fm) or (
-        clf in ('LDA', 'Ridge') and 'count' in fm
-    ):
-        fm = 'tfidf_sv' if '_sv' in fm else 'tfidf'
-        if lang == 'en':
-            fm += '_en'
-        print(fm)
+
+    if dataset is None:
+        dataset = 'train_en' if lang == 'en' else 'train'
+    if dataset not in dataset_choices:
+        dataset = 'train_en'
+
+    # Always use TFIDF features for Naive Bayes and LDA/Ridge.
+    # Some combination  of feature and models do not work with each other.
+    # if (clf == 'ComplementNB' and 'lsa' in fm) or (
+    #     clf in ('LDA', 'Ridge') and 'count' in fm
+    # ):
+    #     orig_fm = fm
+    #     fm = 'tfidf'
+    #     if lang == 'en':
+    #         fm += '_en'
+    #     if '_sv' in orig_fm:
+    #         fm += '_sv'
+
+    # force LDA to use dense features
+    if clf in ('LDA'):
+        if 'dense' not in fm:
+            fm += '_dense'
+    else:
+        # don't use dense for any other classifiers
+        fm.replace('_dense', '')
 
     # handle language
     #   - if dataset is not English
@@ -43,15 +56,24 @@ def parse_inputs(dataset='train_en', keyword=None,
     if '_en' not in dataset:
         dataset = dataset.replace('_en', '')
         fm = fm.replace('_en', '')
-        print(fm)
+
+    return lang, fm, clf, dataset
+
+
+def parse_inputs(dataset='train_en', keyword=None,
+                 fm='lsa_1k_en', clf='lda', seed='49', **kwargs):
+    """Predict sentiments for one single review"""
+    lang, fm, clf, dataset = parse_model_choice(fm, clf, dataset)
 
     if keyword is None or isinstance(keyword, str):
         keyword = [keyword]
     # DataFrames for all keywords
     keywords = keyword
 
-    dfs = [get_dataset(dataset, keyword=x) for x in keywords]  # filtered reviews
-    totals = [df.shape[0] for df in dfs]  # total number of reviews
+    # filtered reviews by keyword
+    dfs = [get_dataset(dataset, keyword=x) for x in keywords]
+    # total number of filtered reviews
+    totals = [df.shape[0] for df in dfs]
     seed = int(seed) if seed.isdigit() else 42
     return dict(locals())
 

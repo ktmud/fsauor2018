@@ -3,7 +3,7 @@ services:
   visualizer:
     image: ktmud/fgclassifier
     volumes:
-        - /opt/storage:/opt/storage
+        - ./data:/app/data
     env_file:
         - .env
     ports:

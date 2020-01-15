@@ -18,7 +18,7 @@ from functools import lru_cache, _make_key
 import config
 from datetime import datetime
 from collections import Counter
-from sklearn.externals import joblib
+import joblib
 from tqdm import tqdm
 
 logging.getLogger('jieba').setLevel(logging.INFO)
@@ -250,6 +250,7 @@ def load_model(feature_model, classifier, model='Baseline',
         model_path = os.path.join(model_save_path, filename)
     # if tfidf features, try dense version as well
 
+    # fallback to the dense version for tfidf
     if 'tfidf' in feature_model and not os.path.exists(model_path):
         filename = filename.replace(feature_model, feature_model + '_dense')
         model_path = os.path.join(model_save_path, filename)

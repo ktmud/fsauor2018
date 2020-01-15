@@ -5,8 +5,8 @@ generate outputs.
 import config
 import logging
 import argparse
+import joblib
 
-from sklearn.externals import joblib
 from data_process import seg_words, load_data_from_csv
 
 logging.basicConfig(level=logging.INFO,

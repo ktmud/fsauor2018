@@ -53,7 +53,8 @@ class Baseline(Pipeline):
                  cache=None, **kwargs):
         if fm is not None:
             if steps is not None:
-                raise ValueError('Cannot specify `fm` and `steps` at the same time.')
+                raise ValueError('Cannot specify `fm` and `steps` at the '
+                                 'same time.')
             steps = [fm]
         else:
             steps = steps or []
