@@ -106,6 +106,7 @@ fm_spec = {
     'hashing': HashingVectorizer(tokenizer=tokenize_zh),
     'count': Count(ngram_range=(1, 5), min_df=5, max_df=0.9,
                    max_features=4000, tokenizer=tokenize_zh),
+    'count_dense': ['count', SparseToDense()],
     'tfidf': ['count', Tfidf()],
     'tfidf_dense': ['tfidf', SparseToDense()],
     'lsa_200': ['tfidf', SVD(n_components=200)],

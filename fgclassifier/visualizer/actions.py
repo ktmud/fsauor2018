@@ -17,25 +17,22 @@ from fgclassifier.utils import get_dataset, load_model, read_data, tokenize
 
 def parse_model_choice(fm, clf, dataset=None):
     """Ensure model choices are argument"""
-    # make sure values are valid
-    if fm not in fm_choices:
-        fm = 'lsa_1k_en'
-    if clf not in clf_choices:
-        clf = 'LDA'
-
-    lang = 'en' if '_en' in fm else 'zh'
-
     if dataset is None:
+        lang = 'en' if '_en' in fm else 'zh'
         dataset = 'train_en' if lang == 'en' else 'train'
+    else:
+        lang = 'en' if '_en' in dataset else 'zh'
+
     if dataset not in dataset_choices:
         dataset = 'train_en'
+        lang = 'en'
 
     # LSA may have negative values, which is not accepted by ComplementNB
     # we'll just fallback to TFIDF.
     if (clf == 'ComplementNB' and ('lsa' in fm or 'word2vec' in fm)):
         orig_fm = fm
         fm = 'tfidf'
-        if '_en' in orig_fm:
+        if lang == 'en':
             fm += '_en'
         if '_sv' in orig_fm:
             fm += '_sv'
@@ -48,10 +45,8 @@ def parse_model_choice(fm, clf, dataset=None):
         # don't use dense for any other classifiers
         fm.replace('_dense', '')
 
-    # handle language
-    #   - if dataset is not English
-    #   - remove _en from model names
-    if '_en' not in dataset:
+    # if dataset is not English, remove _en from model names
+    if lang != 'en':
         dataset = dataset.replace('_en', '')
         fm = fm.replace('_en', '')
 
@@ -61,6 +56,12 @@ def parse_model_choice(fm, clf, dataset=None):
 def parse_inputs(dataset='train_en', keyword=None,
                  fm='lsa_1k_en', clf='lda', seed='49', **kwargs):
     """Predict sentiments for one single review"""
+    # make sure values are valid
+    if fm not in fm_choices:
+        fm = 'lsa_1k_en'
+    if clf not in clf_choices:
+        clf = 'LDA'
+
     lang, fm, clf, dataset = parse_model_choice(fm, clf, dataset)
 
     if keyword is None or isinstance(keyword, str):
@@ -104,6 +105,11 @@ def predict_one(dataset, dfs, totals, seed, fm, clf, **kwargs):
         # split to feature and labels
         X, y = read_data(random_review)
         model = load_model(fm, clf)
+        if not model:
+            return {
+                'error': 404,
+                'message': 'No trained model found'
+            }
         review = random_review.to_dict('records')[0]
         review = {
             'id': review['id'],

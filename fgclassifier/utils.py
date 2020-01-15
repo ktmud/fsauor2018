@@ -254,6 +254,8 @@ def load_model(feature_model, classifier, model='Baseline',
     if 'tfidf' in feature_model and not os.path.exists(model_path):
         filename = filename.replace(feature_model, feature_model + '_dense')
         model_path = os.path.join(model_save_path, filename)
+    if not os.path.exists(model_path):
+        return None
 
     logger.info('Loading model %s', filename)
     model = joblib.load(model_path)

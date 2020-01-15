@@ -12,8 +12,7 @@
             "env": {
                 "FLASK_APP": "app",
                 "FLASK_ENV": "development",
-                "FLASK_DEBUG": "1",
-                "DATA_ROOT": "/opt/storage"
+                "FLASK_DEBUG": "1"
             },
             "args": [
                 "run",

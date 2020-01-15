@@ -7,6 +7,7 @@ import logging
 
 from pathlib import Path
 from config import model_save_path
+from fgclassifier.features import fm_spec
 from fgclassifier.train import train_and_save
 from fgclassifier.visualizer.options import fm_choices, clf_choices
 from fgclassifier.visualizer.actions import parse_model_choice
@@ -16,11 +17,17 @@ logger = logging.getLogger(__name__)
 
 def train_all(skip_trained=False):
     trained = set()
-    for fm, clf in itertools.product(fm_choices, clf_choices):
+    fms = [x for x in fm_choices]
+    # add both english and chinese version
+    fms += [x.replace('_en', '') for x in fms]
+    for fm, clf in itertools.product(fms, clf_choices):
         lang, fm, clf, _ = parse_model_choice(fm, clf)
         sfx = '_en' if lang == 'en' else ''
         fname = f'{fm}_{clf}.pkl'
         trained.add(fname)
+        if fm not in fm_spec:
+            logger.info(f'Skip unkown feature model {fm}')
+            continue
         if skip_trained or fname in trained:
             fpath = Path(model_save_path) / fname
             if fpath.exists():
