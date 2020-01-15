@@ -17,9 +17,7 @@ logger = logging.getLogger(__name__)
 def train_all(skip_trained=False):
     trained = set()
     for fm, clf in itertools.product(fm_choices, clf_choices):
-        print(fm, clf)
         lang, fm, clf, _ = parse_model_choice(fm, clf)
-        print(fm, clf)
         sfx = '_en' if lang == 'en' else ''
         fname = f'{fm}_{clf}.pkl'
         trained.add(fname)

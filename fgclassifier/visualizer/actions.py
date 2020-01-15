@@ -32,7 +32,7 @@ def parse_model_choice(fm, clf, dataset=None):
 
     # LSA may have negative values, which is not accepted by ComplementNB
     # we'll just fallback to TFIDF.
-    if (clf == 'ComplementNB' and 'lsa' in fm):
+    if (clf == 'ComplementNB' and ('lsa' in fm or 'word2vec' in fm)):
         orig_fm = fm
         fm = 'tfidf'
         if '_en' in orig_fm:
