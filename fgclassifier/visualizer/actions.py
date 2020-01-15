@@ -30,21 +30,19 @@ def parse_model_choice(fm, clf, dataset=None):
     if dataset not in dataset_choices:
         dataset = 'train_en'
 
-    # Always use TFIDF features for Naive Bayes and LDA/Ridge.
-    # Some combination  of feature and models do not work with each other.
-    # if (clf == 'ComplementNB' and 'lsa' in fm) or (
-    #     clf in ('LDA', 'Ridge') and 'count' in fm
-    # ):
-    #     orig_fm = fm
-    #     fm = 'tfidf'
-    #     if lang == 'en':
-    #         fm += '_en'
-    #     if '_sv' in orig_fm:
-    #         fm += '_sv'
+    # LSA may have negative values, which is not accepted by ComplementNB
+    # we'll just fallback to TFIDF.
+    if (clf == 'ComplementNB' and 'lsa' in fm):
+        orig_fm = fm
+        fm = 'tfidf'
+        if '_en' in orig_fm:
+            fm += '_en'
+        if '_sv' in orig_fm:
+            fm += '_sv'
 
     # force LDA to use dense features
     if clf in ('LDA'):
-        if 'dense' not in fm:
+        if ('tfidf' in fm or 'count' in fm) and 'dense' not in fm:
             fm += '_dense'
     else:
         # don't use dense for any other classifiers

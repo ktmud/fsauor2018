@@ -79,8 +79,8 @@ dokku storage:mount review-sentiments /var/lib/dokku/data/storage/review-sentime
 Then upload the dataset and the pre-trained models to your host:
 
 ```bash
-ssh dokku@your-host "mkdir -p /var/lib/dokku/data/storage/review-sentiments"
-scp -r data/* root@your-host:/var/lib/dokku/data/storage/review-sentiments
+ssh your-host "mkdir -p /var/lib/dokku/data/storage/review-sentiments"
+rsync -azP --delete your-host:/var/lib/dokku/data/storage/review-sentiments data/models --exclude=feature_cache
 ```
 
 You can also download pre-trained models [here](http://review-sentiments.yjc.me/files/models/).
