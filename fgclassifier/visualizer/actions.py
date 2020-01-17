@@ -160,7 +160,7 @@ def predict_text(text, fm, clf, dataset, **_):
     # if Chinese, we need to tokenize (word segmentation)
     if '_en' not in dataset:
         text = tokenize(text)
-    
+
     X = pd.Series([text], name='content')
     model = load_model(fm, clf)
     predict_labels = model.predict(X)

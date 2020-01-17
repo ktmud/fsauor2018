@@ -14,7 +14,7 @@ from sklearn.feature_extraction.text import HashingVectorizer
 from sklearn.decomposition import TruncatedSVD
 from sklearn.preprocessing import MinMaxScaler
 
-from fgclassifier.embedding import Text2Tokens, W2VTransformer
+# from fgclassifier.embedding import Text2Tokens, W2VTransformer
 from fgclassifier.embedding import tokenize_zh, tokenize_en
 
 
@@ -135,14 +135,14 @@ fm_spec = {
     'lsa_200_tiny': ['tfidf_tiny', SVD(n_components=200)],
     'lsa_500_tiny': ['tfidf_tiny', SVD(n_components=500)],
 
-    'word2vec': [Text2Tokens(),
-                 W2VTransformer(size=300, min_count=5, max_vocab_size=50000,
-                                sample=0.5, window=10, iter=10)],
-    'word2vec_minmax': ['word2vec_minmax', MinMaxScaler()],
+    # 'word2vec': [Text2Tokens(),
+    #              W2VTransformer(size=300, min_count=5, max_vocab_size=50000,
+    #                             sample=0.5, window=10, iter=10)],
+    # 'word2vec_minmax': ['word2vec_minmax', MinMaxScaler()],
 
-    'word2vec_en': [Text2Tokens(tokenizer=tokenize_en),
-                    W2VTransformer(size=300, min_count=3, window=10, iter=10)],
-    'word2vec_en_minmax': ['word2vec_en', MinMaxScaler()],
+    # 'word2vec_en': [Text2Tokens(tokenizer=tokenize_en),
+    #                 W2VTransformer(size=300, min_count=3, window=10, iter=10)],
+    # 'word2vec_en_minmax': ['word2vec_en', MinMaxScaler()],
 
     # For English
     'count_en': Count(ngram_range=(1, 6), min_df=3, stop_words='english',

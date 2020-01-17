@@ -24,7 +24,7 @@ fm_choices = OrderedDict([
     ('tfidf_en_sv', 'TF-IDF(2K)'),
     ('lsa_500_en_sv', 'TF-IDF(2K) -> SVD(500)'),
     ('lsa_1k_en_sv', 'TF-IDF(2K) -> SVD(1K)'),
-    ('word2vec_en', 'Word2Vec'),
+    # ('word2vec_en', 'Word2Vec'),
 ])
 
 # Classifier choices ---------

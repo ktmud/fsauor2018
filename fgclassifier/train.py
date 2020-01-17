@@ -72,7 +72,8 @@ def fm_cross_check(fmns, clss, fm_cache=None, X_train=None, X_test=None,
 
 
 def train_and_save(train_file: str, valid_file: str, train_sample: int,
-                   valid_sample: int, model: str, feature_model: str, classifier: str):
+                   valid_sample: int, model: str, feature_model: str,
+                   classifier: str):
     Model = getattr(models, model)
     train_file, valid_file = 'train', 'valid'
     df_train = get_dataset(train_file)

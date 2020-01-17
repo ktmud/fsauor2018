@@ -16,14 +16,14 @@ RUN pip install snownlp==0.12.3
 RUN pip install Flask-AutoIndex==0.6.2
 
 # Install gensim
-RUN pip install gensim==3.6.0
-RUN pip install msgpack==0.5.6
+RUN pip install gensim==3.8.1
+RUN pip install msgpack==0.6.2
 
 # Install SpaCY language models
 RUN pip install spacy==2.2.3
 RUN python -m spacy download en_core_web_sm
-RUN wget --quiet https://github.com/howl-anderson/Chinese_models_for_SpaCy/releases/download/v2.0.5/zh_core_web_sm-2.0.5.tar.gz && \
-    pip install zh_core_web_sm-2.0.5.tar.gz && rm zh_core_web_sm-2.0.5.tar.gz
+RUN wget --quiet https://github.com/howl-anderson/Chinese_models_for_SpaCy/releases/download/v2.0.5/zh_core_web_sm-2.0.5.tar.gz
+RUN pip install zh_core_web_sm-2.0.5.tar.gz && rm zh_core_web_sm-2.0.5.tar.gz
 
 RUN pip install xgboost==0.81
 RUN pip install joblib==0.14.1
