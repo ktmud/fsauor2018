@@ -84,6 +84,7 @@ files_index = AutoIndex(app, browse_root=os.getenv('DATA_ROOT', 'data'),
 def autoindex(path='.'):
     return files_index.render_autoindex(path)
 
+
 if __name__ == '__main__':
     port = os.environ.get('PORT', 5000)
     socketio.run(app, host='0.0.0.0', port=port)

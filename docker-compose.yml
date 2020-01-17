@@ -1,7 +1,7 @@
 version: '0.1'
 services:
   visualizer:
-    image: ktmud/fgclassifier
+    image: ktmud/fsauor2018
     volumes:
         - ./data:/app/data
     env_file:
