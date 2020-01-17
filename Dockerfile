@@ -34,7 +34,7 @@ RUN python /tmp/prepare.py && rm /tmp/prepare.py
 
 # Add source code
 ADD ./fgclassifier         /app/fgclassifier
-ADD config.py CHECKS .env  /app/
+ADD config.py .env  /app/
 
 # Start the app
 CMD python -m fgclassifier.visualizer.app
