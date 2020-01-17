@@ -192,7 +192,7 @@ def label2dist(y):
 
 
 @threadsafe_lru(10)
-@persistent('stats')
+@persistent('stats', ttl=60*60*24*90)  # expire in 3 month
 def get_stats(dataset, fm, clf):
     """Get performance stats of a model on the selected dataset"""
     X, y = read_data(get_dataset(dataset, include_raw=False))
