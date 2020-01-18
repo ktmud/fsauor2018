@@ -75,7 +75,6 @@ def train_and_save(train_file: str, valid_file: str, train_sample: int,
                    valid_sample: int, model: str, feature_model: str,
                    classifier: str):
     Model = getattr(models, model)
-    train_file, valid_file = 'train', 'valid'
     df_train = get_dataset(train_file)
     df_valid = get_dataset(valid_file)
     n_train_total, n_valid_total = df_train.shape[0], df_valid.shape[0]
@@ -93,7 +92,7 @@ def train_and_save(train_file: str, valid_file: str, train_sample: int,
     model = Model(classifier=classifier, steps=[feature_model],
                   memory='data/feature_cache')
 
-    with joblib.parallel_backend('threading', n_jobs=4):
+    with joblib.parallel_backend('threading', n_jobs=2):
         model.fit(X_train, Y_train)
         score = model.score(X_valid, Y_valid)
         logging.info('')
