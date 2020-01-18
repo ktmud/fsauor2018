@@ -105,11 +105,6 @@ def predict_one(dataset, dfs, totals, seed, fm, clf, **kwargs):
         # split to feature and labels
         X, y = read_data(random_review)
         model = load_model(fm, clf)
-        if not model:
-            return {
-                'error': 404,
-                'message': 'No trained model found'
-            }
         review = random_review.to_dict('records')[0]
         review = {
             'id': review['id'],
@@ -117,6 +112,12 @@ def predict_one(dataset, dfs, totals, seed, fm, clf, **kwargs):
                 review['content_raw'], lang
             ).replace('\n', '<br>')
         }
+        if not model:
+            return {
+                'error': 404,
+                'message': 'No trained model found',
+                'review': review
+            }
         probas = predict_proba(clf, model, X)
         
         true_labels = y.replace({ np.nan: None }).values
