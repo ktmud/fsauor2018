@@ -3,7 +3,7 @@ joblib==0.14.1
 pandas==0.25.3
 jieba==0.39
 Flask==1.0.2
-Flask-Cors==3.0.3
+Flask-Cors==3.0.9
 Flask-SocketIO==3.0.2
 Flask-Assets==0.12
 Flask-AutoIndex==0.6.2
