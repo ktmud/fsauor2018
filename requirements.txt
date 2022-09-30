@@ -1,5 +1,5 @@
 scikit-learn==0.22.1
-joblib==0.14.1
+joblib==1.2.0
 pandas==0.25.3
 jieba==0.39
 Flask==1.0.2
